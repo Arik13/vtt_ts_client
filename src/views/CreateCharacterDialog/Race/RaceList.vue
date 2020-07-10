@@ -2,8 +2,8 @@
     <expanding-radio-form :expansionItems="races"></expanding-radio-form>
 </template>
 
-<script>
-import ExpandingRadioForm from "../../../components/ExpandingRadioForm"
+<script lang="ts">
+import ExpandingRadioForm from "../../../components/ExpandingRadioForm.vue"
 
 // Races
 import AasimarData from "./RaceData/Aasimar"

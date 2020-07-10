@@ -37,7 +37,7 @@
 
         /* Strict Type-Checking Options */
         "strict": true,                           /* Enable all strict type-checking options. */
-        // "noImplicitAny": true,                 /* Raise error on expressions and declarations with an implied 'any' type. */
+        // "noImplicitAny": false,                 /* Raise error on expressions and declarations with an implied 'any' type. */
         "strictNullChecks": false,              /* Enable strict null checks. */
         // "strictFunctionTypes": true,           /* Enable strict checking of function types. */
         // "strictBindCallApply": true,           /* Enable strict 'bind', 'call', and 'apply' methods on functions. */
@@ -70,7 +70,7 @@
         // "inlineSources": true,                 /* Emit the source alongside the sourcemaps within a single file; requires '--inlineSourceMap' or '--sourceMap' to be set. */
 
         /* Experimental Options */
-        // "experimentalDecorators": true,        /* Enables experimental support for ES7 decorators. */
+        "experimentalDecorators": true,        /* Enables experimental support for ES7 decorators. */
         // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
 
         /* Advanced Options */
@@ -102,7 +102,7 @@
         "src/**/*.tsx",
         "src/**/*.vue",
         "tests/**/*.ts",
-        "tests/**/*.tsx"
+        "tests/**/*.tsx", "src/babylon/Camera.ts", "src/babylon/Camera.ts", "src/babylon/engineAPI.ts",
     ],
     "exclude": [
         "node_modules"

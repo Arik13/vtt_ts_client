@@ -3,12 +3,12 @@
     <!-- <div>Ability Score Form</div> -->
 </template>
 
-<script>
-// import Vue from "vue";
-import ExpandingRadioForm from "../../../components/ExpandingRadioForm"
+<script lang="ts">
+import Vue from "vue";
+import ExpandingRadioForm from "../../../components/ExpandingRadioForm.vue"
 // import RadioFormElement from "../../../components/RadioFormElement"
 
-export default {
+export default Vue.extend({
     components: {
         'expanding-radio-form': ExpandingRadioForm
     },
@@ -17,5 +17,5 @@ export default {
             comps: [],
         }
     },
-}
+});
 </script>

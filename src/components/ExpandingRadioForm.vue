@@ -33,9 +33,10 @@
     </v-radio-group>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from "vue"
 
-export default {
+export default Vue.extend({
     props: [
         "expansionItems",
     ],
@@ -44,5 +45,5 @@ export default {
             radioSelection: 0,
         }
     },
-}
+});
 </script>

@@ -49,11 +49,12 @@
 
 </template>
 
-<script>
-import AssetTree from "../components/AssetTree";
-import VerticalTabs from "../components/VerticalTabs";
+<script lang="ts">
+import Vue from "vue";
+import AssetTree from "../components/AssetTree.vue";
+import VerticalTabs from "../components/VerticalTabs.vue";
 
-export default {
+export default Vue.extend({
     data: () => ({
         caseSensitive: false,
         tabs: ["Graphics", "Lights", "Characters"],
@@ -80,8 +81,7 @@ export default {
                 route: `campaigns/${this.$store.state.campaignObject._id}/images`,
                 headers: { "Content-Type": "multipart/form-data" },
                 data: formData,
-                callback: (result) => {
-                    result;
+                callback: () => {
                     this.files = null;
                 }
             };
@@ -90,10 +90,10 @@ export default {
     },
     computed: {
         filter () {
-            return this.caseSensitive? (item, search, textKey) => item[textKey].indexOf(search) > -1 : undefined
+            return this.caseSensitive? (item: Array<string>, search: string, textKey: number) => item[textKey].indexOf(search) > -1 : undefined
         },
     },
-}
+});
 /*
 items: [
             {

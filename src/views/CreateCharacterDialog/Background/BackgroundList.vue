@@ -3,13 +3,12 @@
     <!-- <div>Background Form</div> -->
 </template>
 
-<script>
-// import Vue from "vue";
-import ExpandingRadioForm from "../../../components/ExpandingRadioForm"
+<script lang="ts">
+import Vue from "vue";
+import ExpandingRadioForm from "../../../components/ExpandingRadioForm.vue"
 import AcolyteData from "./BackgroundData/AcolyteData"
-// import RadioFormElement from "../../../components/RadioFormElement"
 
-export default {
+export default Vue.extend({
     components: {
         'expanding-radio-form': ExpandingRadioForm
     },
@@ -20,5 +19,5 @@ export default {
             ],
         }
     },
-}
+});
 </script>

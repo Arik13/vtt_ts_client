@@ -70,9 +70,10 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from "vue";
 
-export default {
+export default Vue.extend({
     props: [
         "propData"
     ],
@@ -86,5 +87,5 @@ export default {
             this.selections.push([]);
         }
     }
-}
+});
 </script>

@@ -14,8 +14,15 @@
     </v-card>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from "vue"
+
+interface CampaignData {
+    name: string;
+    ID: string;
+}
+
+export default Vue.extend({
     data: () => ({
         campaigns: null,
     }),
@@ -25,7 +32,7 @@ export default {
             const payload = {
                 method: "GET",
                 route: `users/${this.$store.state.userID}/campaigns`,
-                callback: (result) => {
+                callback: (result: CampaignData[]) => {
                     this.campaigns = result;
                 }
             };
@@ -34,9 +41,9 @@ export default {
         }
     },
     methods: {
-        editInCampaignEditor(ID) {
+        editInCampaignEditor(ID: string) {
             this.$router.push({ path: `campaigneditor/${ID}` })
         }
     }
-}
+});
 </script>

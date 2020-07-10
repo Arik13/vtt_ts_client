@@ -1,9 +1,9 @@
 import RadioFormElement from "../../../../components/RadioFormElement"
-import GenericRaceForm from "../GenericRaceForm";
-import Subrace from "../Subrace"
+import GenericRaceForm from "../GenericRaceForm.vue";
+import Subrace from "../Subrace.vue"
 
 export default new RadioFormElement(
-        "Gnome",
+        "Human",
         // "Has the blood of angels, a holy fuck",
         // AasimarForm,
         GenericRaceForm,

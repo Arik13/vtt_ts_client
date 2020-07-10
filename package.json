@@ -1,5 +1,5 @@
 {
-  "name": "typescript_test",
+  "name": "vtt_ts_client",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -15,7 +15,9 @@
     "socket.io": "^2.3.0",
     "splitpanes": "^2.2.1",
     "vue": "^2.6.11",
+    "vue-class-component": "^7.2.3",
     "vue-multipane": "^0.9.5",
+    "vue-property-decorator": "^9.0.0",
     "vue-resize-split-pane": "^0.1.5",
     "vue-router": "^3.2.0",
     "vue-split-panel": "^1.0.4",

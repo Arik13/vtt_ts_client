@@ -1,11 +1,11 @@
 import RadioFormElement from "../../../../components/RadioFormElement";
-import BackgroundForm from "../BackgroundForm";
+import BackgroundForm from "../BackgroundForm.vue";
+import CappedMultipleSelectBox from "../../../../components/CappedMultipleSelectBox.vue";
+import {TOOL_STRINGS} from "../../../../dnd/Tools";
 // import BackgroundData from "./BackgroundData";
 // import {SKILL} from "../../../../dnd/enums";
 // import SimpleRadioList from "../SimpleRadioList";
 // import SelectGroup from "../SelectGroup";
-import CappedMultipleSelectBox from "../../../../components/CappedMultipleSelectBox";
-import {TOOL_STRINGS} from "../../../../dnd/Toolsjs";
 
 // Skill proficiencies
 // Tool Proficiencies

@@ -3,19 +3,20 @@
     <!-- <div>Equipment Form</div> -->
 </template>
 
-<script>
-// import Vue from "vue";
-import ExpandingRadioForm from "../../../components/ExpandingRadioForm"
-// import RadioFormElement from "../../../components/RadioFormElement"
+<script lang="ts">
+import Vue from "vue";
+import ExpandingRadioForm from "../../../components/ExpandingRadioForm.vue"
 
-export default {
+export default Vue.extend({
     components: {
         'expanding-radio-form': ExpandingRadioForm
     },
     data() {
         return {
-            comps: [],
+            comps: [
+
+            ],
         }
     },
-}
+});
 </script>

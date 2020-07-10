@@ -22,8 +22,11 @@
         </v-card-text>
     </v-card>
 </template>
-<script>
-export default {
+
+<script lang="ts">
+import Vue from "vue"
+
+export default Vue.extend({
     data() {
         return {
             valid: true,
@@ -47,16 +50,19 @@ export default {
             this.$store.dispatch('accessResource', payload);
         },
         validate() {
-            if (this.$refs.form.validate()) {
+            const form = this.$refs.form as HTMLFormElement;
+            if (form.validate()) {
                 this.submitForm();
             }
         },
         reset() {
-            this.$refs.form.reset()
+            const form = this.$refs.form as HTMLFormElement;
+            form.reset();
         },
         resetValidation() {
-            this.$refs.form.resetValidation()
+            const form = this.$refs.form as HTMLFormElement;
+            form.resetValidation();
         },
     },
-}
+});
 </script>

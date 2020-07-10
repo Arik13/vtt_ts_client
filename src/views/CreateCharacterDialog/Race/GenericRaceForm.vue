@@ -15,28 +15,23 @@
     </div>
 </template>
 
-<script>
-import ExpandingRadioForm from "../../../components/ExpandingRadioForm";
+<script lang="ts">
+import Vue from "vue";
+import { Component, Prop } from "vue-property-decorator";
+import ExpandingRadioForm from "../../../components/ExpandingRadioForm.vue";
 
-export default {
-    props: [
-        "propData",
-    ],
+interface PropData {
+    subRaces: string;
+    features: string;
+}
+
+@Component({
     components: {
         ExpandingRadioForm,
-    },
-    computed: {
-        subRaces() {
-            return this.propData.subRaces;
-        },
-        features() {
-            return this.propData.features;
-        }
-    },
-    data() {
-        return {
-            radioSelection: 0,
-        }
-    },
+    }
+})
+export default class GenericRaceForm extends Vue {
+    @Prop({type: Object as () => PropData})
+    public propData: PropData // notice the bang saying to compiler not to warn about no initial value
 }
 </script>

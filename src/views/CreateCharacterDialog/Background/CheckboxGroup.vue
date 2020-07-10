@@ -13,8 +13,10 @@
     </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from "vue"
+
+export default Vue.extend({
     props: [
         "propData",
         // "numberSelectable",
@@ -26,11 +28,11 @@ export default {
         }
     },
     methods: {
-        shouldDisable(i) {
+        shouldDisable(i: number) {
             const selectionsUsed = this.propData.numberSelectable == this.selected.length;
             const isSelected = this.selected.includes(i);
             return (!isSelected && selectionsUsed);
         }
     },
-}
+});
 </script>

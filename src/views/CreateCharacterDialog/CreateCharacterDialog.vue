@@ -129,18 +129,18 @@
     </div>
 </template>
 
-<script>
-// import Vue from "vue";
-import AbilityScoreForm from "./AbilityScore/AbilityScoreForm";
-import AlignmentForm from "./Alignment/AlignmentForm";
-import BackgroundList from "./Background/BackgroundList";
-import ClassList from "./Class/ClassList";
-import EquipmentForm from "./Equipment/EquipmentForm";
-import RaceList from "./Race/RaceList";
-import CardWrapper from "../../components/CardWrapper";
+<script lang="ts">
+import Vue from "vue";
+import AbilityScoreForm from "./AbilityScore/AbilityScoreForm.vue";
+import AlignmentForm from "./Alignment/AlignmentForm.vue";
+import BackgroundList from "./Background/BackgroundList.vue";
+import ClassList from "./Class/ClassList.vue";
+import EquipmentForm from "./Equipment/EquipmentForm.vue";
+import RaceList from "./Race/RaceList.vue";
+import CardWrapper from "../../components/CardWrapper.vue";
 import CreateCharacterStore from "./CreateCharacterStore";
 
-export default {
+export default Vue.extend({
     components: {
         AbilityScoreForm,
         AlignmentForm,
@@ -201,5 +201,5 @@ export default {
         // console.log("Destroyed");
         this.$store.unregisterModule("createCharacterStore");
     }
-}
+});
 </script>

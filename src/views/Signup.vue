@@ -39,16 +39,18 @@
     </v-container>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from "vue";
+
+export default Vue.extend({
     data() {
         return {
             valid: true,
             email: "test@test.com",
             emailRules: [
-                v => !!v || 'E-mail is required',
-                v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
-                v => (v.length >= 6) || 'E-mail must be 6 or more characters',
+                (v: string) => !!v || 'E-mail is required',
+                (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+                (v: string) => (v.length >= 6) || 'E-mail must be 6 or more characters',
             ],
             password: "testing",
             passwordRules: [],
@@ -58,15 +60,18 @@ export default {
     },
     methods: {
         validate() {
-            if (this.$refs.form.validate()) {
-                this.submitForm();
+            const form = this.$refs.form as HTMLFormElement;
+            if (form.validate()) {
+                this.signup();
             }
         },
         reset() {
-            this.$refs.form.reset()
+            const form = this.$refs.form as HTMLFormElement;
+            form.reset()
         },
         resetValidation() {
-            this.$refs.form.resetValidation()
+            const form = this.$refs.form as HTMLFormElement;
+            form.resetValidation()
         },
         signup() {
             this.$store.dispatch("accessResource", {
@@ -87,5 +92,5 @@ export default {
                 });
         },
     },
-}
+});
 </script>

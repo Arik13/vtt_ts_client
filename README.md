@@ -1,4 +1,4 @@
-# typescript_test
+# vtt_ts_client
 
 ## Project setup
 ```

@@ -1,19 +1,18 @@
 import RadioFormElement from "../../../../components/RadioFormElement";
-import ExpandingRadioForm from "../../../../components/ExpandingRadioForm";
-import ClassForm from "../ClassForm";
-import CappedMultipleSelectBox from "../../../../components/CappedMultipleSelectBox";
-// import {SKILL_LIST} from "../../../../dnd/Skills";
+import ExpandingRadioForm from "../../../../components/ExpandingRadioForm.vue";
+import ClassForm from "../ClassForm.vue";
+import CappedMultipleSelectBox from "../../../../components/CappedMultipleSelectBox.vue";
 import {WEAPON_LIST, WEAPON_STRINGS, getSimpleWeaponsStrings} from "../../../../dnd/Weapons";
 import {ATTRIBUTE_DATA} from "../../../../dnd/Attribute";
 import {ITEM_STRINGS} from "../../../../dnd/Items";
 import {getCantripStringsArray} from "../../../../dnd/Spells/Sorcerer/Cantrips";
 import {getSpells1StringsArray} from "../../../../dnd/Spells/Sorcerer/Spells1";
-// import ExpandingRadioForm from "../../../../components/ExpandingRadioForm";
 
 const sorcerousOriginData = [
     new RadioFormElement(
         "Draconic Bloodline",
-
+        null,
+        null,
     ),
 ]
 

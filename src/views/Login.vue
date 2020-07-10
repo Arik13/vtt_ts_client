@@ -9,13 +9,13 @@
                     ref="form"
                     v-model="valid"
                     :lazy-validation="true"
-                    >
+                >
                     <v-text-field
                         :rules="emailRules"
                         v-model="email"
                         label="E-mail"
                         required
-                        />
+                    />
                     <v-text-field
                         :rules="passwordRules"
                         v-model="password"
@@ -23,7 +23,7 @@
                         type="password"
                         required
                         autocomplete="off"
-                        />
+                    />
                     <v-btn @click="submitForm">
                         Login
                     </v-btn>
@@ -33,19 +33,21 @@
     </v-container>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue'
+export default Vue.extend({
     data() {
         return {
             valid: true,
             email: "test@test.com",
             emailRules: [
-                v => !!v || 'E-mail is required',
-                v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
-                v => (v.length >= 6) || 'E-mail must be 6 or more characters',
+                (v: string) => !!v || 'E-mail is required',
+                (v: string) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+                (v: string) => (v.length >= 6) || 'E-mail must be 6 or more characters',
             ],
             password: "testing",
             passwordRules: [],
+            form: this.$refs.form as HTMLFormElement,
         }
     },
     methods: {
@@ -62,16 +64,16 @@ export default {
             this.$store.dispatch('login', payload);
         },
         validate() {
-            if (this.$refs.form.validate()) {
+            if (this.form.validate()) {
                 this.submitForm();
             }
         },
         reset() {
-            this.$refs.form.reset()
+            this.form.reset()
         },
         resetValidation() {
-            this.$refs.form.resetValidation()
+            this.form.resetValidation()
         },
     },
-}
+})
 </script>

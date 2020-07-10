@@ -2,11 +2,13 @@
     <expanding-radio-form :expansionItems="classes"></expanding-radio-form>
 </template>
 
-<script>
-import ExpandingRadioForm from "../../../components/ExpandingRadioForm"
-import SorcererData from "./ClassData/SorcererData"
+<script lang="ts">
+import Vue from 'vue';
 
-export default {
+import ExpandingRadioForm from "../../../components/ExpandingRadioForm.vue";
+import SorcererData from "./ClassData/SorcererData";
+
+export default Vue.extend({
     components: {
         'expanding-radio-form': ExpandingRadioForm
     },
@@ -17,5 +19,8 @@ export default {
             ],
         }
     },
-}
+    mounted() {
+        console.log(ExpandingRadioForm);
+    }
+});
 </script>

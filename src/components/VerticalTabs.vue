@@ -28,36 +28,39 @@
     </v-container>
 </template>
 
-<script>
-    export default {
-        data: () => ({
-            model: 'tab-1',
-            name: "vertical-tabs",
-        }),
-        props: {
-            color: String,
-            height: {
-                type: [Number, String],
-                default: 460,
-            },
-            tabNames: Array,
-            sliderColor: String,
-            value: null,
-            verticalText: Boolean,
+<script lang="ts">
+import Vue from "vue"
+
+export default Vue.extend({
+    data: () => ({
+        model: 'tab-1',
+        name: "vertical-tabs",
+    }),
+    props: {
+        color: String,
+        height: {
+            type: [Number, String],
+            default: 460,
         },
-        computed: {
-            containerStyle () {
-                return this.verticalText ? {
-                    height: isNaN(this.height) ? this.height : `${this.height}px`,
-                } : {
-                    height: (48 * this.items.length) + 'px',
-                }
-            },
-            tabsStyle () {
-                return this.verticalText ? {width: isNaN(this.height) ? this.height : `${this.height}px`,} : {}
-            },
+        tabNames: Array,
+        sliderColor: String,
+        value: null,
+        verticalText: Boolean,
+    },
+    computed: {
+        containerStyle() {
+            return {height: isNaN(Number(this.height)) ? this.height : `${this.height}px`};
+            // return this.verticalText ? {
+            //     height: isNaN(Number(this.height)) ? this.height : `${this.height}px`,
+            // } : {
+            //     height: (48 * this.items.length) + 'px',
+            // }
         },
-    }
+        tabsStyle () {
+            return this.verticalText ? {width: isNaN(Number(this.height)) ? this.height : `${this.height}px`,} : {}
+        },
+    },
+});
 </script>
 
 <style scoped>

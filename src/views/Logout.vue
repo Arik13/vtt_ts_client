@@ -2,8 +2,10 @@
     <div>Logout</div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from "vue";
+
+export default Vue.extend({
     mounted() {
         this.$store.dispatch("logout", {
             reroute: () => {
@@ -11,7 +13,7 @@ export default {
             }
         });
     }
-}
+});
 </script>
 
 <style>

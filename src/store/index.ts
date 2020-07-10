@@ -1,18 +1,24 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-// import { RootState } from './types';
 import ax from 'axios';
 const axios = ax.create({baseURL: "http://localhost:3000/api/"});
+// import { RootState } from './types';
 // import io from 'socket.io-client';
 // var socket = io('http://localhost:3001');
 
-Vue.use(Vuex)
+interface AuthData {
+    token: string;
+    userID: string;
+}
+
+Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        isDrawerOpen: true,
+        authData: null,
         authToken: null,
         userID: null,
+        isDrawerOpen: true,
         campaignObject: null,
     },
     getters: {
@@ -48,7 +54,7 @@ export default new Vuex.Store({
         login({dispatch, state}, payload) {
             payload.method = "PUT";
             payload.route = "/users";
-            payload.callback = (data) => {
+            payload.callback = (data: AuthData) => {
                 state.authToken = data.token;
                 state.userID = data.userID;
                 localStorage.setItem("authToken", data.token);
@@ -69,9 +75,5 @@ export default new Vuex.Store({
         toggleDrawerOpen({commit}) {
             commit("toggleDrawerOpen");
         },
-        // sendEvent({state}, event) {
-        //     state;
-        //     socket.emit("event", event);
-        // }
     }
 })
