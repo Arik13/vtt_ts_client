@@ -1,5 +1,5 @@
 //Key Input Manager To Use Keys to Move Forward and BackWard and Look to the Left or Right
-// var FreeCameraKeyboardWalkInput = function () {
+// let FreeCameraKeyboardWalkInput = function () {
 //     const W = 87;
 //     const S = 83;
 //     const A = 65;
@@ -17,7 +17,7 @@
 
 // //Add attachment controls
 // FreeCameraKeyboardWalkInput.prototype.attachControl = function (element, noPreventDefault) {
-//     var _this = this;
+//     let _this = this;
 
 //     // If a key was pressed
 //     if (!this._onKeyDown) {
@@ -31,7 +31,7 @@
 //                 _this.keysDown.indexOf(evt.keyCode) !== -1 ||
 //                 _this.keysLeft.indexOf(evt.keyCode) !== -1 ||
 //                 _this.keysRight.indexOf(evt.keyCode) !== -1) {
-//                 var index = _this._keys.indexOf(evt.keyCode);
+//                 let index = _this._keys.indexOf(evt.keyCode);
 //                 // Add the key to the queue
 //                 if (index === -1) {
 //                     _this._keys.push(evt.keyCode);
@@ -49,7 +49,7 @@
 //                 _this.keysDown.indexOf(evt.keyCode) !== -1 ||
 //                 _this.keysLeft.indexOf(evt.keyCode) !== -1 ||
 //                 _this.keysRight.indexOf(evt.keyCode) !== -1) {
-//                 var index = _this._keys.indexOf(evt.keyCode);
+//                 let index = _this._keys.indexOf(evt.keyCode);
 //                 // Clear the key from the queue
 //                 if (index >= 0) {
 //                     _this._keys.splice(index, 1);
@@ -84,15 +84,15 @@
 // // Keys movement control by checking inputs
 // FreeCameraKeyboardWalkInput.prototype.checkInputs = function () {
 //     if (this._onKeyDown) {
-//         var camera = this.camera;
-//         for (var i = 0; i < this._keys.length; i++) {
-//             var keyCode = this._keys[i];
-//             var xMod = Math.sin(camera["rotation"]["y"]);
-//             var zMod = Math.cos(camera["rotation"]["y"]);
-//             var speed = camera.speed;
-//             var forward = new Vector3(xMod * speed , 0, zMod * speed);
-//             var up = new Vector3(0, 1, 0);
-//             var left = forward.cross(up);
+//         let camera = this.camera;
+//         for (let i = 0; i < this._keys.length; i++) {
+//             let keyCode = this._keys[i];
+//             let xMod = Math.sin(camera["rotation"]["y"]);
+//             let zMod = Math.cos(camera["rotation"]["y"]);
+//             let speed = camera.speed;
+//             let forward = new Vector3(xMod * speed , 0, zMod * speed);
+//             let up = new Vector3(0, 1, 0);
+//             let left = forward.cross(up);
 //             if (this.keysLeft.indexOf(keyCode) !== -1) {
 //                 camera.direction.copyFromFloats(left["x"], left["y"], left["z"]);
 //             }
@@ -135,7 +135,7 @@
 
 
 //The Mouse Manager to use the mouse (touch) to search around including above and below
-    // var FreeCameraSearchInput = function (touchEnabled) {
+    // let FreeCameraSearchInput = function (touchEnabled) {
     //     if (touchEnabled === void 0) { touchEnabled = true; }
     //     this.touchEnabled = touchEnabled;
     //     this.buttons = [0, 1, 2];
@@ -146,12 +146,12 @@
 
     // //add attachment control which also contains the code to react to the input from the mouse
     // FreeCameraSearchInput.prototype.attachControl = function (element, noPreventDefault) {
-    //     var _this = this;
-    //     var engine = this.camera.getEngine();
-    //     var angle = {x:0, y:0};
+    //     let _this = this;
+    //     let engine = this.camera.getEngine();
+    //     let angle = {x:0, y:0};
     //     if (!this._pointerInput) {
     //         this._pointerInput = function (p, s) {
-    //             var evt = p.event;
+    //             let evt = p.event;
     //             if (!_this.touchEnabled && evt.pointerType === "touch") {
     //                 return;
     //             }
@@ -190,8 +190,8 @@
     //                 if (!_this.previousPosition || engine.isPointerLock) {
     //                     return;
     //                 }
-    //                 var offsetX = evt.clientX - _this.previousPosition.x;
-    //                 var offsetY = evt.clientY - _this.previousPosition.y;
+    //                 let offsetX = evt.clientX - _this.previousPosition.x;
+    //                 let offsetY = evt.clientY - _this.previousPosition.y;
     //                 angle.x +=offsetX;
     //                 angle.y -=offsetY;
     //                 if(Math.abs(angle.x) > _this.restrictionX )  {
@@ -227,8 +227,8 @@
     //         if (!engine.isPointerLock) {
     //             return;
     //         }
-    //         var offsetX = evt.movementX || evt.mozMovementX || evt.webkitMovementX || evt.msMovementX || 0;
-    //         var offsetY = evt.movementY || evt.mozMovementY || evt.webkitMovementY || evt.msMovementY || 0;
+    //         let offsetX = evt.movementX || evt.mozMovementX || evt.webkitMovementX || evt.msMovementX || 0;
+    //         let offsetY = evt.movementY || evt.mozMovementY || evt.webkitMovementY || evt.msMovementY || 0;
     //         if (_this.camera.getScene().useRightHandedSystem) {
     //             _this.camera.cameraRotation.y -= offsetX / _this.angularSensibility;
     //         }

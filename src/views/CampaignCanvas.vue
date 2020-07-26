@@ -4,11 +4,11 @@
 
 <script lang="ts">
 import Vue from "vue";
-import engineAPI from "../babylon/engineAPI";
+import engineAPI from "../babylon/EngineAPI";
 
 export default Vue.extend({
     data: () => ({
-        engine: null,
+        engineController: null,
     }),
     props: {
         bus: {
@@ -17,12 +17,13 @@ export default Vue.extend({
         },
     },
     mounted() {
-        const ref = this.$refs["renderCanvas"] as Vue;
-        this.engine = engineAPI(ref.$el);
+        const ref = this.$refs.renderCanvas as Vue;
+        const el = ref.$el as HTMLCanvasElement;
+        this.engineController = engineAPI(el);
         this.bus.$on('resized', () => {
-            this.engine.resize();
+            this.engineController.resize();
         });
-        setTimeout(() => {this.engine.resize();}, 400);
+        setTimeout(() => {this.engineController.resize();}, 400);
     }
 });
 </script>

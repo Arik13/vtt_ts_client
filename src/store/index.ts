@@ -3,8 +3,8 @@ import Vuex from 'vuex';
 import ax from 'axios';
 const axios = ax.create({baseURL: "http://localhost:3000/api/"});
 // import { RootState } from './types';
-// import io from 'socket.io-client';
-// var socket = io('http://localhost:3001');
+import io from 'socket.io-client';
+const socket = io('http://localhost:3001');
 
 interface AuthData {
     token: string;
@@ -19,7 +19,8 @@ export default new Vuex.Store({
         authToken: null,
         userID: null,
         isDrawerOpen: true,
-        campaignObject: null,
+        // campaignObject: null,
+        campaignID: null,
     },
     getters: {
         userID: state => {
@@ -32,6 +33,11 @@ export default new Vuex.Store({
         }
     },
     actions: {
+        triggerEvent({state}, payload) {
+            state;
+            socket.emit(payload.eventType, payload.event);
+            // socket.send(payload);
+        },
         accessResource({state}, payload) {
             const finalPayload = {
                 method: payload.method,
@@ -66,10 +72,10 @@ export default new Vuex.Store({
         logout({state}, payload) {
             state.authToken = null;
             state.userID = null;
-            state.campaignObject = null;
+            // state.campaignObject = null;
             localStorage.removeItem("authToken");
             localStorage.removeItem("userID");
-            localStorage.removeItem("campaignObject");
+            // localStorage.removeItem("campaignObject");
             payload.reroute();
         },
         toggleDrawerOpen({commit}) {

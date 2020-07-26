@@ -1,7 +1,7 @@
-/* eslint-disable */
-
 import { KeyInput } from "./KeyInput";
-import { MouseInput } from "./MouseInput";
+import { MouseInput } from "./MouseInput/MouseInput";
+
+import "babylonjs"
 
 export class PlanarCamera extends BABYLON.UniversalCamera {
     direction: BABYLON.Vector3;
@@ -24,7 +24,8 @@ export class PlanarCamera extends BABYLON.UniversalCamera {
         super(name, position, scene);
         this.setTarget(target);
         this.direction = new BABYLON.Vector3(Math.cos(this.angle), 0, Math.sin(this.angle));
-        this.cameraRotation = new BABYLON.Vector2;
+        // this.cameraRotation = new BABYLON.Vector2(Math.PI/2, 0);
+        this.rotation = new BABYLON.Vector3(Math.PI/2, 0, 0);
         this.angularSpeed = angularSpeed;
         this.minZ = minZ;
         this.speed = speed;
@@ -33,15 +34,15 @@ export class PlanarCamera extends BABYLON.UniversalCamera {
 }
 
 export const cameraFactory = (scene: BABYLON.Scene) => {
-    var camera = new PlanarCamera(
+    const camera = new PlanarCamera(
         "MyCamera",                         // Name
-        new BABYLON.Vector3(0, 5, 0),       // Position
+        new BABYLON.Vector3(0, 120, 0),     // Position
         new BABYLON.Vector3(0, 0, 0),       // Target
         scene,                              // Scene
         0.06,                               // Angular speed
-        0.001,                              // Minimum Z Level
-        0.01,                               // Speed
-        0,                                  // Angle
+        0.1,                                // Minimum Z Level
+        0.3,                                // Speed
+        0,                          // Angle
     );
 
     // Remove default input management.

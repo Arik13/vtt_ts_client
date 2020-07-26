@@ -62,7 +62,7 @@ export default Vue.extend({
         lightItems: [],
         characterItems: [],
         search: null,
-        files: null,
+        files: [],
     }),
     components: {
         "asset-tree": AssetTree,
@@ -71,21 +71,30 @@ export default Vue.extend({
     methods: {
         uploadFiles() {
             const files = this.files;
-            if (!files) return;
-            const formData = new FormData();
-            for( let i = 0; i < files.length; i++ ){
-                formData.append('files[' + i + ']', files[i]);
-            }
-            const payload = {
-                method: "POST",
-                route: `campaigns/${this.$store.state.campaignObject._id}/images`,
-                headers: { "Content-Type": "multipart/form-data" },
-                data: formData,
-                callback: () => {
-                    this.files = null;
+            if (!files.length) return;
+            const file = files[0] as File;
+            this.$store.dispatch("triggerEvent", {
+                eventType: "UploadImage", event: {
+                    campaignID: this.$store.state.campaignID,
+                        name: file.name,
+                        file: file,
+                    }
                 }
-            };
-            this.$store.dispatch("accessResource", payload);
+            );
+            // const formData = new FormData();
+            // for( let i = 0; i < files.length; i++ ){
+            //     formData.append('files[' + i + ']', files[i]);
+            // }
+            // const payload = {
+                //     method: "POST",
+            //     route: `campaigns/${this.$store.state.campaignObject._id}/images`,
+            //     headers: { "Content-Type": "multipart/form-data" },
+            //     data: formData,
+            //     callback: () => {
+                //         this.files = null;
+            //     }
+            // };
+            // this.$store.dispatch("accessResource", payload);
         }
     },
     computed: {

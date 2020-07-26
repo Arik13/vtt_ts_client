@@ -1,109 +1,119 @@
-import {cameraFactory} from "./Camera";
-import LIGHTS from "./Lights";
+import {INPUT_EVENT, inputBus, InputEvent, InputReciever} from "./InputBus";
+import {MeshData, LocationData} from "./LocationData";
+import {Location} from "./Location";
+import "babylonjs";
 
-const buildGridLines = function(scene: BABYLON.Scene) {
-    const gridLines = 10;
-    const hiZ = 2;
-    const loZ = -2;
-    const hiX = 2;
-    const loX = -2;
-    const height = 0.04;
-    const tubes = [];
-    const tubeMaterial = new BABYLON.StandardMaterial("tubeMaterial", scene);
-    // tubeMaterial.emissiveTexture = new BABYLON.Color3(0, 0, 0);
-    tubeMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-    for (let i = 0; i <= gridLines + 1; i++) {
-        const points = [
-            new BABYLON.Vector3(hiX, height, loZ + ((hiX-loX)/(gridLines+1))*(i)),
-            new BABYLON.Vector3(loX, height, loZ + ((hiX-loX)/(gridLines+1))*(i)),
-        ];
-        const tube = BABYLON.MeshBuilder.CreateTube(
-            "tube", {
-                path: points,
-                radius: 0.005,
-                tessellation: 3,
-                radiusFunction: null,
-                cap: 1,
-                arc: 1,
-                // updateable: false,
-                sideOrientation: BABYLON.Mesh.FRONTSIDE,
-                frontUVs: null,
-                backUVs: null,
-                instance: null,
-                invertUV: null,
-            }, scene);
-        tube.material = tubeMaterial;
-        tubes.push(tube);
-        // lines.push(line);
+
+const createLocation = function (
+    engine: BABYLON.Engine,
+    canvas: HTMLCanvasElement,
+    locationData: LocationData,
+    )
+{
+    const location = new Location(engine, locationData.mapMeshData, canvas);
+    for (const key in locationData.tokens) {
+        location.addToken(
+            locationData.tokens[key].position.file,
+            locationData.tokens[key].position.rank,
+            locationData.tokens[key].meshData,
+        );
     }
-    for (let i = 0; i <= gridLines + 1; i++) {
-        const points = [
-            new BABYLON.Vector3(loX + ((hiZ-loZ)/(gridLines+1))*(i), height, hiZ),
-            new BABYLON.Vector3(loX + ((hiZ-loZ)/(gridLines+1))*(i), height, loZ),
-        ];
-        const tube = BABYLON.MeshBuilder.CreateTube(
-            "tube", {
-                path: points,
-                radius: 0.005,
-                tessellation: 3,
-                radiusFunction: null,
-                cap: 1,
-                arc: 1,
-                // updateable: false,
-                sideOrientation: BABYLON.Mesh.FRONTSIDE,
-                frontUVs: null,
-                backUVs: null,
-                instance: null,
-                invertUV: null,
-            }, scene);
-        tube.material = tubeMaterial;
-        tubes.push(tube);
-        // lines.push(line);
+    return location;
+};
+
+const locations = [
+    // Location 1
+    {
+        mapMeshData: new MeshData("textures/map.jpg", "Map", "Map Material"),
+        tokens: [
+            {
+                position: {rank: 10, file: 10},
+                meshData: new MeshData("textures/avatar.png", "Avatar", "Avatar Material"),
+            }
+        ]
+    },
+    // Location 2
+    {
+        mapMeshData: new MeshData("textures/map2.jpg", "Map", "Map Material"),
+        tokens: [
+            // {
+            //     position: {rank: 10, file: 10},
+            //     meshData: new MeshData("textures/avatar.png", "Avatar", "Avatar Material"),
+            // }
+        ]
+    },
+]
+
+class BabylonController implements InputReciever{
+    engine: BABYLON.Engine;
+    locations: Location[] = [];
+    activeLocationIndex: number;
+    constructor(canvas: HTMLCanvasElement) {
+        // this.test();
+
+        inputBus.registerReciever(this);
+        this.engine = new BABYLON.Engine(canvas, true);     // Generate the BABYLON 3D engine
+        canvas.addEventListener('contextmenu', event => event.preventDefault());
+        for (let i = 0; i < locations.length; i++) {
+            this.locations.push(createLocation(this.engine, canvas, locations[i]));
+        }
+
+        // Watch for browser/canvas resize events
+        window.addEventListener("resize", () => {
+            this.engine.resize();
+        });
+        this.activeLocationIndex = 0;
+        this.getActiveLocation().view.attachControl();
+
+        // setInterval(() => {
+        //     this.setActiveLocation((this.activeLocationIndex + 1) % 2)
+        // }, 1500);
+        // Register a render loop to repeatedly render the scene
+        this.engine.runRenderLoop(() => {
+            if (this.locations.length) {
+                this.locations[this.activeLocationIndex].render();
+            }
+        });
+    }
+    recieveEvent(evt: InputEvent) {
+        switch(evt.type) {
+            case INPUT_EVENT.LEFT_DOWN:
+                return this.getActiveView().trySelect();
+            case INPUT_EVENT.LEFT_DOWN_MOVE:
+                if (this.getActiveView().hasSelection()) {
+                    const view = this.getActiveView();
+                    const model = this.getActiveModel();
+                    const currentPosition = view.getCurrentCursorPosition();
+                    if (currentPosition) {
+                        const newPosition = model.findClosestTileCenter(currentPosition);
+                        view.setSelectionPosition(newPosition);
+                    }
+                }
+                break;
+
+            case INPUT_EVENT.LEFT_UP_MOVE:
+                break;
+        }
+    }
+    resize() {
+        this.engine.resize();
+    }
+    getActiveView() {
+        return this.locations[this.activeLocationIndex].view;
+    }
+    getActiveModel() {
+        return this.locations[this.activeLocationIndex].model;
+    }
+    getActiveLocation() {
+        return this.locations[this.activeLocationIndex];
+    }
+    setActiveLocation(index: number) {
+        this.getActiveLocation().view.detachControl();
+        this.activeLocationIndex = index;
+        this.getActiveLocation().view.attachControl();
     }
 }
 
-const createScene = function (engine: BABYLON.Engine, canvas: HTMLCanvasElement) {
-    const scene = new BABYLON.Scene(engine);
-
-    const camera = cameraFactory(scene);
-    camera.attachControl(canvas, true);
-
-    LIGHTS(scene);
-
-    const map = BABYLON.MeshBuilder.CreateGround("myGround", {width: 4, height: 4, subdivisions: 4}, scene);
-    const mapMaterial = new BABYLON.StandardMaterial("mapMaterial", scene);
-    mapMaterial.emissiveTexture = new BABYLON.Texture("textures/map.jpg", scene);
-    mapMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-    map.material = mapMaterial;
-
-    //creates lines
-    buildGridLines(scene);
-    const pipeline = new BABYLON.DefaultRenderingPipeline(
-        "defaultPipeline", // The name of the pipeline
-        true, // Do you want the pipeline to use HDR texture?
-        scene, // The scene instance
-        [camera] // The list of cameras to be attached to
-    );
-    pipeline.samples = 4;
-    pipeline.fxaaEnabled = true;
-
-    return scene;
-};
-
-export default function (canvas: HTMLCanvasElement) {
-    const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
-    canvas.addEventListener('contextmenu', event => event.preventDefault());
-
-    const scene = createScene(engine, canvas);
-
-    // Register a render loop to repeatedly render the scene
-    engine.runRenderLoop(function () {
-        scene.render();
-    });
-
-    // Watch for browser/canvas resize events
-    window.addEventListener("resize", function () {
-        engine.resize();
-    });
-    return engine;
+export default function (canvas: HTMLCanvasElement): BabylonController {
+    return new BabylonController(canvas);
 }

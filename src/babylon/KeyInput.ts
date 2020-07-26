@@ -1,4 +1,3 @@
-import { Vector3 } from "babylonjs";
 import {PlanarCamera} from "./Camera"
 
 
@@ -25,6 +24,9 @@ export class KeyInput implements BABYLON.ICameraInput<PlanarCamera> {
     constructor(camera: PlanarCamera) {
         this.camera = camera;
     }
+    setCamera(camera: PlanarCamera) {
+        this.camera = camera;
+    }
     getSimpleName(): string {
         return "keyboard";
     }
@@ -39,18 +41,20 @@ export class KeyInput implements BABYLON.ICameraInput<PlanarCamera> {
     }
     detachControl(element: HTMLElement | null): void {
         if (this.attached) {
+            console.log(element);
             element.removeEventListener("keydown", this._onKeyDown);
             element.removeEventListener("keyup", this._onKeyUp);
-            BABYLON.Tools.UnregisterTopRootEvents(
-                // element.ownerDocument.defaultView,
-                null,
-                [
-                    { name: "blur", handler: this._onLostFocus }
-                ]);
-                this._keys = [];
-            }
-            this.attached = false;
+            // BABYLON.Tools.UnregisterTopRootEvents(
+            //     // element.ownerDocument.defaultView,
+            //     null,
+            //     [
+            //         { name: "blur", handler: this._onLostFocus }
+            //     ]
+            // );
+            this._keys = [];
         }
+        this.attached = false;
+    }
     attachControl(element: HTMLElement, noPreventDefault?: boolean): void {
         if (!this.attached) {
             element.tabIndex = 1;
@@ -104,8 +108,8 @@ export class KeyInput implements BABYLON.ICameraInput<PlanarCamera> {
                 const xMod = Math.sin(camera.rotation.y);
                 const zMod = Math.cos(camera.rotation.y);
                 const speed = camera.speed;
-                const forward = new Vector3(xMod * speed , 0, zMod * speed);
-                const up = new Vector3(0, 1, 0);
+                const forward = new BABYLON.Vector3(xMod * speed , 0, zMod * speed);
+                const up = new BABYLON.Vector3(0, 1, 0);
                 const left = forward.cross(up);
                 if (this.keysLeft.indexOf(keyCode) !== -1) {
                     camera.direction.copyFromFloats(left.x, left.y, left.z);

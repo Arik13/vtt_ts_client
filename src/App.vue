@@ -39,7 +39,8 @@ export default Vue.extend({
     mounted() {
         this.$store.state.authToken = localStorage.getItem("authToken");
         this.$store.state.userID = localStorage.getItem("userID");
-        this.$store.state.campaignObject = localStorage.getItem("campaignObject");
+        this.$store.state.campaignID = localStorage.getItem("campaignID");
+        // this.$store.state.campaignObject = JSON.parse(localStorage.getItem("campaignObject"));
     },
     computed: {
         isLoggedIn(): boolean {

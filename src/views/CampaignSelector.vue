@@ -42,6 +42,7 @@ export default Vue.extend({
     },
     methods: {
         editInCampaignEditor(ID: string) {
+            this.$store.state.campaignID = ID;
             this.$router.push({ path: `campaigneditor/${ID}` })
         }
     }

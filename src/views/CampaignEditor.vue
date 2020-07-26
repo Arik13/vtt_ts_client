@@ -34,6 +34,8 @@ import { Component } from "vue-property-decorator";
 import AssetManager from "./AssetManager.vue";
 import CampaignCanvas from "./CampaignCanvas.vue";
 import CreateCharacterDialog from "./CreateCharacterDialog/CreateCharacterDialog.vue";
+
+// @ts-ignore
 import { Splitpanes, Pane } from "splitpanes";
 import 'splitpanes/dist/splitpanes.css';
 
@@ -54,23 +56,23 @@ export default class CampaignEditor extends Vue {
             this.loadCampaign(campaignID);
             return true;
         }
+        // console.log(this.$store.state.campaignObject)
     }
     resize() {
             this.bus.$emit('resized');
     }
-    log() {
-        console.log("Resized");
-    }
     loadCampaign(campaignID: string) {
-        const payload = {
-            method: "GET",
-            route: `campaigns/${campaignID}`,
-            callback: (result: any) => {
-                this.$store.state.campaignObject = result;
-                localStorage.setItem("campaignObject", result);
-            }
-        };
-        this.$store.dispatch("accessResource", payload);
+        localStorage.setItem("campaignID", campaignID);
+        // const payload = {
+        //     method: "GET",
+        //     route: `campaigns/${campaignID}`,
+        //     callback: (result: any) => {
+        //         this.$store.state.campaignObject = result;
+        //         // console.log(result);
+        //         // localStorage.setItem("campaignObject", JSON.stringify(result));
+        //     }
+        // };
+        // this.$store.dispatch("accessResource", payload);
     }
     get isLoggedIn() {
             return this.$store.state.authToken;
