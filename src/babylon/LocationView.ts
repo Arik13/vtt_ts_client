@@ -1,6 +1,7 @@
 import {MeshData} from "./LocationData"
 import {cameraFactory, PlanarCamera} from "./Camera"
 import lightScene from "./Lights"
+import { imageStore } from '@/GameStores/ImageStore';
 
 // import "babylonjs"
 
@@ -35,6 +36,7 @@ export class LocationView {
         this.buildGridLines(this.scene);
         this.createPickPlane();
         this.detachControl();
+        this.test();
         // const pipeline = new BABYLON.DefaultRenderingPipeline(
         //     "defaultPipeline", // The name of the pipeline
         //     true, // Do you want the pipeline to use HDR texture?
@@ -43,6 +45,47 @@ export class LocationView {
         // );
         // pipeline.samples = 4;
         // pipeline.fxaaEnabled = true;
+    }
+    test() {
+        const blob = new Blob([imageStore.images[0].fileBuffer]);
+        const url = URL.createObjectURL(blob);
+        console.log
+        const mesh = BABYLON.MeshBuilder.CreatePlane(
+            "Test Plane",
+            {
+                width: 20,
+                height: 20,
+                sideOrientation: BABYLON.Mesh.DOUBLESIDE
+            },
+            this.scene,
+        );
+        mesh.addRotation(Math.PI/2, 0, 0);
+        mesh.setPositionWithLocalVector(new BABYLON.Vector3(0, 0, 0));
+        const meshMaterial = new BABYLON.StandardMaterial("Test Material", this.scene);
+        mesh.alphaIndex = 4;
+        meshMaterial.emissiveTexture = new BABYLON.Texture(
+            // "textures/avatar.png",
+            url,
+            // null,
+            this.scene,
+        );
+        meshMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+        meshMaterial.opacityTexture = new BABYLON.Texture(
+            // "textures/avatar.png",
+            url,
+            // null,
+            this.scene,
+            false,
+            true,
+            BABYLON.Texture.NEAREST_SAMPLINGMODE,
+            null,
+            null,
+            // ,
+        );
+        mesh.material = meshMaterial;
+        this.meshes.push(mesh);
+        // mesh.
+
     }
     getCamera(): PlanarCamera {
         return this.scene.cameras[0] as PlanarCamera;
@@ -66,6 +109,7 @@ export class LocationView {
         alphaIndex: number
         ): void
     {
+        if (!tokenModel) return;
         const mesh = this.createMesh(
             tokenModel,
             width,
@@ -83,6 +127,7 @@ export class LocationView {
         alphaIndex: number
         ): BABYLON.Mesh
     {
+
         const mesh = BABYLON.MeshBuilder.CreatePlane(
             tokenModel.meshName,
             {
@@ -120,6 +165,7 @@ export class LocationView {
         alphaIndex: number
         ): void
     {
+        if (!tokenModel) return;
         const mesh = this.createMesh(
             tokenModel,
             width,

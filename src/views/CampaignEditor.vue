@@ -9,7 +9,9 @@
         <pane :min-size="40">
             <splitpanes horizontal :push-other-panes="false" @resize="resize()">
                 <pane :min-size="40">
-                    <campaign-canvas :bus="bus" style="height: 100%; width: 100%;" />
+                    <!-- <campaign-canvas :bus="bus" style="height: 100%; width: 100%;" /> -->
+                    <campaign-canvas v-if="isCampaignLoaded" :bus="bus" />
+                    <div v-else><h3>Loading...</h3></div>
                 </pane>
                 <pane :min-size="25" :size="25">
                     <v-card height="100%" width="100%" dark tile>
@@ -22,7 +24,7 @@
             </splitpanes>
         </pane>
         <pane :min-size="25" :size="25">
-            <asset-manager height="100%" width="100%"></asset-manager>
+            <asset-manager v-if="isCampaignLoaded" height="100%" width="100%"/>
         </pane>
     </splitpanes>
 </div>
@@ -39,6 +41,10 @@ import CreateCharacterDialog from "./CreateCharacterDialog/CreateCharacterDialog
 import { Splitpanes, Pane } from "splitpanes";
 import 'splitpanes/dist/splitpanes.css';
 
+import {ACTION, ACTION_ARG} from "@store/actions";
+import {EVENT_NAME, EVENT_TYPE} from "@shared/events/events";
+import { imageStore } from '@/GameStores/ImageStore';
+
 @Component({
     components: {
         "asset-manager": AssetManager,
@@ -50,35 +56,51 @@ import 'splitpanes/dist/splitpanes.css';
 })
 export default class CampaignEditor extends Vue {
     bus: Vue = new Vue();
+    loaded = false;
     mounted() {
         const campaignID = this.$route.params.ID;
         if (campaignID) {
-            this.loadCampaign(campaignID);
+            this.startEditor(campaignID);
             return true;
         }
+        else if (this.$store.state.campaignID) {
+            this.$store.state.loaded = true;
+        }
+
         // console.log(this.$store.state.campaignObject)
     }
     resize() {
             this.bus.$emit('resized');
     }
-    loadCampaign(campaignID: string) {
-        localStorage.setItem("campaignID", campaignID);
-        // const payload = {
-        //     method: "GET",
-        //     route: `campaigns/${campaignID}`,
-        //     callback: (result: any) => {
-        //         this.$store.state.campaignObject = result;
-        //         // console.log(result);
-        //         // localStorage.setItem("campaignObject", JSON.stringify(result));
-        //     }
-        // };
-        // this.$store.dispatch("accessResource", payload);
+    startEditor(campaignID: string) {
+        const event: EVENT_TYPE.JOIN = {
+            campaignID: campaignID,
+            userID: this.$store.state.userID,
+        };
+
+        const payload: ACTION_ARG.TRIGGER_EVENT = {
+            eventName: EVENT_NAME.JOIN,
+            event: event,
+            callback: (res: any) => {
+                this.$store.dispatch(ACTION.LOAD_CAMPAIGN, {
+                    id: campaignID,
+                    callback: (result: any) => {
+                        console.log("Campaign Loaded");
+                        // this.loaded = true;
+                        this.$store.state.loaded = true;
+                        console.log("Image Store: ", imageStore);
+                    }
+                });
+            }
+        };
+
+        this.$store.dispatch(ACTION.TRIGGER_EVENT, payload);
     }
     get isLoggedIn() {
             return this.$store.state.authToken;
     }
     get isCampaignLoaded() {
-        return this.$store.state.campaignObject;
+        return this.$store.state.loaded;
     }
 }
 </script>

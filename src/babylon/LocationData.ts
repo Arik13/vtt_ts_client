@@ -11,7 +11,6 @@ export interface PositionedMeshData {
 export interface LocationData {
     mapMeshData: MeshData;
     tokens: PositionedMeshData[];
-
 }
 
 export class MeshData {

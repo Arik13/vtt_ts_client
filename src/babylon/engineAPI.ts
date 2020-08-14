@@ -24,13 +24,13 @@ const createLocation = function (
 const locations = [
     // Location 1
     {
-        mapMeshData: new MeshData("textures/map.jpg", "Map", "Map Material"),
-        tokens: [
-            {
-                position: {rank: 10, file: 10},
-                meshData: new MeshData("textures/avatar.png", "Avatar", "Avatar Material"),
-            }
-        ]
+        // mapMeshData: new MeshData("textures/map.jpg", "Map", "Map Material"),
+        // tokens: [
+        //     {
+        //         position: {rank: 10, file: 10},
+        //         meshData: new MeshData("textures/avatar.png", "Avatar", "Avatar Material"),
+        //     }
+        // ]
     },
     // Location 2
     {
@@ -44,17 +44,18 @@ const locations = [
     },
 ]
 
+import {imageStore} from "@/GameStores/ImageStore";
+
 class BabylonController implements InputReciever{
     engine: BABYLON.Engine;
     locations: Location[] = [];
     activeLocationIndex: number;
     constructor(canvas: HTMLCanvasElement) {
-        // this.test();
-
         inputBus.registerReciever(this);
         this.engine = new BABYLON.Engine(canvas, true);     // Generate the BABYLON 3D engine
         canvas.addEventListener('contextmenu', event => event.preventDefault());
         for (let i = 0; i < locations.length; i++) {
+            // @ts-ignore
             this.locations.push(createLocation(this.engine, canvas, locations[i]));
         }
 
@@ -65,9 +66,6 @@ class BabylonController implements InputReciever{
         this.activeLocationIndex = 0;
         this.getActiveLocation().view.attachControl();
 
-        // setInterval(() => {
-        //     this.setActiveLocation((this.activeLocationIndex + 1) % 2)
-        // }, 1500);
         // Register a render loop to repeatedly render the scene
         this.engine.runRenderLoop(() => {
             if (this.locations.length) {

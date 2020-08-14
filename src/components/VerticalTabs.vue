@@ -1,29 +1,25 @@
 <template>
-    <!-- Credit to jacekkarczmarczyk, https://gist.github.com/jacekkarczmarczyk/eca6015c176e85ea78706e63383bbe5c -->
-    <v-container>
+    <v-container height="100%">
         <v-row>
-            <div
-                :style="containerStyle"
-                class="vertical-tabs"
-                :class="{'vertical-tabs--vertical-text': verticalText, 'vertical-tabs--horizontal-text': !verticalText}"
+            <v-tabs
+                v-model="model"
+                width="100%"
+                vertical
             >
-                <v-tabs
-                    v-model="model"
-                    :show-arrows="verticalText"
-                    :style="tabsStyle"
+                <v-tab
+                    v-for="tab in tabs"
+                    :key="tab.name"
+                    :href="`#${tab.name}`"
+                    class="tabNoMargin"
                 >
-                    <v-tab
-                        v-for="tabName in tabNames"
-                        :key="tabName"
-                        :href="`#${tabName}`"
-                    >
-                        {{tabName}}
-                    </v-tab>
-                </v-tabs>
-            </div>
-            <v-tabs-items dark v-model="model">
-                <slot></slot>
-            </v-tabs-items>
+                    <v-icon>
+                        {{ tab.icon }}
+                    </v-icon>
+                </v-tab>
+                <v-tabs-items dark v-model="model">
+                    <slot />
+                </v-tabs-items>
+            </v-tabs>
         </v-row>
     </v-container>
 </template>
@@ -37,73 +33,7 @@ export default Vue.extend({
         name: "vertical-tabs",
     }),
     props: {
-        color: String,
-        height: {
-            type: [Number, String],
-            default: 460,
-        },
-        tabNames: Array,
-        sliderColor: String,
-        value: null,
-        verticalText: Boolean,
-    },
-    computed: {
-        containerStyle() {
-            return {height: isNaN(Number(this.height)) ? this.height : `${this.height}px`};
-            // return this.verticalText ? {
-            //     height: isNaN(Number(this.height)) ? this.height : `${this.height}px`,
-            // } : {
-            //     height: (48 * this.items.length) + 'px',
-            // }
-        },
-        tabsStyle () {
-            return this.verticalText ? {width: isNaN(Number(this.height)) ? this.height : `${this.height}px`,} : {}
-        },
+        tabs: Array,
     },
 });
 </script>
-
-<style scoped>
-    .vertical-tabs {
-        overflow: hidden;
-    }
-    .vertical-tabs--horizontal-text .v-tabs {
-        transform: rotate(90deg);
-        transform-origin: 100px 100px;
-        height: 200px;
-    }
-    .vertical-tabs--horizontal-text .v-tabs >>> .v-tabs__container {
-        height: 200px;
-    }
-    .vertical-tabs--horizontal-text .v-tabs >>> .v-tabs__div {
-        width: 48px;
-        height: 200px;
-        display: inline-block;
-    }
-    .vertical-tabs--horizontal-text .v-tabs >>> .v-tabs__item {
-        transform: rotate(-90deg);
-        transform-origin: 100px 100px;
-        width: 200px;
-        height: 48px;
-        display: block;
-        text-align: left;
-        line-height: 36px;
-        white-space: pre;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .vertical-tabs--vertical-text {
-        width: 48px;
-    }
-    .vertical-tabs--vertical-text .v-tabs {
-        transform: rotate(90deg);
-        transform-origin: 24px 24px;
-    }
-    .vertical-tabs--vertical-text .v-tabs >>> .v-tabs__item {
-        transform: rotate(180deg);
-    }
-    .vertical-tabs--vertical-text .v-tabs >>> .v-tabs__slider-wrapper {
-        top: 0;
-        bottom: auto;
-    }
-</style>

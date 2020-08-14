@@ -1,7 +1,8 @@
 <template>
     <v-app dark>
-        <v-navigation-drawer permanent app dark></v-navigation-drawer>
+        <v-navigation-drawer app dark v-model="drawer"></v-navigation-drawer>
         <v-app-bar app dark>
+
             <router-link
                 v-for="navItem in navItems"
                 :key="navItem.title"
@@ -13,6 +14,8 @@
                     <v-btn v-else icon><v-icon>{{navItem.icon}}</v-icon></v-btn>
                 </template>
             </router-link>
+            <v-spacer />
+            <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
         </v-app-bar>
         <v-main>
             <v-card tile color="dark grey" height="100%" >
@@ -24,6 +27,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+// import {DB} from "./DB/IndexedDB";
 
 interface NavItem {
     title: string;
@@ -35,12 +39,14 @@ interface NavItem {
 export default Vue.extend({
     name: 'App',
     data: () => ({
+        drawer: false
     }),
     mounted() {
         this.$store.state.authToken = localStorage.getItem("authToken");
         this.$store.state.userID = localStorage.getItem("userID");
         this.$store.state.campaignID = localStorage.getItem("campaignID");
-        // this.$store.state.campaignObject = JSON.parse(localStorage.getItem("campaignObject"));
+
+        // console.log(DB);
     },
     computed: {
         isLoggedIn(): boolean {
@@ -52,10 +58,14 @@ export default Vue.extend({
                 { title: "Signup", icon: "how_to_reg", route: "/signup", show: !this.isLoggedIn},
                 { title: "Log Out", icon: "exit_to_app", route: "/logout", show: this.isLoggedIn},
                 { title: "Creator", icon: "exit_to_app", route: "/campaigncreator", show: this.isLoggedIn},
-                { title: "Editor", icon: "exit_to_app", route: "/campaigneditor", show: this.isLoggedIn},
+                { title: "Editor", icon: "exit_to_app", route: "/campaigneditor", show: (this.isLoggedIn && this.$store.state.campaignID)},
                 { title: "Selector", icon: "exit_to_app", route: "/campaignselector", show: this.isLoggedIn},
             ];
         }
     },
+    destroyed() {
+        console.log("destroyed");
+        localStorage.removeItem("campaignID");
+    }
 });
 </script>
