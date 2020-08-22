@@ -15,7 +15,8 @@ export enum ACTION {
 //     }
 // }
 
-import {EVENT_NAME, EVENT_TYPE} from "@shared/events/events"
+import {EVENT_NAME, EVENT_TYPE} from "@shared/Events/Events";
+
 export namespace ACTION_ARG {
     export type TRIGGER_EVENT = {
         eventName: EVENT_NAME;

@@ -2,6 +2,7 @@ import {MeshData} from "./LocationData";
 import {LocationView, LocationViewListener} from "./LocationView";
 import {LocationModel} from "./LocationModel";
 import {PlanarCamera} from "./Camera";
+import { Asset } from '@shared/Assets/Asset';
 
 export class Location implements LocationViewListener { // Controller
     model: LocationModel;
@@ -9,8 +10,9 @@ export class Location implements LocationViewListener { // Controller
     inputs: BABYLON.ICameraInput<PlanarCamera>[];
     constructor(
         engine: BABYLON.Engine,
-        map: MeshData,
         canvas: HTMLCanvasElement,
+        locationData: Asset.LocationModel,
+        mapMeshData: MeshData,
         )
     {
         this.view = new LocationView(
@@ -18,18 +20,25 @@ export class Location implements LocationViewListener { // Controller
             this,
             canvas,
         );
+        console.log(locationData);
         this.model = new LocationModel(
-            100,
-            100,
-            11,
-            11,
+            locationData.files * locationData.tileWidth,
+            locationData.ranks * locationData.tileLength,
+            locationData.files,
+            locationData.ranks,
         );
         this.view.addMap (
-            map,
+            mapMeshData,
             this.model.getWidth(),
             this.model.getHeight(),
             new BABYLON.Vector3(0, 0, 0),
             1,
+        );
+        this.view.buildGridLines(
+            locationData.ranks,
+            locationData.files,
+            locationData.files * locationData.tileWidth,
+            locationData.ranks * locationData.tileLength,
         );
     }
     addToken(rank: number, file: number, tokenModel: MeshData) {

@@ -1,18 +1,8 @@
-/*
-
-
-*/
-
-export class ImageFile {
-    _id: string;
-    fileBuffer: ArrayBuffer;
-    fileType: string;
-    name: string;
-}
+import {Asset} from "@shared/Assets/Asset"
 
 export class ImageStore {
-    images: ImageFile[];
-    setImages(images: ImageFile[]) {
+    images: Asset.ImageInfo[];
+    setImages(images: Asset.ImageInfo[]) {
         this.images = images;
     }
     getImage(id: string) {

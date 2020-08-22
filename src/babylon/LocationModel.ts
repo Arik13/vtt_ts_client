@@ -1,3 +1,4 @@
+import { Asset } from '@shared/Assets/Asset';
 
 export class LocationModel {
     gridElementWidth: number;
@@ -6,13 +7,14 @@ export class LocationModel {
     ranks: number;
     worldSpaceWidth: number;
     worldSpaceHeight: number;
+    // locationData: Asset.LocationData
     // tokens: PositionedToken[];
     constructor(
         worldSpaceWidth: number,
         worldSpaceHeight: number,
         ranks: number,
         files: number,
-        // scene: BABYLON.Scene,
+        // locationData: Asset.LocationData,
         )
     {
         this.worldSpaceWidth = worldSpaceWidth;
@@ -21,6 +23,7 @@ export class LocationModel {
         this.files = files;
         this.gridElementHeight = worldSpaceHeight / ranks;
         this.gridElementWidth = worldSpaceWidth / files;
+        // this.locationData = locationData;
     }
     getWidth(): number {
         return this.worldSpaceWidth;

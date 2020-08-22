@@ -190,15 +190,12 @@ export default Vue.extend({
         }
     },
     created() {
-        // console.log("Created");
         this.$store.registerModule("createCharacterStore", CreateCharacterStore);
     },
     mounted() {
-        // console.log("Mounted");
         this.$store.commit("setRace", {race: "aasimar", subrace: "scourge"});
     },
     destroyed() {
-        // console.log("Destroyed");
         this.$store.unregisterModule("createCharacterStore");
     }
 });

@@ -11,14 +11,13 @@
                 </v-list-item>
             </template>
         </v-list>
-        <!-- <img :src="image"> -->
     </v-card>
 </template>
 
 <script lang="ts">
 import Vue from "vue"
 import {ACTION, ACTION_ARG} from "@store/actions";
-import {EVENT_NAME, EVENT_TYPE} from "@shared/events/events";
+import {EVENT_NAME, EVENT_TYPE} from "@shared/Events/Events";
 
 interface CampaignData {
     name: string;
@@ -28,7 +27,6 @@ interface CampaignData {
 export default Vue.extend({
     data: () => ({
         campaigns: null,
-        // image: null,
     }),
     computed: {
         loggedIn() {
@@ -40,7 +38,7 @@ export default Vue.extend({
     methods: {
         startCampaign(ID: string) {
             this.$store.state.campaignID = ID;
-            this.$router.push({ path: `campaigneditor/${ID}` });
+            this.$router.push({ path: `/loading/${ID}` });
         }
     },
     mounted() {

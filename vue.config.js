@@ -1,5 +1,6 @@
-// const path = require('path')
-import * as path from "path"
+//@typescript-eslint/no-var-requires
+const path = require('path')
+// import * as path from "path"
 function resolve (dir) {
   return path.join(__dirname, dir)
 }

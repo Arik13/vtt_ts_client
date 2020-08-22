@@ -3,10 +3,12 @@ import Vuex, { Payload } from 'vuex';
 import ax from 'axios';
 import {CampaignDBService} from "../DB/IndexedDB";
 import io from 'socket.io-client';
-import {EVENT_NAME, EVENT_TYPE} from "@shared/events/events";
+import {EVENT_NAME, EVENT_TYPE} from "@shared/Events/Events";
 const socket = io('http://localhost:3001');
 const axios = ax.create({baseURL: "http://localhost:3000/api/"});
 import {imageStore} from "../GameStores/ImageStore";
+import {locationStore} from "../GameStores/LocationStore";
+import {Asset} from "@shared/Assets/Asset";
 
 type AuthData = {
     token: string;
@@ -24,16 +26,6 @@ function arrayBufferToString(buffer: ArrayBuffer){
     }
     return str;
 }
-
-// function blobToFile(theBlob: Blob, fileName:string): File {
-//     var b: any = theBlob;
-//     //A Blob() is almost a File() - it's just missing the two properties below which we will add
-//     b.lastModifiedDate = new Date();
-//     b.name = fileName;
-
-//     //Cast to a File() type
-//     return <File>theBlob;
-// }
 
 export default new Vuex.Store({
     state: {
@@ -55,6 +47,9 @@ export default new Vuex.Store({
         toggleDrawerOpen(state) {
             state.isDrawerOpen = !state.isDrawerOpen;
         },
+        test(state) {
+            console.log("test mutation");
+        }
     },
     actions: {
         async loadCampaign({state}, payload) {
@@ -67,22 +62,26 @@ export default new Vuex.Store({
                     the reply binary only. Need to do a bit of shuffling to group things together again.
                 */
                 const metaBinary: ArrayBuffer = reply.pop();
-                const metaData = JSON.parse(arrayBufferToString(metaBinary));
+                const metaData: Asset.AssetSyncGroup = JSON.parse(arrayBufferToString(metaBinary));
+
+                console.log("Sync Data: ", metaData);
+
                 const imageBuffers: ArrayBuffer[] = reply;
 
+                // Sync Images
                 const toAdd = [];
-                for (let i = 0; i < metaData.toAdd.length; i++) {
-                    toAdd.push(metaData.toAdd[i]);
+                const imageMetaData = metaData.imageData;
+                for (let i = 0; i < imageMetaData.toAdd.length; i++) {
+                    toAdd.push(imageMetaData.toAdd[i]);
                     toAdd[i].fileBuffer = imageBuffers[i];
                 }
-
-                //
-                await DB.sync(toAdd, metaData.toRemove);
+                await DB.syncAssets(metaData);
                 const assets = await DB.getAssets();
-                // state.assets = assets;
-                // console.log(imageStore);
-                imageStore.setImages(assets.assetStore)
-                // console.log(imageStore);
+
+                console.log("Loaded Assets: ", assets);
+
+                imageStore.setImages(assets.imageStore)
+                locationStore.setLocations(assets.locationStore)
                 payload.callback();
             });
         },

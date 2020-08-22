@@ -41,7 +41,6 @@ export class KeyInput implements BABYLON.ICameraInput<PlanarCamera> {
     }
     detachControl(element: HTMLElement | null): void {
         if (this.attached) {
-            console.log(element);
             element.removeEventListener("keydown", this._onKeyDown);
             element.removeEventListener("keyup", this._onKeyUp);
             // BABYLON.Tools.UnregisterTopRootEvents(

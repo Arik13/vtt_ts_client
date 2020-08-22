@@ -44,7 +44,7 @@ export default Vue.extend({
                     userID: this.$store.state.userID,
                 },
                 callback: () => {
-                    this.$router.push({ path: 'campaigneditor' })
+                    this.$router.push({ path: 'campaignselector' })
                 }
             };
             this.$store.dispatch('accessResource', payload);

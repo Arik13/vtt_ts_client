@@ -1,24 +1,20 @@
-/*
-
-
-*/
-
-export class Location {
-    _id: string;
-
-}
+import {Asset} from "@shared/Assets/Asset";
 
 export class LocationStore {
-    locations: Location[];
-    setLocation(locations: Location[]) {
+    locations: Asset.LocationData[];
+    getLocation(id: string) {
+        // Linear search, can be improved later to binary search or hashtables
+        for (let i = 0; i < this.locations.length; i++) {
+            if (this.locations[i].locationID == id) {
+                return this.locations[i];
+            }
+        }
+    }
+    setLocations(locations: Asset.LocationData[]) {
         this.locations = locations;
     }
-    getLoaction(id: string) {
-        // Linear search, can be improved later
-        // Possibly switch locations to be a hashtable
-        this.locations.forEach((location) => {
-            if (location._id == id) return location;
-        })
+    forEach(handler: (value: Asset.LocationData) => void) {
+        this.locations.forEach(handler);
     }
 }
 

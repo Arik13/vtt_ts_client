@@ -1,5 +1,6 @@
 import { openDB, deleteDB, wrap, unwrap, IDBPDatabase, DBSchema } from 'idb';
-import {ImageFile} from "../GameStores/ImageStore";
+// import {ImageFile} from "../GameStores/ImageStore";
+import {Asset} from "@shared/Assets/Asset";
 
 enum STORE {
     IMAGE_STORE = "imageStore",
@@ -11,7 +12,7 @@ enum STORE {
 interface ClientDB extends DBSchema {
     imageStore: {
         key: string;
-        value: ImageFile;
+        value: Asset.ImageInfo;
     };
     imageKeyStore: {
         key: string;
@@ -19,7 +20,7 @@ interface ClientDB extends DBSchema {
     };
     locationStore: {
         key: string;
-        value: {};
+        value: Asset.LocationData;
     };
     locationKeyStore: {
         key: string;
@@ -57,7 +58,7 @@ class CampaignDBService {
         }
         return assetDependencies;
     }
-    async sync(toAdd: any[], toRemove: any) {
+    async syncImages(toAdd: any[], toRemove: any) {
         // Add new images
         toAdd.forEach(async (value: any) => {
             const id = value._id;
@@ -71,10 +72,58 @@ class CampaignDBService {
             await this.db.delete(STORE.IMAGE_STORE, value);
         });
     }
+    async syncLocations(toAdd: any[], toRemove: any) {
+        // Add new images
+        toAdd.forEach(async (value: any) => {
+            const id = value._id;
+            await this.db.put(STORE.LOCATION_KEY_STORE, id, id);
+            await this.db.put(STORE.LOCATION_STORE, value, id);
+        });
+
+        // Remove extraneous images
+        toRemove.forEach(async (value: any) => {
+            await this.db.delete(STORE.LOCATION_KEY_STORE, value);
+            await this.db.delete(STORE.LOCATION_STORE, value);
+        });
+    }
+    async syncAssets(assets: Asset.AssetSyncGroup) {
+        // Add new images
+
+        const queryList: Promise<any>[] = [];
+
+        assets.imageData.toAdd.forEach(async (value: Asset.ImageInfo) => {
+            const id = value._id;
+            queryList.push(this.db.put(STORE.IMAGE_KEY_STORE, id, id));
+            queryList.push(this.db.put(STORE.IMAGE_STORE, value, id));
+        });
+
+        // Remove extraneous images
+        assets.imageData.toRemove.forEach(async (value: any) => {
+            queryList.push(this.db.delete(STORE.IMAGE_KEY_STORE, value));
+            queryList.push(this.db.delete(STORE.IMAGE_STORE, value));
+        });
+
+        assets.locationData.toAdd.forEach(async (value: any) => {
+            const id = value.locationID;
+            queryList.push(this.db.put(STORE.LOCATION_KEY_STORE, id, id));
+            queryList.push(this.db.put(STORE.LOCATION_STORE, value, id));
+        });
+
+        // Remove extraneous images
+        assets.locationData.toRemove.forEach(async (value: any) => {
+            queryList.push(this.db.delete(STORE.LOCATION_KEY_STORE, value));
+            queryList.push(this.db.delete(STORE.LOCATION_STORE, value));
+        });
+
+        await Promise.all(queryList);
+    }
+
     async getAssets() {
         return {
-            assetKeyStore: await this.db.getAll(STORE.IMAGE_KEY_STORE),
-            assetStore: await this.db.getAll(STORE.IMAGE_STORE),
+            imageKeyStore: await this.db.getAll(STORE.IMAGE_KEY_STORE),
+            imageStore: await this.db.getAll(STORE.IMAGE_STORE),
+            locationKeyStore: await this.db.getAll(STORE.LOCATION_KEY_STORE),
+            locationStore: await this.db.getAll(STORE.LOCATION_STORE),
         }
     }
 }

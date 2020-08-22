@@ -22,9 +22,9 @@ export default {
         }
     },
     methods: {
-        setAlignment(alignment: ALIGNMENT) {
-            console.log("Alignment: ", alignment);
-        }
+        // setAlignment(alignment: ALIGNMENT) {
+
+        // }
     },
 }
 </script>

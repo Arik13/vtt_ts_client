@@ -45,8 +45,6 @@ export default Vue.extend({
         this.$store.state.authToken = localStorage.getItem("authToken");
         this.$store.state.userID = localStorage.getItem("userID");
         this.$store.state.campaignID = localStorage.getItem("campaignID");
-
-        // console.log(DB);
     },
     computed: {
         isLoggedIn(): boolean {
@@ -64,7 +62,6 @@ export default Vue.extend({
         }
     },
     destroyed() {
-        console.log("destroyed");
         localStorage.removeItem("campaignID");
     }
 });

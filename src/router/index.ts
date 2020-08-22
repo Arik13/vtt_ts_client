@@ -8,6 +8,7 @@ import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
 import Logout from '../views/Logout.vue';
 import Signup from '../views/Signup.vue';
+import LoadingScreen from '../views/LoadingScreen.vue';
 
 Vue.use(VueRouter)
 
@@ -20,6 +21,7 @@ const routes: Array<RouteConfig> = [
     {path: "/campaigneditor/:ID", components: {default: CampaignEditor}, meta: {title: "Campaign Editor"}},
     {path: "/campaigncreator", components: {default: CampaignCreator}, meta: {title: "Campaign Creator"}},
     {path: "/campaignselector", components: {default: CampaignSelector}, meta: {title: "Campaign Selector"}},
+    {path: "/loading/:ID", components: {default: LoadingScreen}, meta: {title: "Loading"}},
 ];
 
 const router = new VueRouter({

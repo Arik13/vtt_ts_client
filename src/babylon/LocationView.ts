@@ -33,10 +33,10 @@ export class LocationView {
         this.camera = camera;
         this.canvas = canvas;
         lightScene(this.scene);
-        this.buildGridLines(this.scene);
+        // this.buildGridLines(this.scene);
         this.createPickPlane();
         this.detachControl();
-        this.test();
+        // this.test();
         // const pipeline = new BABYLON.DefaultRenderingPipeline(
         //     "defaultPipeline", // The name of the pipeline
         //     true, // Do you want the pipeline to use HDR texture?
@@ -49,7 +49,6 @@ export class LocationView {
     test() {
         const blob = new Blob([imageStore.images[0].fileBuffer]);
         const url = URL.createObjectURL(blob);
-        console.log
         const mesh = BABYLON.MeshBuilder.CreatePlane(
             "Test Plane",
             {
@@ -178,43 +177,55 @@ export class LocationView {
     render() {
         this.scene.render();
     }
-    buildGridLines(scene: BABYLON.Scene) {
-        const gridLines = 10;
-        const hiZ = 50;
-        const loZ = -50;
-        const hiX = 50;
-        const loX = -50;
+    buildGridLines(ranks: number, files: number, width: number, length: number) {
+        const gridLines = ranks-1;
+        const hiZ = width/2;
+        const loZ = -width/2;
+        const hiX = length/2;
+        const loX = -length/2;
         const height = 0;
         const tubes: BABYLON.Mesh[] = [];
-        const tubeMaterial = new BABYLON.StandardMaterial("tubeMaterial", scene);
+        const tubeMaterial = new BABYLON.StandardMaterial("tubeMaterial", this.scene);
         tubeMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
 
         const tubeMeshSchema: any = {
             path: [],
-            radius: 0.2,
+            radius: 0.1,
             tessellation: 3,
             cap: 1,
             arc: 1,
             sideOrientation: BABYLON.Mesh.FRONTSIDE,
         };
 
-        for (let i = 0; i <= gridLines + 1; i++) {
+        for (let i = 0; i <= ranks; i++) {
             const points = [
-                [new BABYLON.Vector3(hiX, height, loZ + ((hiX-loX)/(gridLines+1))*(i)),
-                new BABYLON.Vector3(loX, height, loZ + ((hiX-loX)/(gridLines+1))*(i)),],
-                [new BABYLON.Vector3(loX + ((hiZ-loZ)/(gridLines+1))*(i), height, hiZ),
-                new BABYLON.Vector3(loX + ((hiZ-loZ)/(gridLines+1))*(i), height, loZ),]
+                [new BABYLON.Vector3(hiX, height, loZ + ((hiX-loX)/(ranks))*(i)),
+                new BABYLON.Vector3(loX, height, loZ + ((hiX-loX)/(ranks))*(i)),],
+                // [new BABYLON.Vector3(loX + ((hiZ-loZ)/(files))*(i), height, hiZ),
+                // new BABYLON.Vector3(loX + ((hiZ-loZ)/(files))*(i), height, loZ),]
             ];
-            for (let j = 0; j < 2; j++) {
+            for (let j = 0; j < 1; j++) {
                 tubeMeshSchema.path = points[j];
                 const tube = BABYLON.MeshBuilder.CreateTube(
                     "tube",
                     tubeMeshSchema,
-                    scene
+                    this.scene
                 );
-                // tube.material = tubeMaterial;
-                // tube.alphaIndex = 2;
-                // tube.isPickable = false;
+                tubes.push(tube);
+            }
+        }
+        for (let i = 0; i <= files; i++) {
+            const points = [
+                [new BABYLON.Vector3(loX + ((hiZ-loZ)/(files))*(i), height, hiZ),
+                new BABYLON.Vector3(loX + ((hiZ-loZ)/(files))*(i), height, loZ),]
+            ];
+            for (let j = 0; j < 1; j++) {
+                tubeMeshSchema.path = points[j];
+                const tube = BABYLON.MeshBuilder.CreateTube(
+                    "tube",
+                    tubeMeshSchema,
+                    this.scene
+                );
                 tubes.push(tube);
             }
         }
@@ -264,7 +275,6 @@ export class LocationView {
                 // if (pick.pickedMesh.showBoundingBox) {
 
                 // }
-                // console.log(pick.pickedMesh.name);
                 this.pickedMesh = pick.pickedMesh;
                 this.pickedMesh.showBoundingBox = true;
                 this.pickStartingPosition = this.getGroundPosition();
