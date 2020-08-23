@@ -198,6 +198,7 @@ import {ACTION, ACTION_ARG} from "@/store/actions";
 import {EVENT_NAME, EVENT_TYPE} from "@shared/Events/Events";
 import { imageStore, ImageStore } from '@/GameStores/ImageStore';
 import { locationStore, LocationStore } from '@/GameStores/LocationStore';
+import {Subscriber} from "@/GameStores/Subscriber";
 
 enum TAB {
     IMAGES = "Images",
@@ -231,7 +232,7 @@ type MenuItem = {
 
 export default Vue.extend({
     data: () => ({
-        imageStore: null,
+        imageStore: null as ImageStore,
         locationStore: null as LocationStore,
         caseSensitive: false,
 
@@ -411,6 +412,15 @@ export default Vue.extend({
                 }
             }
             this.$store.dispatch(ACTION.TRIGGER_EVENT, payload);
+        },
+        notify(id: number) {
+            const newImages = this.imageStore.getLatestImages(id);
+            newImages.forEach(image => {
+                this.imageItems.push({
+                    id: image._id,
+                    name: image.name,
+                })
+            })
         }
     },
     computed: {
@@ -420,7 +430,12 @@ export default Vue.extend({
     },
     mounted() {
         this.imageStore = imageStore;
-        imageStore.images.forEach(image => {
+        const subscriber: Subscriber = {
+            notify: this.notify
+        }
+        const id = this.imageStore.subscribe(subscriber);
+        const images = this.imageStore.getLatestImages(id);
+        images.forEach(image => {
             this.imageItems.push({
                 id: image._id,
                 name: image.name,

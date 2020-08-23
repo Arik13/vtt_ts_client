@@ -5,6 +5,8 @@ import {CampaignDBService} from "../DB/IndexedDB";
 import io from 'socket.io-client';
 import {EVENT_NAME, EVENT_TYPE} from "@shared/Events/Events";
 const socket = io('http://localhost:3001');
+let DB: CampaignDBService = null;
+
 const axios = ax.create({baseURL: "http://localhost:3000/api/"});
 import {imageStore} from "../GameStores/ImageStore";
 import {locationStore} from "../GameStores/LocationStore";
@@ -26,6 +28,14 @@ function arrayBufferToString(buffer: ArrayBuffer){
     }
     return str;
 }
+
+socket.on(EVENT_NAME.DOWNLOAD_IMAGE, async (payload: any) => {
+    const imageDataBinary: ArrayBuffer = payload.pop();
+    const imageData: Asset.ImageInfo = JSON.parse(arrayBufferToString(imageDataBinary));
+    imageData.fileBuffer = payload[0];
+    await DB.addImage(imageData);
+    imageStore.addImage(imageData);
+})
 
 export default new Vuex.Store({
     state: {
@@ -53,7 +63,7 @@ export default new Vuex.Store({
     },
     actions: {
         async loadCampaign({state}, payload) {
-            const DB = new CampaignDBService(payload.id);
+            DB = new CampaignDBService(payload.id);
             await DB.open();
             const keys = await DB.getSyncKeys() as EVENT_TYPE.LOAD_CAMPAIGN;
             socket.emit(EVENT_NAME.LOAD_CAMPAIGN, keys, async (reply: any) => {

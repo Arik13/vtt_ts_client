@@ -126,6 +126,10 @@ class CampaignDBService {
             locationStore: await this.db.getAll(STORE.LOCATION_STORE),
         }
     }
+    async addImage(image: Asset.ImageInfo) {
+        await this.db.put(STORE.IMAGE_KEY_STORE, image._id, image._id);
+        await this.db.put(STORE.IMAGE_STORE, image, image._id);
+    }
 }
 
 export {CampaignDBService};
