@@ -1,8 +1,10 @@
 <template>
     <v-app dark>
+        <!-- Navigation drawer on the left -->
         <v-navigation-drawer app dark v-model="drawer"></v-navigation-drawer>
-        <v-app-bar app dark>
 
+        <!-- App bar, on the top, contains important links -->
+        <v-app-bar app dark>
             <router-link
                 v-for="navItem in navItems"
                 :key="navItem.title"
@@ -17,6 +19,8 @@
             <v-spacer />
             <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
         </v-app-bar>
+
+        <!-- The main body of the app, the component rendered here is controlled by the router, depending on the current url -->
         <v-main>
             <v-card tile color="dark grey" height="100%" >
                 <router-view />
@@ -26,8 +30,12 @@
 </template>
 
 <script lang="ts">
+/*
+    This is the root component, responsible for rendering and managing the app bar and the nav drawer,
+    as well as the main router view which will render the content of the app, depending on the current URL.
+*/
+
 import Vue from 'vue';
-// import {DB} from "./DB/IndexedDB";
 
 interface NavItem {
     title: string;
@@ -37,15 +45,11 @@ interface NavItem {
 }
 
 export default Vue.extend({
-    name: 'App',
+    name: 'App',    // Do not remove
     data: () => ({
+        // Controls if the nav drawer is open or not
         drawer: false
     }),
-    mounted() {
-        this.$store.state.authToken = localStorage.getItem("authToken");
-        this.$store.state.userID = localStorage.getItem("userID");
-        this.$store.state.campaignID = localStorage.getItem("campaignID");
-    },
     computed: {
         isLoggedIn(): boolean {
             return (this.$store.state.authToken);
@@ -63,6 +67,12 @@ export default Vue.extend({
     },
     destroyed() {
         localStorage.removeItem("campaignID");
-    }
+    },
+    // Retrieves user token and id for auto login
+    mounted() {
+        this.$store.state.authToken = localStorage.getItem("authToken");
+        this.$store.state.userID = localStorage.getItem("userID");
+        this.$store.state.campaignID = localStorage.getItem("campaignID");
+    },
 });
 </script>

@@ -3,13 +3,13 @@
             height="100%" width="100%"
             class="overflow-y-auto"
         >
-        <v-card flat dark style="padding: 0px" height="100%" width="100%">
+        <v-card flat dark style="padding: 0px" max-height="700px" height="100%" width="100%">
             <v-card-title style="margin: 0; padding: 0">{{title}}</v-card-title>
             <v-card-text style="padding: 0" height="100%" width="100%">
-                <v-list dense striped>
-                    <v-list-item-group>
+                <v-list dense striped height="100%">
+                    <v-list-item-group height="100%">
                         <v-list-item
-                            v-for="(element, i) in items" :key="element.id" @contextmenu="show(element.id, $event)" :class="zebraStyle(i)"
+                            v-for="(element, i) in assets" :key="element.id" @contextmenu="show(element.id, $event)" :class="zebraStyle(i)"
                             @click="menuBus(assetClickEventCode, element.id)"
                         >
                             {{ element.name }}
@@ -20,6 +20,7 @@
             </v-card-text>
         </v-card>
         <v-menu
+            dark
             v-model="showMenu"
             :position-x="x"
             :position-y="y"
@@ -28,9 +29,9 @@
             transition="none"
             tile
         >
-            <v-list dense flat style="padding: 0px; margin: 0px;">
+            <v-list dense striped style="padding: 0px; margin: 0px;">
                 <v-list-item-group>
-                    <v-list-item v-for="(menuItem, i) in menuItems" :key="i">
+                    <v-list-item v-for="(menuItem, i) in menuItems" :key="i" :style="menuItem.style">
                         <v-list-item-title @click="menuBus(menuItem.eventCode, menuedItemID)">
                             {{ menuItem.title }}
                         </v-list-item-title>
@@ -42,6 +43,14 @@
 </template>
 
 <script lang="ts">
+/*
+    The asset tree does not currently display a tree of assets, but a list of assets.
+    A folder system view will provided in the future. This component is passed a list of
+    menu items, each with a name and handler. Each asset can be right clicked, and a menu
+    will be provided. Clicking a menu item will pass the ID of the right clicked asset to
+    the menu item handler.
+*/
+
 import Vue from "vue"
 import draggable from 'vuedraggable';
 
@@ -61,7 +70,7 @@ export default Vue.extend({
     }),
     props: {
         title: null,
-        items: null,
+        assets: null,
         filter: null,
         search: null,
         menuItems: null,
@@ -91,5 +100,11 @@ export default Vue.extend({
 <style>
     .zebra {
         background-color: rgba(255, 255, 255, 0.05);
+    }
+    .v-list {
+        /* height: 600px; */
+        height: 100%;
+        overflow-y: auto;
+        /* position: absolute; */
     }
 </style>

@@ -1,9 +1,6 @@
-import {MeshData} from "./LocationData"
-import {cameraFactory, PlanarCamera} from "./Camera"
-import lightScene from "./Lights"
-import { imageStore } from '@/GameStores/ImageStore';
-
-// import "babylonjs"
+import {MeshData} from "@/Babylon/Engine/MeshData"
+import lightScene from "@/Babylon/Engine/Lights"
+import {cameraFactory, PlanarCamera} from "@/Babylon/Engine/Camera"
 
 export interface LocationViewListener {
     tokenSelected(tokenID: string): void;
@@ -21,7 +18,6 @@ export class LocationView {
     constructor(
         engine: BABYLON.Engine,
         listener: LocationViewListener,
-        // inputs: BABYLON.ICameraInput<PlanarCamera>[],
         canvas: HTMLCanvasElement,
     ) {
         this.scene = new BABYLON.Scene(engine);
@@ -33,58 +29,16 @@ export class LocationView {
         this.camera = camera;
         this.canvas = canvas;
         lightScene(this.scene);
-        // this.buildGridLines(this.scene);
         this.createPickPlane();
         this.detachControl();
-        // this.test();
-        // const pipeline = new BABYLON.DefaultRenderingPipeline(
-        //     "defaultPipeline", // The name of the pipeline
-        //     true, // Do you want the pipeline to use HDR texture?
-        //     this.scene, // The scene instance
-        //     this.scene.cameras // The list of cameras to be attached to
-        // );
-        // pipeline.samples = 4;
-        // pipeline.fxaaEnabled = true;
-    }
-    test() {
-        const blob = new Blob([imageStore.images[0].fileBuffer]);
-        const url = URL.createObjectURL(blob);
-        const mesh = BABYLON.MeshBuilder.CreatePlane(
-            "Test Plane",
-            {
-                width: 20,
-                height: 20,
-                sideOrientation: BABYLON.Mesh.DOUBLESIDE
-            },
-            this.scene,
+        const pipeline = new BABYLON.DefaultRenderingPipeline(
+            "defaultPipeline", // The name of the pipeline
+            true, // Do you want the pipeline to use HDR texture?
+            this.scene, // The scene instance
+            this.scene.cameras // The list of cameras to be attached to
         );
-        mesh.addRotation(Math.PI/2, 0, 0);
-        mesh.setPositionWithLocalVector(new BABYLON.Vector3(0, 0, 0));
-        const meshMaterial = new BABYLON.StandardMaterial("Test Material", this.scene);
-        mesh.alphaIndex = 4;
-        meshMaterial.emissiveTexture = new BABYLON.Texture(
-            // "textures/avatar.png",
-            url,
-            // null,
-            this.scene,
-        );
-        meshMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-        meshMaterial.opacityTexture = new BABYLON.Texture(
-            // "textures/avatar.png",
-            url,
-            // null,
-            this.scene,
-            false,
-            true,
-            BABYLON.Texture.NEAREST_SAMPLINGMODE,
-            null,
-            null,
-            // ,
-        );
-        mesh.material = meshMaterial;
-        this.meshes.push(mesh);
-        // mesh.
-
+        pipeline.samples = 4;
+        pipeline.fxaaEnabled = true;
     }
     getCamera(): PlanarCamera {
         return this.scene.cameras[0] as PlanarCamera;
@@ -178,7 +132,6 @@ export class LocationView {
         this.scene.render();
     }
     buildGridLines(ranks: number, files: number, width: number, length: number) {
-        const gridLines = ranks-1;
         const hiZ = width/2;
         const loZ = -width/2;
         const hiX = length/2;
@@ -201,8 +154,6 @@ export class LocationView {
             const points = [
                 [new BABYLON.Vector3(hiX, height, loZ + ((hiX-loX)/(ranks))*(i)),
                 new BABYLON.Vector3(loX, height, loZ + ((hiX-loX)/(ranks))*(i)),],
-                // [new BABYLON.Vector3(loX + ((hiZ-loZ)/(files))*(i), height, hiZ),
-                // new BABYLON.Vector3(loX + ((hiZ-loZ)/(files))*(i), height, loZ),]
             ];
             for (let j = 0; j < 1; j++) {
                 tubeMeshSchema.path = points[j];
@@ -267,18 +218,10 @@ export class LocationView {
             }
         }
         else {
-            // if (pick.pickedMesh == this.pickedMesh) {
-            //     this.pickedMesh.showBoundingBox = false;
-            //     this.pickedMesh = null;
-            // }
             if (pick.pickedMesh != this.pickPlane && pick.pickedMesh.isPickable) {
-                // if (pick.pickedMesh.showBoundingBox) {
-
-                // }
                 this.pickedMesh = pick.pickedMesh;
                 this.pickedMesh.showBoundingBox = true;
                 this.pickStartingPosition = this.getGroundPosition();
-                // this.pickedMesh.showBoundingBox = !this.pickedMesh.showBoundingBox;
             }
         }
     }

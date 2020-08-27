@@ -10,6 +10,8 @@ import Vue from 'vue'
 import {ACTION, ACTION_ARG} from "@store/actions";
 import {EVENT_NAME, EVENT_TYPE} from "@shared/Events/Events";
 import { imageStore } from '@/GameStores/ImageStore';
+import { locationStore } from '@/GameStores/LocationStore';
+import {createCampaignData} from "@/GameStores/CampaignData";
 
 export default Vue.extend({
     data: () => ({
@@ -17,6 +19,29 @@ export default Vue.extend({
     }),
     methods: {
         startEditor(campaignID: string) {
+            // No campaign has been loaded
+            // if (!this.$store.state.campaignID) {
+
+            // }
+            // The current campaign is already loaded
+            if (campaignID == this.$store.state.campaignID) {
+                return this.$router.push({ path: `/campaigneditor/${campaignID}` });
+            }
+            this.start(campaignID);
+            // A new campaign is being loaded, reconnect to get a new session
+            // else {
+            //     this.$store.dispatch(ACTION.RECONNECT, {
+            //         callback: () => {
+            //             this.start(campaignID);
+            //         }
+            //     });
+            // }
+        },
+        start(campaignID: string) {
+
+            // imageStore.reset();
+            // locationStore.reset();
+
             const event: EVENT_TYPE.JOIN = {
                 campaignID: campaignID,
                 userID: this.$store.state.userID,
@@ -29,6 +54,7 @@ export default Vue.extend({
                     this.$store.dispatch(ACTION.LOAD_CAMPAIGN, {
                         id: campaignID,
                         callback: (result: any) => {
+                            this.$store.state.campaignID = campaignID;
                             this.$router.push({ path: `/campaigneditor/${campaignID}` });
                         }
                     });

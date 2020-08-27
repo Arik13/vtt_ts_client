@@ -1,5 +1,5 @@
-import {InputBus, inputBus, INPUT_EVENT} from "../InputBus";
-import {PlanarCamera} from "../Camera";
+import {InputBus, inputBus, INPUT_EVENT} from "./InputBus";
+import {PlanarCamera} from "@/Babylon/Engine/Camera";
 
 enum MOUSE_BUTTON {
     NONE = -1,

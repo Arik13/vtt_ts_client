@@ -41,7 +41,9 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { ACTION, ACTION_ARG } from '@/store/actions';
 
+// TODO: Create password and username validation
 export default Vue.extend({
     data() {
         return {
@@ -59,37 +61,34 @@ export default Vue.extend({
         }
     },
     methods: {
-        validate() {
-            const form = this.$refs.form as HTMLFormElement;
-            if (form.validate()) {
-                this.signup();
-            }
-        },
-        reset() {
-            const form = this.$refs.form as HTMLFormElement;
-            form.reset()
-        },
-        resetValidation() {
-            const form = this.$refs.form as HTMLFormElement;
-            form.resetValidation()
-        },
+        // validate() {
+        //     const form = this.$refs.form as HTMLFormElement;
+        //     if (form.validate()) {
+        //         this.signup();
+        //     }
+        // },
+        // reset() {
+        //     const form = this.$refs.form as HTMLFormElement;
+        //     form.reset()
+        // },
+        // resetValidation() {
+        //     const form = this.$refs.form as HTMLFormElement;
+        //     form.resetValidation()
+        // },
         signup() {
-            this.$store.dispatch("accessResource", {
+            const payload: ACTION_ARG.ACCESS_RESOURCE = {
                 method: "POST",
                 route: "/users",
-                data:
-                    {
-                        email: this.email,
-                        password: this.password,
-                        username: this.username,
-                    },
+                data: {
+                    email: this.email,
+                    password: this.password,
+                    username: this.username,
+                },
                 callback: () => {
                     this.$router.push({ path: 'login' })
                 }
-            })
-                .then(() => {
-                    //this.$refs.form.reset();
-                });
+            }
+            this.$store.dispatch(ACTION.ACCESS_RESOURCE, payload);
         },
     },
 });

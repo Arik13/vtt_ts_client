@@ -51,12 +51,13 @@
                         <v-tab-item :value="TAB.IMAGES">
                             <asset-tree
                                 :title="TAB.IMAGES"
-                                :items="imageItems"
+                                :assets="imageItems"
                                 :filter="filter"
                                 :search="search"
                                 :menuItems="imageMenuItems"
                                 :menuBus="menuHandler"
                                 :assetClickEventCode="MENU_EVENT.OPEN_IMAGE"
+                                height="100%"
                             />
                             <v-divider /><br>
                             <v-file-input
@@ -68,33 +69,34 @@
                                 id="fileInput"
                                 ref="fileInput"
                                 multiple
-                                @change="uploadFiles()"
+                                @change="createImage()"
                             />
                         </v-tab-item>
 
                         <!-- Lights Manager -->
                         <v-tab-item :value="TAB.LIGHTS">
-                            <asset-tree :title="TAB.LIGHTS" :items="lightItems" :filter="filter" :search="search" />
+                            <asset-tree :title="TAB.LIGHTS" :assets="lightItems" :filter="filter" :search="search" />
                         </v-tab-item>
 
                         <!-- Characters Manager -->
                         <v-tab-item :value="TAB.CHARACTERS">
-                            <asset-tree :title="TAB.CHARACTERS" :items="characterItems" :filter="filter" :search="search" />
+                            <asset-tree :title="TAB.CHARACTERS" :assets="characterItems" :filter="filter" :search="search" />
                         </v-tab-item>
 
                         <!-- Locations Manager -->
                         <v-tab-item :value="TAB.LOCATIONS">
                             <asset-tree
                                 :title="TAB.LOCATIONS"
-                                :items="locationItems"
+                                :assets="locationItems"
                                 :filter="filter"
                                 :search="search"
                                 :menuItems="locationMenuItems"
                                 :menuBus="menuHandler"
-                                :assetClickEventCode="MENU_EVENT.OPEN_LOCATION"
+                                :assetClickEventCode="MENU_EVENT.VIEW_LOCATION"
                             />
                             <v-divider /><br>
                             <v-btn @click="dialogs.createLocation.on = true">Create Location</v-btn>
+                            <br><br>
                         </v-tab-item>
                     </v-tabs-items>
                 </v-tabs>
@@ -191,18 +193,31 @@
 </template>
 
 <script lang="ts">
+/*
+    The asset manager is responsible for displaying lists of each assets, and providing
+    a set of dialogs and menus that allow for the manipulation of those assets.
+
+    The top half of the template above contains the HTML for the asset lists,
+    and the bottom half contains the HTML for the dialogs.
+
+    In the data, each dialog has a state. Each dialog also has a handler,
+    which can update the asset store relevant to the asset being created/updated/deleted.
+*/
 
 import Vue from "vue";
 import AssetTree from "@/components/AssetTree.vue";
 import {ACTION, ACTION_ARG} from "@/store/actions";
 import {EVENT_NAME, EVENT_TYPE} from "@shared/Events/Events";
-import { imageStore, ImageStore } from '@/GameStores/ImageStore';
-import { locationStore, LocationStore } from '@/GameStores/LocationStore';
+import {Asset} from "@shared/Assets/Asset";
+import { Store } from '@/GameStores/Store';
+import {imageStore, ImageStore} from '@/GameStores/ImageStore';
+import {locationStore, LocationStore} from '@/GameStores/LocationStore';
 import {Subscriber} from "@/GameStores/Subscriber";
+import {babylonController} from "@/Babylon/Engine/BabylonController";
 
 enum TAB {
     IMAGES = "Images",
-    GRAPHICS = "Graphics",
+    // GRAPHICS = "Graphics",
     LIGHTS = "Lights",
     CHARACTERS = "Characters",
     LOCATIONS = "Locations",
@@ -216,6 +231,7 @@ enum MENU_EVENT {
     CREATE_LOCATION = "createLocation",
     OPEN_LOCATION = "openLocation",
     DELETE_LOCATION = "deleteLocation",
+    VIEW_LOCATION = "viewLocation"
 }
 
 enum DIALOG {
@@ -232,8 +248,8 @@ type MenuItem = {
 
 export default Vue.extend({
     data: () => ({
-        imageStore: null as ImageStore,
-        locationStore: null as LocationStore,
+        imageStore: imageStore as ImageStore,
+        locationStore: locationStore as LocationStore,
         caseSensitive: false,
 
         tabs: [
@@ -263,6 +279,7 @@ export default Vue.extend({
         locationMenuItems: [
             {title: "Open", eventCode: MENU_EVENT.OPEN_LOCATION,},
             {title: "Delete", eventCode: MENU_EVENT.DELETE_LOCATION,},
+            {title: "View", eventCode: MENU_EVENT.VIEW_LOCATION,},
         ],
 
         dialogs: {
@@ -307,29 +324,35 @@ export default Vue.extend({
     methods: {
         menuHandler(menuEvent: MENU_EVENT, itemID: string) {
             switch(menuEvent) {
+                // IMAGES
                 case MENU_EVENT.OPEN_IMAGE:
-                    this.dialogs.imageViewer.state.imageSrc = this.loadImageURL(itemID);
+                    this.dialogs.imageViewer.state.imageSrc = this.createImageURL(itemID);
                     this.openDialog(DIALOG.IMAGE_VIEWER);
-                    break;
+                    return;
+                case MENU_EVENT.DELETE_IMAGE:
+                    this.imageStore.delete(itemID);
+                    return;
+
+                // LOCATIONS
+                case MENU_EVENT.OPEN_LOCATION:
+                    this.dialogs.locationViewer.state.location = this.locationStore.get(itemID);
+                    this.dialogs.locationViewer.state.mapImageSrc = this.createImageURL(this.dialogs.locationViewer.state.location.mapImageID);
+                    this.openDialog(DIALOG.LOCATION_VIEWER);
+                    return;
+                case MENU_EVENT.CREATE_LOCATION:
+                    return;
+                case MENU_EVENT.DELETE_LOCATION:
+                    this.locationStore.delete(itemID);
+                    return;
+                case MENU_EVENT.VIEW_LOCATION:
+                    babylonController.setActiveLocation(itemID);
+                    return;
+
+                // TOKENS
                 case MENU_EVENT.CREATE_TOKEN:
                     this.dialogs.createToken.state.imageID = itemID;
                     this.openDialog(DIALOG.CREATE_TOKEN);
-                    break;
-                case MENU_EVENT.DELETE_IMAGE:
-                    break;
-                case MENU_EVENT.OPEN_LOCATION:
-                    // const location = this.locationStore.getLocation(itemID);
-                    console.log("Location: ", location);
-                    this.dialogs.locationViewer.state.location = this.locationStore.getLocation(itemID);
-                    this.dialogs.locationViewer.state.mapImageSrc = this.loadImageURL(this.dialogs.locationViewer.state.location.mapImageID);
-                    console.log(this.dialogs.locationViewer);
-
-                    this.openDialog(DIALOG.LOCATION_VIEWER);
-                    break;
-                case MENU_EVENT.CREATE_LOCATION:
-                    break;
-                case MENU_EVENT.DELETE_LOCATION:
-                    break;
+                    return;
             }
         },
         openDialog(dialogName: DIALOG) {
@@ -343,37 +366,20 @@ export default Vue.extend({
                 dialogObject.state[key] = null;
             }
         },
-        loadImageURL(imageID: string) {
-            const image = imageStore.getImage(imageID);
+        createImageURL(imageID: string) {
+            const image = imageStore.get(imageID);
             if (!image) return;
             return URL.createObjectURL(new Blob([image.fileBuffer]));
-            // this.dialogs.imageViewer.state.imageSrc = url;
         },
-
-        // EVENT Methods
-        async uploadFiles() {
+        async createImage() {
             const files = this.files;
-            if (!files.length) return;
+            if (!files || !files.length) return;
             const file = files[0] as File;
-            const fileBuff = await file.arrayBuffer();
-
-            const event: EVENT_TYPE.UPLOAD_IMAGE = {
-                campaignID: this.$store.state.campaignID,
-                name: file.name,
-                file: fileBuff,
-            }
-            const payload: ACTION_ARG.TRIGGER_EVENT = {
-                eventName: EVENT_NAME.UPLOAD_IMAGE,
-                event: event,
-                callback: (reply: any) => {
-                    if (reply.success) {
-                        console.log("Image Uploaded")
-                    }
-                }
-            }
-            this.$store.dispatch(ACTION.TRIGGER_EVENT, payload);
+            const fileBuffer = await file.arrayBuffer();
+            this.imageStore.create(file.name, fileBuffer);
+            this.files = null;
         },
-        async createToken() {
+        createToken() {
             const event: EVENT_TYPE.CREATE_TOKEN = {
                 imageID: this.dialogs.createToken.state.imageID,
                 label: this.dialogs.createToken.state.label,
@@ -392,36 +398,48 @@ export default Vue.extend({
             }
             this.$store.dispatch(ACTION.TRIGGER_EVENT, payload);
         },
-        async createLocation() {
-            const event: EVENT_TYPE.CREATE_LOCATION = {
+        createLocation() {
+            const locationAsset: Asset.LocationData = {
                 name: this.dialogs.createLocation.state.name,
                 mapImageID: this.dialogs.createLocation.state.mapImageID,
-                files: this.dialogs.createLocation.state.files,
-                ranks: this.dialogs.createLocation.state.ranks,
-                tileLength: this.dialogs.createLocation.state.tileLength,
-                tileWidth: this.dialogs.createLocation.state.tileWidth,
-            }
-            this.resetDialogState(DIALOG.CREATE_LOCATION);
-            const payload: ACTION_ARG.TRIGGER_EVENT = {
-                eventName: EVENT_NAME.CREATE_LOCATION,
-                event: event,
-                callback: (reply: any) => {
-                    if (reply.success) {
-                        console.log("Location Created");
-                    }
+                model: {
+                    files: this.dialogs.createLocation.state.files,
+                    ranks: this.dialogs.createLocation.state.ranks,
+                    tileLength: this.dialogs.createLocation.state.tileLength,
+                    tileWidth: this.dialogs.createLocation.state.tileWidth,
                 }
             }
-            this.$store.dispatch(ACTION.TRIGGER_EVENT, payload);
+            this.locationStore.create(locationAsset);
+            this.resetDialogState(DIALOG.CREATE_LOCATION);
         },
-        notify(id: number) {
-            const newImages = this.imageStore.getLatestImages(id);
-            newImages.forEach(image => {
-                this.imageItems.push({
-                    id: image._id,
-                    name: image.name,
-                })
+        imageCreated(id: string) {
+            const image = this.imageStore.get(id);
+            this.imageItems.push({
+                id: image.id,
+                name: image.name,
             })
-        }
+        },
+        imageDeleted(id: string) {
+            for (let i = 0; i < this.imageItems.length; i++) {
+                if (this.imageItems[i].id == id) {
+                    this.imageItems.splice(i, 1);
+                }
+            }
+        },
+        locationCreated(id: string) {
+            const location = this.locationStore.get(id);
+            this.locationItems.push({
+                id: location.id,
+                name: location.name,
+            })
+        },
+        locationDeleted(id: string) {
+            for (let i = 0; i < this.locationItems.length; i++) {
+                if (this.locationItems[i].id == id) {
+                    this.locationItems.splice(i, 1);
+                }
+            }
+        },
     },
     computed: {
         filter () {
@@ -429,26 +447,31 @@ export default Vue.extend({
         },
     },
     mounted() {
-        this.imageStore = imageStore;
-        const subscriber: Subscriber = {
-            notify: this.notify
+        // Subscribe to changes in the asset stores
+        const imageSubscriber: Subscriber = {
+            added: this.imageCreated,
+            deleted: this.imageDeleted,
         }
-        const id = this.imageStore.subscribe(subscriber);
-        const images = this.imageStore.getLatestImages(id);
-        images.forEach(image => {
+        const locationSubscriber: Subscriber = {
+            added: this.locationCreated,
+            deleted: this.locationDeleted,
+        }
+        this.imageStore.subscribe(imageSubscriber);
+        this.locationStore.subscribe(locationSubscriber);
+
+        // Pull all assets from the stores and add them to the view
+        this.imageStore.forEach(image => {
             this.imageItems.push({
-                id: image._id,
+                id: image.id,
                 name: image.name,
             })
-        })
-
-        this.locationStore = locationStore;
-        locationStore.forEach(location => {
+        });
+        this.locationStore.forEach(location => {
             this.locationItems.push({
-                id: location.locationID,
+                id: location.id,
                 name: location.name,
             })
-        })
+        });
     }
 });
 </script>

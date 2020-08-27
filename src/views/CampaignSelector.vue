@@ -37,7 +37,6 @@ export default Vue.extend({
     },
     methods: {
         startCampaign(ID: string) {
-            this.$store.state.campaignID = ID;
             this.$router.push({ path: `/loading/${ID}` });
         }
     },

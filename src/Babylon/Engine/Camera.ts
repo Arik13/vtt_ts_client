@@ -1,5 +1,16 @@
-import { KeyInput } from "./KeyInput";
-import { MouseInput } from "./MouseInput/MouseInput";
+/*
+    TODO: Add vertical translation capability to the camera via the mousewheel
+
+    The planar camera is initialized pointing at the origin, 120 feet above it.
+    The camera can pitch and yaw, but not roll. It can be translated in the
+    x and z directions along the plane it starts on, which is parallel to the
+    xz plane (the ground).
+
+    In world space, the Y direction is up/down.
+*/
+
+import { KeyInput } from "@/Babylon/Input/KeyInput";
+import { MouseInput } from "@/Babylon/Input/MouseInput";
 
 import "babylonjs"
 
@@ -49,6 +60,7 @@ export const cameraFactory = (scene: BABYLON.Scene) => {
     camera.inputs.removeByType("FreeCameraKeyboardMoveInput");
     camera.inputs.removeByType("FreeCameraMouseInput");
 
+    // Add custom inputs
     camera.inputs.add(new KeyInput(camera));
     camera.inputs.add(new MouseInput(camera, true));
     return camera;

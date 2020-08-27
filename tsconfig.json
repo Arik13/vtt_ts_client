@@ -102,7 +102,7 @@
         "src/**/*.tsx",
         "src/**/*.vue",
         "tests/**/*.ts",
-        "tests/**/*.tsx", "src/babylon/Camera.ts", "src/babylon/Camera.ts", "src/babylon/EngineAPI.ts",
+        "tests/**/*.tsx", "src/babylon/Camera.ts", "src/babylon/Camera.ts", "src/babylon/Engine/BabylonController.ts",
     ],
     "exclude": [
         "node_modules"

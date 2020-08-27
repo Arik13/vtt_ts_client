@@ -35,6 +35,8 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import {ACTION, ACTION_ARG} from "@/store/actions";
+
 export default Vue.extend({
     data() {
         return {
@@ -52,16 +54,16 @@ export default Vue.extend({
     },
     methods: {
         submitForm() {
-            const payload = {
+            const payload: ACTION_ARG.LOGIN = {
                 data: {
                     email: this.email,
                     password: this.password,
                 },
-                reroute: () => {
+                callback: () => {
                     this.$router.push({ path: 'campaignselector' })
                 }
             };
-            this.$store.dispatch('login', payload);
+            this.$store.dispatch(ACTION.LOGIN, payload);
         },
         validate() {
             if (this.form.validate()) {

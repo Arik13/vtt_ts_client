@@ -1,3 +1,7 @@
+/*
+    The input managers
+*/
+
 export interface InputReciever {
     recieveEvent(evt: InputEvent): void;
 }

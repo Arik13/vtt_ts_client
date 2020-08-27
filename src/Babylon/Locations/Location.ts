@@ -1,7 +1,7 @@
-import {MeshData} from "./LocationData";
-import {LocationView, LocationViewListener} from "./LocationView";
-import {LocationModel} from "./LocationModel";
-import {PlanarCamera} from "./Camera";
+import {MeshData} from "@/Babylon/Engine/MeshData";
+import {LocationView, LocationViewListener} from "@/Babylon/Locations/LocationView";
+import {LocationModel} from "@/Babylon/Locations/LocationModel";
+import {PlanarCamera} from "@/Babylon/Engine/Camera";
 import { Asset } from '@shared/Assets/Asset';
 
 export class Location implements LocationViewListener { // Controller
@@ -20,7 +20,6 @@ export class Location implements LocationViewListener { // Controller
             this,
             canvas,
         );
-        console.log(locationData);
         this.model = new LocationModel(
             locationData.files * locationData.tileWidth,
             locationData.ranks * locationData.tileLength,

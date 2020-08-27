@@ -1,3 +1,4 @@
 export interface Subscriber {
-    notify(id: number): void;
+    added(id: string): void;
+    deleted(id: string): void;
 }

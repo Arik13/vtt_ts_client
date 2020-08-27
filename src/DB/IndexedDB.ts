@@ -32,6 +32,7 @@ class CampaignDBService {
     db: IDBPDatabase<ClientDB>;
     campaignID: string;
     constructor(campaignID: string) {
+        console.log("DB Service for: ", campaignID);
         this.campaignID = campaignID;
     }
     async open() {
@@ -58,59 +59,31 @@ class CampaignDBService {
         }
         return assetDependencies;
     }
-    async syncImages(toAdd: any[], toRemove: any) {
-        // Add new images
-        toAdd.forEach(async (value: any) => {
-            const id = value._id;
-            await this.db.put(STORE.IMAGE_KEY_STORE, id, id);
-            await this.db.put(STORE.IMAGE_STORE, value, id);
-        });
-
-        // Remove extraneous images
-        toRemove.forEach(async (value: any) => {
-            await this.db.delete(STORE.IMAGE_KEY_STORE, value);
-            await this.db.delete(STORE.IMAGE_STORE, value);
-        });
-    }
-    async syncLocations(toAdd: any[], toRemove: any) {
-        // Add new images
-        toAdd.forEach(async (value: any) => {
-            const id = value._id;
-            await this.db.put(STORE.LOCATION_KEY_STORE, id, id);
-            await this.db.put(STORE.LOCATION_STORE, value, id);
-        });
-
-        // Remove extraneous images
-        toRemove.forEach(async (value: any) => {
-            await this.db.delete(STORE.LOCATION_KEY_STORE, value);
-            await this.db.delete(STORE.LOCATION_STORE, value);
-        });
-    }
     async syncAssets(assets: Asset.AssetSyncGroup) {
-        // Add new images
-
         const queryList: Promise<any>[] = [];
 
+        // Add new images
         assets.imageData.toAdd.forEach(async (value: Asset.ImageInfo) => {
-            const id = value._id;
+            const id = value.id;
             queryList.push(this.db.put(STORE.IMAGE_KEY_STORE, id, id));
             queryList.push(this.db.put(STORE.IMAGE_STORE, value, id));
         });
 
         // Remove extraneous images
-        assets.imageData.toRemove.forEach(async (value: any) => {
+        assets.imageData.toRemove.forEach(async (value: string) => {
             queryList.push(this.db.delete(STORE.IMAGE_KEY_STORE, value));
             queryList.push(this.db.delete(STORE.IMAGE_STORE, value));
         });
 
-        assets.locationData.toAdd.forEach(async (value: any) => {
-            const id = value.locationID;
+        // Add new locations
+        assets.locationData.toAdd.forEach(async (value: Asset.LocationData) => {
+            const id = value.id;
             queryList.push(this.db.put(STORE.LOCATION_KEY_STORE, id, id));
             queryList.push(this.db.put(STORE.LOCATION_STORE, value, id));
         });
 
-        // Remove extraneous images
-        assets.locationData.toRemove.forEach(async (value: any) => {
+        // Remove extraneous locations
+        assets.locationData.toRemove.forEach(async (value: string) => {
             queryList.push(this.db.delete(STORE.LOCATION_KEY_STORE, value));
             queryList.push(this.db.delete(STORE.LOCATION_STORE, value));
         });
@@ -127,9 +100,23 @@ class CampaignDBService {
         }
     }
     async addImage(image: Asset.ImageInfo) {
-        await this.db.put(STORE.IMAGE_KEY_STORE, image._id, image._id);
-        await this.db.put(STORE.IMAGE_STORE, image, image._id);
+        console.log(image)
+        await this.db.put(STORE.IMAGE_KEY_STORE, image.id, image.id);
+        await this.db.put(STORE.IMAGE_STORE, image, image.id);
+    }
+    async deleteImage(imageID: string) {
+        await this.db.delete(STORE.IMAGE_KEY_STORE, imageID);
+        await this.db.delete(STORE.IMAGE_STORE, imageID);
+    }
+    async addLocation(location: Asset.LocationData) {
+        await this.db.put(STORE.LOCATION_KEY_STORE, location.id, location.id);
+        await this.db.put(STORE.LOCATION_STORE, location, location.id);
     }
 }
+let DB: CampaignDBService = null;
 
-export {CampaignDBService};
+const createCampaignDBService = async (campaignID: string) => {
+    DB = new CampaignDBService(campaignID);
+    await DB.open();
+}
+export {CampaignDBService, createCampaignDBService, DB};

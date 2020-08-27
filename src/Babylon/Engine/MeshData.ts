@@ -1,17 +1,17 @@
-export interface Position {
-    rank: number;
-    file: number;
-}
+// export interface Position {
+//     rank: number;
+//     file: number;
+// }
 
-export interface PositionedMeshData {
-    position: Position;
-    meshData: MeshData;
-}
+// export interface PositionedMeshData {
+//     position: Position;
+//     meshData: MeshData;
+// }
 
-export interface LocationData {
-    mapMeshData: MeshData;
-    tokens: PositionedMeshData[];
-}
+// export interface LocationData {
+//     mapMeshData: MeshData;
+//     tokens: PositionedMeshData[];
+// }
 
 export class MeshData {
     texturePath: string;

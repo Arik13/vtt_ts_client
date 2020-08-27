@@ -1,21 +1,18 @@
+/*
+    Actions in the VueX store have no type safety. By always declaring the payload passed to dispatch
+    as an ACTION_ARG, some modicum of type safety is assured.
+*/
+
+import {EVENT_NAME, EVENT_TYPE} from "@shared/Events/Events";
+
 export enum ACTION {
     LOAD_CAMPAIGN = "loadCampaign",
     TRIGGER_EVENT = "triggerEvent",
     ACCESS_RESOURCE = "accessResource",
     LOGIN = "login",
     LOGOUT = "logout",
-    TOGGLE_DRAWER_OPEN = "toggleDrawerOpen",
+    RECONNECT = "reconnect",
 }
-
-// {
-//     method: "GET",
-//     route: `users/${this.$store.state.userID}/campaigns`,
-//     callback: (result: CampaignData[]) => {
-//         this.campaigns = result;
-//     }
-// }
-
-import {EVENT_NAME, EVENT_TYPE} from "@shared/Events/Events";
 
 export namespace ACTION_ARG {
     export type TRIGGER_EVENT = {
@@ -27,10 +24,22 @@ export namespace ACTION_ARG {
     export type ACCESS_RESOURCE = {
         method: string;
         route: string;
+        data?: any;
         callback: (result: any) => void;
     }
-}
 
-// export const ACTION_ARG_TYPES = {
-//     LOAD_CAMPAIGN_ARGS: LOAD_CAMPAIGN_ARGS,
-// }
+    export type LOGIN = {
+        data: {
+            email: string;
+            password: string;
+        };
+        callback: () => void;
+    }
+    export type LOGOUT = {
+        callback: () => void;
+    }
+
+    export type RECONNECT = {
+        callback: () => void;
+    }
+}

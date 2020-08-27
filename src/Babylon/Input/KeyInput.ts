@@ -1,5 +1,4 @@
-import {PlanarCamera} from "./Camera"
-
+import {PlanarCamera} from "@/Babylon/Engine/Camera"
 
 enum KEY {
     W = 87,
