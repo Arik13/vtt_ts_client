@@ -63,5 +63,9 @@ export const cameraFactory = (scene: BABYLON.Scene) => {
     // Add custom inputs
     camera.inputs.add(new KeyInput(camera));
     camera.inputs.add(new MouseInput(camera, true));
+
+    // camera.applyGravity = true;
+    camera.ellipsoid = new BABYLON.Vector3(0.5, 1, 0.5);
+    camera.checkCollisions = true;
     return camera;
 }

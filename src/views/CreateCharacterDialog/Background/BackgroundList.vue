@@ -5,7 +5,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import ExpandingRadioForm from "../../../components/ExpandingRadioForm.vue"
+import ExpandingRadioForm from "@/views/components/ExpandingRadioForm.vue"
 import AcolyteData from "./BackgroundData/AcolyteData"
 
 export default Vue.extend({

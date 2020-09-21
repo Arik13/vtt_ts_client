@@ -3,7 +3,7 @@
     <v-card dark height="100%" tile>
 
         <!-- Search element -->
-        <v-card flat dense tile>
+        <!-- <v-card flat dense tile>
             <v-card-text>
                 <v-text-field
                     v-model="search"
@@ -23,14 +23,14 @@
                     label="Case sensitive search"
                 ></v-checkbox>
             </v-card-text>
-        </v-card>
+        </v-card> -->
 
         <!-- ---------------------------------------------------------------------------- -->
         <!-- Asset Tabs -->
         <v-card flat dense tile height="100%">
             <v-card-text >
                 <v-tabs
-                    v-model="model"
+                    v-model="tabModel"
                     width="100%"
                     vertical
                     style="border-top: #333333 1px solid; border-bottom: #333333 1px solid"
@@ -46,20 +46,39 @@
                         </v-icon>
                     </v-tab>
 
-                    <v-tabs-items dark v-model="model" style="padding: 0px 10px; border-left: #333333 1px solid">
+                    <v-tabs-items dark v-model="tabModel" style="padding: 0px 0px 0px 5px; border-left: #333333 1px solid">
                         <!-- Image Manager -->
                         <v-tab-item :value="TAB.IMAGES">
-                            <asset-tree
+                            <asset-view
+                                v-if="imageDirectory"
+                                :title="TAB.IMAGES"
+                                :filter="filter"
+                                :search="search"
+                                :folderMenuItems="imageFolderMenuItems"
+                                :menuItems="imageMenuItems"
+                                :menuBus="menuHandler"
+                                :assetClickEventName="MENU_EVENT_NAME.OPEN_IMAGE"
+                                :directory="imageDirectory"
+                                height="100%"
+                            />
+                            <!-- <asset-tree
                                 :title="TAB.IMAGES"
                                 :assets="imageItems"
                                 :filter="filter"
                                 :search="search"
                                 :menuItems="imageMenuItems"
                                 :menuBus="menuHandler"
-                                :assetClickEventCode="MENU_EVENT.OPEN_IMAGE"
+                                :assetClickEventName="MENU_EVENT_NAME.OPEN_IMAGE"
                                 height="100%"
+                            /> -->
+                            <input
+                                type="file"
+                                style="display: none"
+                                ref="fileInput"
+                                accept="image/*"
+                                @change="createImage($event)"
                             />
-                            <v-divider /><br>
+                            <!-- <v-divider /><br>
                             <v-file-input
                                 v-model="files"
                                 label="Upload Image"
@@ -70,7 +89,7 @@
                                 ref="fileInput"
                                 multiple
                                 @change="createImage()"
-                            />
+                            /> -->
                         </v-tab-item>
 
                         <!-- Lights Manager -->
@@ -92,7 +111,7 @@
                                 :search="search"
                                 :menuItems="locationMenuItems"
                                 :menuBus="menuHandler"
-                                :assetClickEventCode="MENU_EVENT.VIEW_LOCATION"
+                                :assetClickEventName="MENU_EVENT_NAME.VIEW_LOCATION"
                             />
                             <v-divider /><br>
                             <v-btn @click="dialogs.createLocation.on = true">Create Location</v-btn>
@@ -115,7 +134,9 @@
                 <v-card-text>
                     <v-text-field label="Label" v-model="dialogs.createToken.state.label" />
                     <v-text-field label="Rank" v-model="dialogs.createToken.state.x" />
-                    <v-text-field label="File" v-model="dialogs.createToken.state.y" />
+                    <v-text-field label="File" v-model="dialogs.createToken.state.z" />
+                    <v-text-field label="Width" v-model="dialogs.createToken.state.width" />
+                    <v-text-field label="Length" v-model="dialogs.createToken.state.length" />
                     <v-btn @click="createToken()">Create</v-btn>
                 </v-card-text>
             </v-card>
@@ -188,6 +209,18 @@
                 </v-card-text>
             </v-card>
         </v-dialog>
+        <!-- Create Directory -->
+        <v-dialog v-model="dialogs.createDirectory.on" dark max-width="400px" width="100%">
+            <v-card>
+                <v-card-title>
+                    Create Directory
+                </v-card-title>
+                <v-card-text>
+                    <v-text-field label="Name" v-model="dialogs.createDirectory.state.name" />
+                    <v-btn @click="createDirectory()">Create</v-btn>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
         <!-- ---------------------------------------------------------------------------- -->
     </v-card>
 </template>
@@ -205,33 +238,33 @@
 */
 
 import Vue from "vue";
-import AssetTree from "@/components/AssetTree.vue";
-import {ACTION, ACTION_ARG} from "@/store/actions";
-import {EVENT_NAME, EVENT_TYPE} from "@shared/Events/Events";
+import AssetTree from "./components/AssetTree.vue";
+import AssetView from "./components/AssetView.vue";
 import {Asset} from "@shared/Assets/Asset";
-import { Store } from '@/GameStores/Store';
-import {imageStore, ImageStore} from '@/GameStores/ImageStore';
-import {locationStore, LocationStore} from '@/GameStores/LocationStore';
-import {Subscriber} from "@/GameStores/Subscriber";
+import {imageStore} from '@/Stores/ImageStore';
+import {locationStore} from '@/Stores/LocationStore';
+import {directoryStore} from '@/Stores/DirectoryStore';
+import {Subscriber} from "@/Stores/Subscriber";
 import {babylonController} from "@/Babylon/Engine/BabylonController";
+import dispatcher from "@/Dispatcher/Dispatcher";
 
 enum TAB {
     IMAGES = "Images",
-    // GRAPHICS = "Graphics",
     LIGHTS = "Lights",
     CHARACTERS = "Characters",
     LOCATIONS = "Locations",
 }
 
-enum MENU_EVENT {
+export enum MENU_EVENT_NAME {
     CREATE_TOKEN = "createToken",
     OPEN_IMAGE = "openImage",
+    CREATE_IMAGE = "createImage",
     DELETE_IMAGE = "deleteImage",
-
     CREATE_LOCATION = "createLocation",
     OPEN_LOCATION = "openLocation",
     DELETE_LOCATION = "deleteLocation",
-    VIEW_LOCATION = "viewLocation"
+    VIEW_LOCATION = "viewLocation",
+    CREATE_DIRECTORY = "createDirectory"
 }
 
 enum DIALOG {
@@ -239,19 +272,24 @@ enum DIALOG {
     CREATE_TOKEN = "createToken",
     CREATE_LOCATION = "createLocation",
     LOCATION_VIEWER = "locationViewer",
+    CREATE_DIRECTORY = "createDirectory",
 }
 
 type MenuItem = {
     title: string;
-    eventCode: string;
+    eventName: string;
 }
+
+interface HTMLInputEvent extends Event {
+    target: HTMLInputElement & EventTarget;
+}
+
 
 export default Vue.extend({
     data: () => ({
-        imageStore: imageStore as ImageStore,
-        locationStore: locationStore as LocationStore,
         caseSensitive: false,
-
+        TAB: TAB,
+        MENU_EVENT_NAME: MENU_EVENT_NAME,
         tabs: [
             {name: TAB.IMAGES, icon: "mdi-image"},
             {name: TAB.LIGHTS, icon: "mdi-lightbulb"},
@@ -259,16 +297,20 @@ export default Vue.extend({
             {name: TAB.LOCATIONS, icon: "mdi-map-marker"},
         ],
         search: null,
-        model: 'tab-1',
-        TAB: TAB,
-        MENU_EVENT: MENU_EVENT,
+        tabModel: TAB.IMAGES,
 
+        imageDirectory: null,
+        locationDirectory: null,
         // Image assets state
-        imageMenuItems: [
-            {title: "Create Token", eventCode: MENU_EVENT.CREATE_TOKEN,},
-            {title: "Delete", eventCode: MENU_EVENT.DELETE_IMAGE,},
-        ],
         imageItems: [],
+        imageMenuItems: [
+            {title: "Create Token", eventName: MENU_EVENT_NAME.CREATE_TOKEN,},
+            {title: "Delete", eventName: MENU_EVENT_NAME.DELETE_IMAGE,},
+        ],
+        imageFolderMenuItems: [
+            {title: "New Folder", eventName: MENU_EVENT_NAME.CREATE_DIRECTORY},
+            {title: "Add Image", eventName: MENU_EVENT_NAME.CREATE_IMAGE},
+        ],
         files: [],
 
         // Asset Lists
@@ -277,17 +319,20 @@ export default Vue.extend({
         characterItems: [],
         locationItems: [],
         locationMenuItems: [
-            {title: "Open", eventCode: MENU_EVENT.OPEN_LOCATION,},
-            {title: "Delete", eventCode: MENU_EVENT.DELETE_LOCATION,},
-            {title: "View", eventCode: MENU_EVENT.VIEW_LOCATION,},
+            {title: "Open", eventName: MENU_EVENT_NAME.OPEN_LOCATION,},
+            {title: "Delete", eventName: MENU_EVENT_NAME.DELETE_LOCATION,},
+            {title: "View", eventName: MENU_EVENT_NAME.VIEW_LOCATION,},
         ],
+        pickedDirectoryID: null,
 
         dialogs: {
             createToken: {
                 on: false,
                 state: {
-                    x: 1,
-                    y: 1,
+                    x: 20,
+                    z: 20,
+                    width: 5,
+                    length: 5,
                     label: "test",
                     imageID: null,
                 }
@@ -297,10 +342,17 @@ export default Vue.extend({
                 state: {
                     mapImageID: "",
                     name: "Location 1",
-                    files: 10,
-                    ranks: 10,
+                    files: 40,
+                    ranks: 40,
                     tileLength: 5,
                     tileWidth: 5,
+                }
+            },
+            createDirectory: {
+                on: false,
+                state: {
+                    parentID: "",
+                    name: "New Directory",
                 }
             },
             imageViewer: {
@@ -320,46 +372,80 @@ export default Vue.extend({
     }),
     components: {
         "asset-tree": AssetTree,
+        "asset-view": AssetView,
     },
     methods: {
-        menuHandler(menuEvent: MENU_EVENT, itemID: string) {
-            switch(menuEvent) {
+        menuHandler(eventName: MENU_EVENT_NAME, itemID: string) {
+            switch(eventName) {
                 // IMAGES
-                case MENU_EVENT.OPEN_IMAGE:
+                case MENU_EVENT_NAME.OPEN_IMAGE: {
                     this.dialogs.imageViewer.state.imageSrc = this.createImageURL(itemID);
                     this.openDialog(DIALOG.IMAGE_VIEWER);
                     return;
-                case MENU_EVENT.DELETE_IMAGE:
-                    this.imageStore.delete(itemID);
+                }
+                case MENU_EVENT_NAME.CREATE_IMAGE: {
+                    this.pickedDirectoryID = itemID
+                    const input = this.$refs.fileInput as HTMLInputElement;
+                    input.click();
+                    // let fileInputVue = this.$refs.fileInput as Vue;
+                    // let fileInput = fileInputVue.$el as HTMLElement;
+                    // console.log("File Input: ", fileInput);
+
+                    // fileInput.click();
+                    // console.log("test create image");
+
                     return;
+                }
+                case MENU_EVENT_NAME.DELETE_IMAGE: {
+                    const dir = directoryStore.getDirectory(itemID);
+                    dispatcher.deleteImage(dir.itemID, dir.id);
+                    return;
+                }
 
                 // LOCATIONS
-                case MENU_EVENT.OPEN_LOCATION:
-                    this.dialogs.locationViewer.state.location = this.locationStore.get(itemID);
+                case MENU_EVENT_NAME.OPEN_LOCATION: {
+                    this.dialogs.locationViewer.state.location = locationStore.get(itemID);
                     this.dialogs.locationViewer.state.mapImageSrc = this.createImageURL(this.dialogs.locationViewer.state.location.mapImageID);
                     this.openDialog(DIALOG.LOCATION_VIEWER);
                     return;
-                case MENU_EVENT.CREATE_LOCATION:
+                }
+                case MENU_EVENT_NAME.CREATE_LOCATION: {
                     return;
-                case MENU_EVENT.DELETE_LOCATION:
-                    this.locationStore.delete(itemID);
+                }
+                case MENU_EVENT_NAME.DELETE_LOCATION: {
+                    dispatcher.deleteLocation(itemID);
                     return;
-                case MENU_EVENT.VIEW_LOCATION:
-                    babylonController.setActiveLocation(itemID);
+                }
+                case MENU_EVENT_NAME.VIEW_LOCATION: {
+                    dispatcher.setActiveLocation(itemID);
                     return;
+                }
 
                 // TOKENS
-                case MENU_EVENT.CREATE_TOKEN:
+                case MENU_EVENT_NAME.CREATE_TOKEN: {
                     this.dialogs.createToken.state.imageID = itemID;
                     this.openDialog(DIALOG.CREATE_TOKEN);
                     return;
+                }
+
+                // DIRECTORIES
+                case MENU_EVENT_NAME.CREATE_DIRECTORY: {
+                    this.dialogs.createDirectory.state.parentID = itemID;
+
+                    this.openDialog(DIALOG.CREATE_DIRECTORY);
+                    console.log(itemID);
+                    console.log("Create a directory");
+                    return;
+                }
             }
         },
         openDialog(dialogName: DIALOG) {
+            /* eslint-disable  @typescript-eslint/no-explicit-any */
             const dialogObject = this.dialogs[dialogName] as any;
             dialogObject.on = true;
         },
         resetDialogState(dialogName: DIALOG) {
+            /* eslint-disable  @typescript-eslint/no-explicit-any */
             const dialogObject = this.dialogs[dialogName] as any;
             dialogObject.on = false;
             for (const key in dialogObject.state) {
@@ -371,32 +457,32 @@ export default Vue.extend({
             if (!image) return;
             return URL.createObjectURL(new Blob([image.fileBuffer]));
         },
-        async createImage() {
-            const files = this.files;
+        async createImage(event: HTMLInputEvent) {
+            const files = event.target.files;
             if (!files || !files.length) return;
             const file = files[0] as File;
             const fileBuffer = await file.arrayBuffer();
-            this.imageStore.create(file.name, fileBuffer);
+            dispatcher.createImage(file.name, fileBuffer, this.pickedDirectoryID);
             this.files = null;
         },
         createToken() {
-            const event: EVENT_TYPE.CREATE_TOKEN = {
+            const locationID = babylonController.getActiveLocationID();
+            const token: Asset.TokenData = {
+                name: this.dialogs.createToken.state.label,
                 imageID: this.dialogs.createToken.state.imageID,
-                label: this.dialogs.createToken.state.label,
-                x: this.dialogs.createToken.state.x,
-                y: this.dialogs.createToken.state.y,
-            }
-            this.resetDialogState(DIALOG.CREATE_TOKEN);
-            const payload: ACTION_ARG.TRIGGER_EVENT = {
-                eventName: EVENT_NAME.CREATE_TOKEN,
-                event: event,
-                callback: (reply: any) => {
-                    if (reply.success) {
-                        console.log("Token Created");
+                model: {
+                    position: {
+                        x: this.dialogs.createToken.state.x,
+                        z: this.dialogs.createToken.state.z,
+                    },
+                    dimensions: {
+                        width: this.dialogs.createToken.state.width,
+                        length: this.dialogs.createToken.state.length,
                     }
-                }
+                },
             }
-            this.$store.dispatch(ACTION.TRIGGER_EVENT, payload);
+            dispatcher.addToken(locationID, token);
+            this.resetDialogState(DIALOG.CREATE_TOKEN);
         },
         createLocation() {
             const locationAsset: Asset.LocationData = {
@@ -409,11 +495,20 @@ export default Vue.extend({
                     tileWidth: this.dialogs.createLocation.state.tileWidth,
                 }
             }
-            this.locationStore.create(locationAsset);
+            dispatcher.createLocation(locationAsset);
             this.resetDialogState(DIALOG.CREATE_LOCATION);
         },
+        createDirectory() {
+            dispatcher.createDirectory(
+                this.dialogs.createDirectory.state.name,
+                this.dialogs.createDirectory.state.parentID,
+            );
+            // directoryStore.createDirectory(
+            // );
+            this.resetDialogState(DIALOG.CREATE_DIRECTORY);
+        },
         imageCreated(id: string) {
-            const image = this.imageStore.get(id);
+            const image = imageStore.get(id);
             this.imageItems.push({
                 id: image.id,
                 name: image.name,
@@ -427,7 +522,7 @@ export default Vue.extend({
             }
         },
         locationCreated(id: string) {
-            const location = this.locationStore.get(id);
+            const location = locationStore.get(id);
             this.locationItems.push({
                 id: location.id,
                 name: location.name,
@@ -456,22 +551,24 @@ export default Vue.extend({
             added: this.locationCreated,
             deleted: this.locationDeleted,
         }
-        this.imageStore.subscribe(imageSubscriber);
-        this.locationStore.subscribe(locationSubscriber);
+        imageStore.subscribe(imageSubscriber);
+        locationStore.subscribe(locationSubscriber);
 
         // Pull all assets from the stores and add them to the view
-        this.imageStore.forEach(image => {
+        imageStore.forEach(image => {
             this.imageItems.push({
                 id: image.id,
                 name: image.name,
             })
         });
-        this.locationStore.forEach(location => {
+        locationStore.forEach(location => {
             this.locationItems.push({
                 id: location.id,
                 name: location.name,
             })
         });
+        this.imageDirectory = directoryStore.getRoot().children[0];
+        this.locationDirectory = directoryStore.getRoot().children[1];
     }
 });
 </script>

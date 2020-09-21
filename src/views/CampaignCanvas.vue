@@ -9,11 +9,11 @@
 
 */
 import Vue from "vue";
-import {initializeBabylon} from "@/Babylon/Engine/BabylonController";
+import {initializeBabylon, BabylonController} from "@/Babylon/Engine/BabylonController";
 
 export default Vue.extend({
     data: () => ({
-        engineController: null,
+        engineController: null as BabylonController,
     }),
     props: {
         bus: {

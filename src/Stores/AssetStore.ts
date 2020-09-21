@@ -1,12 +1,14 @@
 import {Asset} from "@shared/Assets/Asset";
 import {Subscriber} from "./Subscriber";
-import {AssetManager} from "./AssetManager";
+import {ServerProxy} from "./ServerProxy";
 
-export abstract class Store<T extends Asset.Asset> {
+export abstract class AssetStore<T extends Asset.Asset> {
+    serverProxy: ServerProxy;
     subscribers: Subscriber[] = [];
     assets: Map<string, T> = new Map();
     name: string;
-    constructor(name: string) {
+    constructor(name: string, serverProxy: ServerProxy) {
+        this.serverProxy = serverProxy;
         this.name = name;
     }
     subscribe(subscriber: Subscriber) {
@@ -26,14 +28,6 @@ export abstract class Store<T extends Asset.Asset> {
         this.assets.clear();
         this.subscribers = [];
     }
-
-///////////////////////////////////////////////////////////
-// C.R.U.D. Operations (Create, Read, Update, Delete)
-
-    // Create
-    abstract create(...args: any[]): void;
-
-    // Read
     get(id: string): T {
         return this.assets.get(id);
     }
@@ -44,11 +38,6 @@ export abstract class Store<T extends Asset.Asset> {
             subscriber.added(asset.id);
         });
     }
-
-    // Update methods defined by sub class
-
-    // Delete
-    abstract delete(id: string): void;
     deleted(id: string): void {
         const asset = this.assets.get(id);
         if (!asset) return;
@@ -57,12 +46,6 @@ export abstract class Store<T extends Asset.Asset> {
         });
         this.assets.delete(id);
     }
-///////////////////////////////////////////////////////////
-    // abstract addHandler(): void;
-    // abstract createHandler(): void;
-    // abstract deleteHandler(): void;
-    // abstract addHandler(): void;
-
 }
 
 

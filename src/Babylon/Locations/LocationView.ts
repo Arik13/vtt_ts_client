@@ -19,17 +19,22 @@ export class LocationView {
         engine: BABYLON.Engine,
         listener: LocationViewListener,
         canvas: HTMLCanvasElement,
+        width: number,
+        length: number,
     ) {
         this.scene = new BABYLON.Scene(engine);
+        this.scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
+        this.scene.collisionsEnabled = true;
         this.scene.getBoundingBoxRenderer().frontColor = BABYLON.Color3.Red();
         this.scene.getBoundingBoxRenderer().backColor = BABYLON.Color3.Red();
+
         const camera = cameraFactory(this.scene);
         this.scene.cameras = [camera];
         this.listener = listener;
         this.camera = camera;
         this.canvas = canvas;
         lightScene(this.scene);
-        this.createPickPlane();
+        this.createPickPlane(width, length);
         this.detachControl();
         const pipeline = new BABYLON.DefaultRenderingPipeline(
             "defaultPipeline", // The name of the pipeline
@@ -39,6 +44,7 @@ export class LocationView {
         );
         pipeline.samples = 4;
         pipeline.fxaaEnabled = true;
+        this.createTestPlane();
     }
     getCamera(): PlanarCamera {
         return this.scene.cameras[0] as PlanarCamera;
@@ -94,7 +100,7 @@ export class LocationView {
         mesh.setPositionWithLocalVector(new BABYLON.Vector3(position.x, position.y, position.z));
         const meshMaterial = new BABYLON.StandardMaterial(tokenModel.materialName, this.scene);
         mesh.alphaIndex = alphaIndex;
-        meshMaterial.emissiveTexture = new BABYLON.Texture(
+        meshMaterial.diffuseTexture = new BABYLON.Texture(
             tokenModel.texturePath,
             this.scene,
         );
@@ -140,9 +146,10 @@ export class LocationView {
         const tubes: BABYLON.Mesh[] = [];
         const tubeMaterial = new BABYLON.StandardMaterial("tubeMaterial", this.scene);
         tubeMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+        tubeMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
 
-        const tubeMeshSchema: any = {
-            path: [],
+        const tubeMeshSchema = {
+            path: [] as BABYLON.Vector3[],
             radius: 0.1,
             tessellation: 3,
             cap: 1,
@@ -185,8 +192,28 @@ export class LocationView {
         grid.alphaIndex = 2;
         grid.isPickable = false;
     }
-    createPickPlane() {
-        const ground = BABYLON.Mesh.CreateGround("ground", 100, 100, 1, this.scene, false);
+    createTestPlane() {
+        // const meshPlane = BABYLON.MeshBuilder.CreatePlane(
+        //     "TestPlaneMesh",
+        //     {
+        //         width: 100,
+        //         height: 100,
+        //         sideOrientation: BABYLON.Mesh.DOUBLESIDE
+        //     },
+        //     this.scene,
+        // );
+        // meshPlane.addRotation(Math.PI/2, 0, 0);
+        // meshPlane.checkCollisions = true;
+        // let material = new BABYLON.StandardMaterial("TestPlaneMaterial", this.scene);
+        // material.alpha = 0.5;
+        // material.diffuseColor = BABYLON.Color3.Red();
+        // material.specularColor = BABYLON.Color3.Red();
+
+        // meshPlane.material = material;
+    }
+    createPickPlane(width: number, length: number) {
+        const ground = BABYLON.Mesh.CreateGround("ground", width, length, 1, this.scene, false);
+        ground.checkCollisions = true;
         const groundMaterial = new BABYLON.StandardMaterial("ground", this.scene);
         groundMaterial.specularColor = BABYLON.Color3.Black();
         ground.alphaIndex = 4;
@@ -218,7 +245,11 @@ export class LocationView {
             }
         }
         else {
+            // this.pickedMesh.showBoundingBox = false;
             if (pick.pickedMesh != this.pickPlane && pick.pickedMesh.isPickable) {
+                // if (this.pickedMesh) {
+                //     this.pickedMesh.showBoundingBox = false;
+                // }
                 this.pickedMesh = pick.pickedMesh;
                 this.pickedMesh.showBoundingBox = true;
                 this.pickStartingPosition = this.getGroundPosition();

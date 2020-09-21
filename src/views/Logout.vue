@@ -4,14 +4,13 @@
 
 <script lang="ts">
 import Vue from "vue";
+import dispatcher from '@/Dispatcher/Dispatcher';
 
 export default Vue.extend({
     mounted() {
-        this.$store.dispatch("logout", {
-            callback: () => {
-                this.$router.push("/login");
-            }
-        });
+        dispatcher.logout();
+        this.$store.state.isLoggedIn = false;
+        this.$router.push("/login");
     }
 });
 </script>

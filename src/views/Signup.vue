@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ACTION, ACTION_ARG } from '@/store/actions';
+import { ACTION, ACTION_ARG } from '@/Stores/vuex/actions';
 
 // TODO: Create password and username validation
 export default Vue.extend({

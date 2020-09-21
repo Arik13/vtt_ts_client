@@ -35,7 +35,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import {ACTION, ACTION_ARG} from "@/store/actions";
+import dispatcher from "@/Dispatcher/Dispatcher"
 
 export default Vue.extend({
     data() {
@@ -53,17 +53,13 @@ export default Vue.extend({
         }
     },
     methods: {
-        submitForm() {
-            const payload: ACTION_ARG.LOGIN = {
-                data: {
-                    email: this.email,
-                    password: this.password,
-                },
-                callback: () => {
-                    this.$router.push({ path: 'campaignselector' })
-                }
-            };
-            this.$store.dispatch(ACTION.LOGIN, payload);
+        async submitForm() {
+            const result = await dispatcher.login(this.email, this.password);
+            this.$store.state.isLoggedIn = true;
+            if (result) {
+                console.log("Logging in");
+                this.$router.push({ path: 'campaignselector' })
+            }
         },
         validate() {
             if (this.form.validate()) {

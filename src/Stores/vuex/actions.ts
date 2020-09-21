@@ -18,13 +18,16 @@ export namespace ACTION_ARG {
     export type TRIGGER_EVENT = {
         eventName: EVENT_NAME;
         event: EVENT_TYPE.EVENT_TYPE;
+        /* eslint-disable  @typescript-eslint/no-explicit-any */
         callback: (res: any) => void;
     }
 
     export type ACCESS_RESOURCE = {
         method: string;
         route: string;
+        /* eslint-disable  @typescript-eslint/no-explicit-any */
         data?: any;
+        /* eslint-disable  @typescript-eslint/no-explicit-any */
         callback: (result: any) => void;
     }
 

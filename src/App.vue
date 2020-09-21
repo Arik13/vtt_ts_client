@@ -5,6 +5,7 @@
 
         <!-- App bar, on the top, contains important links -->
         <v-app-bar app dark>
+            <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
             <router-link
                 v-for="navItem in navItems"
                 :key="navItem.title"
@@ -17,7 +18,16 @@
                 </template>
             </router-link>
             <v-spacer />
-            <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+            <v-btn icon>
+                <v-icon>
+                    mdi-cog
+                </v-icon>
+            </v-btn>
+            <v-btn icon>
+                <v-avatar size="30">
+                    <img :src="avatarURL" :alt="'Profile'">
+                </v-avatar>
+            </v-btn>
         </v-app-bar>
 
         <!-- The main body of the app, the component rendered here is controlled by the router, depending on the current url -->
@@ -36,6 +46,7 @@
 */
 
 import Vue from 'vue';
+import {campaignStore} from "@/Stores/CampaignStore";
 
 interface NavItem {
     title: string;
@@ -47,12 +58,14 @@ interface NavItem {
 export default Vue.extend({
     name: 'App',    // Do not remove
     data: () => ({
+        avatarURL: "https://st2.depositphotos.com/1104517/11967/v/950/depositphotos_119675554-stock-illustration-male-avatar-profile-picture-vector.jpg",
         // Controls if the nav drawer is open or not
         drawer: false
     }),
     computed: {
         isLoggedIn(): boolean {
-            return (this.$store.state.authToken);
+            return this.$store.state.isLoggedIn;
+            // return (this.$store.state.authToken);
         },
         navItems(): NavItem[] {
             return [
@@ -60,7 +73,7 @@ export default Vue.extend({
                 { title: "Signup", icon: "how_to_reg", route: "/signup", show: !this.isLoggedIn},
                 { title: "Log Out", icon: "exit_to_app", route: "/logout", show: this.isLoggedIn},
                 { title: "Creator", icon: "exit_to_app", route: "/campaigncreator", show: this.isLoggedIn},
-                { title: "Editor", icon: "exit_to_app", route: "/campaigneditor", show: (this.isLoggedIn && this.$store.state.campaignID)},
+                { title: "Editor", icon: "exit_to_app", route: "/campaigneditor", show: (this.isLoggedIn && (!!campaignStore))},
                 { title: "Selector", icon: "exit_to_app", route: "/campaignselector", show: this.isLoggedIn},
             ];
         }
@@ -70,6 +83,7 @@ export default Vue.extend({
     },
     // Retrieves user token and id for auto login
     mounted() {
+
         this.$store.state.authToken = localStorage.getItem("authToken");
         this.$store.state.userID = localStorage.getItem("userID");
         this.$store.state.campaignID = localStorage.getItem("campaignID");

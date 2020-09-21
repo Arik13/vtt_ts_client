@@ -19,10 +19,11 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
     restrictionX: number;
     restrictionY: number;
     previousPosition: {x: number; y: number};
-    private _observer: any = null;
     pickPlane: BABYLON.Mesh
     pickedMesh: BABYLON.AbstractMesh;
     isDown: boolean;
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
+    private _observer: BABYLON.Observer<any> = null;
     constructor(camera: PlanarCamera, touchEnabled: boolean) {
         this.inputBus = inputBus;
         this.camera = camera;
@@ -46,6 +47,7 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
         return "FreeCameraSearchInput";
     }
     attachControl(element: HTMLElement, noPreventDefault?: boolean): void {
+        element;
         if (this.isAttached || !this.camera) return;
         this._observer = this.camera.getScene().onPointerObservable.add(
             this.pointerInput,
@@ -65,8 +67,8 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
         if (!this.isAttached) return;
     }
     handlePointerDown(pointerInfo: BABYLON.PointerInfo, eventState: BABYLON.EventState) {
+        eventState;
         this.isDown = true;
-        const scene = this.camera.getScene();
 
         const evt = pointerInfo.event as PointerEvent;
         this.buttonsPressed.push(evt.button);
@@ -93,6 +95,7 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
         }
     }
     handlePointerUp(pointerInfo: BABYLON.PointerInfo, eventState: BABYLON.EventState) {
+        eventState;
         this.isDown = false;
         const evt = pointerInfo.event as PointerEvent;
         this.buttonsPressed.splice(this.buttonsPressed.indexOf(evt.button), 1);
@@ -109,6 +112,7 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
         }
     }
     handlePointerMove(pointerInfo: BABYLON.PointerInfo, eventState: BABYLON.EventState) {
+        eventState;
         if (this.buttonsPressed.includes(MOUSE_BUTTON.LEFT)) {
             inputBus.sendEvent({
                 type: INPUT_EVENT.LEFT_DOWN_MOVE
@@ -137,12 +141,32 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
         }
     }
     handlePick(pointerInfo: BABYLON.PointerInfo, eventState: BABYLON.EventState) {
+        pointerInfo;
+        eventState;
         const scene = this.camera.getScene();
         const pick = scene.pick(scene.pointerX, scene.pointerY, (mesh) => {return mesh !== this.pickPlane && mesh.isPickable});
         if (pick.hit) {
         //     this.pickedMesh.showBoundingBox = !this.pickedMesh.showBoundingBox;
         }
     }
+    handlePointerWheel(pointerInfo: BABYLON.PointerInfo, eventState: BABYLON.EventState) {
+        eventState;
+        // Move parameters to view
+        const defaultZoomDistance = 10;
+        const maxHeight = 250;
+        const minHeight = 10;
+
+        const wheelEvent = pointerInfo.event as WheelEvent;
+        const zoomDisplacement = (wheelEvent.deltaY < 0)? -defaultZoomDistance : defaultZoomDistance;
+        const possibleHeight = this.camera.position.y + zoomDisplacement;
+        const finalHeight = Math.min(Math.max(possibleHeight, minHeight), maxHeight)
+        this.camera.position = new BABYLON.Vector3(
+            this.camera.position.x,
+            (finalHeight >= 0)? finalHeight : 0,
+            this.camera.position.z,
+        );
+    }
+
     pointerInput = (pointerInfo: BABYLON.PointerInfo, eventState: BABYLON.EventState): void => {
         eventState;
         const evt = pointerInfo.event as PointerEvent;
@@ -151,10 +175,16 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
             case BABYLON.PointerEventTypes.POINTERDOWN: return this.handlePointerDown(pointerInfo, eventState);
             case BABYLON.PointerEventTypes.POINTERUP: return this.handlePointerUp(pointerInfo, eventState);
             case BABYLON.PointerEventTypes.POINTERMOVE: return this.handlePointerMove(pointerInfo, eventState);
-            case BABYLON.PointerEventTypes.POINTERWHEEL: return;
+            case BABYLON.PointerEventTypes.POINTERWHEEL: return this.handlePointerWheel(pointerInfo, eventState);
             case BABYLON.PointerEventTypes.POINTERPICK: return this.handlePick(pointerInfo, eventState);
-            case BABYLON.PointerEventTypes.POINTERTAP: return;
-            case BABYLON.PointerEventTypes.POINTERDOUBLETAP: return;
+            // case BABYLON.PointerEventTypes.POINTERTAP: return this.handlePointerTap(pointerInfo, eventState);
+            // case BABYLON.PointerEventTypes.POINTERDOUBLETAP: return this.handlePointerDoubleTap(pointerInfo, eventState);
         }
     }
+    // handlePointerTap(pointerInfo: BABYLON.PointerInfo, eventState: BABYLON.EventState) {
+    //     // console.log("Tap");
+    // }
+    // handlePointerDoubleTap(pointerInfo: BABYLON.PointerInfo, eventState: BABYLON.EventState) {
+    //     // console.log("Double Tap");
+    // }
 }

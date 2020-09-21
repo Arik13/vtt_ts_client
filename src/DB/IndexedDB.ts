@@ -1,12 +1,20 @@
-import { openDB, deleteDB, wrap, unwrap, IDBPDatabase, DBSchema } from 'idb';
-// import {ImageFile} from "../GameStores/ImageStore";
+import {
+    openDB,
+    IDBPDatabase,
+    DBSchema,
+    // deleteDB,
+    // wrap,
+    // unwrap,
+} from 'idb';
 import {Asset} from "@shared/Assets/Asset";
 
-enum STORE {
+export enum STORE {
     IMAGE_STORE = "imageStore",
     IMAGE_KEY_STORE = "imageKeyStore",
     LOCATION_STORE = "locationStore",
     LOCATION_KEY_STORE = "locationKeyStore",
+    TOKEN_STORE = "tokenStore",
+    TOKEN_KEY_STORE = "tokenKeyStore",
 }
 
 interface ClientDB extends DBSchema {
@@ -24,49 +32,64 @@ interface ClientDB extends DBSchema {
     };
     locationKeyStore: {
         key: string;
-        value: string;
+        value: Asset.LocationKey;
+    };
+    tokenStore: {
+        key: string;
+        value: Asset.TokenData;
+    };
+    tokenKeyStore: {
+        key: string;
+        value: Asset.TokenKey;
     };
 }
+
+const DB_VERSION = 1;
 
 class CampaignDBService {
     db: IDBPDatabase<ClientDB>;
     campaignID: string;
     constructor(campaignID: string) {
-        console.log("DB Service for: ", campaignID);
+        console.log("Constructing DB Service for campaign: ", campaignID);
         this.campaignID = campaignID;
     }
     async open() {
-        await deleteDB(this.campaignID);
+        // Delete for debugging purposes
+        // await deleteDB(this.campaignID);
         this.db = await openDB(
             this.campaignID,
-            1,
+            DB_VERSION,
             {
                 upgrade(db, oldVersion, newVersion, transaction) {
+                    transaction;
                     console.log(`Upgrading DB from version ${oldVersion} to version ${newVersion}`);
                     db.createObjectStore(STORE.IMAGE_STORE);
                     db.createObjectStore(STORE.IMAGE_KEY_STORE);
                     db.createObjectStore(STORE.LOCATION_STORE);
                     db.createObjectStore(STORE.LOCATION_KEY_STORE);
+                    db.createObjectStore(STORE.TOKEN_STORE);
+                    db.createObjectStore(STORE.TOKEN_KEY_STORE);
                 },
             }
         );
         return true;
     }
-    async getSyncKeys(): Promise<any> {
-        const assetDependencies = {
-            imageIDs: await this.db.getAll(STORE.IMAGE_KEY_STORE),
-            locations: await this.db.getAll(STORE.LOCATION_KEY_STORE),
+    async getSyncKeys(): Promise<Asset.AssetSyncKeys> {
+        const assetDependencies: Asset.AssetSyncKeys = {
+            imageKeys: await this.db.getAll(STORE.IMAGE_KEY_STORE),
+            locationKeys: await this.db.getAll(STORE.LOCATION_KEY_STORE),
+            tokenKeys: await this.db.getAll(STORE.TOKEN_KEY_STORE),
         }
         return assetDependencies;
     }
     async syncAssets(assets: Asset.AssetSyncGroup) {
-        const queryList: Promise<any>[] = [];
+        const queryList: Promise<string | void>[] = [];
 
         // Add new images
         assets.imageData.toAdd.forEach(async (value: Asset.ImageInfo) => {
             const id = value.id;
             queryList.push(this.db.put(STORE.IMAGE_KEY_STORE, id, id));
-            queryList.push(this.db.put(STORE.IMAGE_STORE, value, id));
+            queryList.push(this.db.put(STORE.IMAGE_STORE, value, id))
         });
 
         // Remove extraneous images
@@ -76,16 +99,33 @@ class CampaignDBService {
         });
 
         // Add new locations
-        assets.locationData.toAdd.forEach(async (value: Asset.LocationData) => {
-            const id = value.id;
-            queryList.push(this.db.put(STORE.LOCATION_KEY_STORE, id, id));
-            queryList.push(this.db.put(STORE.LOCATION_STORE, value, id));
+        // console.log("Sync Location Data: ", assets.locationData);
+        assets.locationData.toAdd.forEach(async (locationKeyValue: Asset.LocationKeyValue) => {
+            const id = locationKeyValue.key.locationID;
+            const key = locationKeyValue.key;
+            const location = locationKeyValue.value;
+            queryList.push(this.db.put(STORE.LOCATION_KEY_STORE, key, id));
+            queryList.push(this.db.put(STORE.LOCATION_STORE, location, id));
         });
 
         // Remove extraneous locations
-        assets.locationData.toRemove.forEach(async (value: string) => {
-            queryList.push(this.db.delete(STORE.LOCATION_KEY_STORE, value));
-            queryList.push(this.db.delete(STORE.LOCATION_STORE, value));
+        assets.locationData.toRemove.forEach(async (value: Asset.LocationKey) => {
+            queryList.push(this.db.delete(STORE.LOCATION_KEY_STORE, value.locationID));
+            queryList.push(this.db.delete(STORE.LOCATION_STORE, value.locationID));
+        });
+
+        assets.tokenData.toAdd.forEach(async (tokenKeyValue: Asset.TokenKeyValue) => {
+            const id = tokenKeyValue.key.tokenID;
+            const key = tokenKeyValue.key;
+            const token = tokenKeyValue.value;
+            queryList.push(this.db.put(STORE.TOKEN_KEY_STORE, key, id));
+            queryList.push(this.db.put(STORE.TOKEN_STORE, token, id));
+        });
+
+        // Remove extraneous tokens
+        assets.tokenData.toRemove.forEach(async (value: Asset.TokenKey) => {
+            queryList.push(this.db.delete(STORE.TOKEN_KEY_STORE, value.tokenID));
+            queryList.push(this.db.delete(STORE.TOKEN_STORE, value.tokenID));
         });
 
         await Promise.all(queryList);
@@ -93,14 +133,15 @@ class CampaignDBService {
 
     async getAssets() {
         return {
-            imageKeyStore: await this.db.getAll(STORE.IMAGE_KEY_STORE),
             imageStore: await this.db.getAll(STORE.IMAGE_STORE),
-            locationKeyStore: await this.db.getAll(STORE.LOCATION_KEY_STORE),
+            imageKeyStore: await this.db.getAll(STORE.IMAGE_KEY_STORE),
             locationStore: await this.db.getAll(STORE.LOCATION_STORE),
+            locationKeyStore: await this.db.getAll(STORE.LOCATION_KEY_STORE),
+            tokenStore: await this.db.getAll(STORE.TOKEN_STORE),
+            tokenKeyStore: await this.db.getAll(STORE.TOKEN_KEY_STORE),
         }
     }
     async addImage(image: Asset.ImageInfo) {
-        console.log(image)
         await this.db.put(STORE.IMAGE_KEY_STORE, image.id, image.id);
         await this.db.put(STORE.IMAGE_STORE, image, image.id);
     }
@@ -108,9 +149,27 @@ class CampaignDBService {
         await this.db.delete(STORE.IMAGE_KEY_STORE, imageID);
         await this.db.delete(STORE.IMAGE_STORE, imageID);
     }
-    async addLocation(location: Asset.LocationData) {
-        await this.db.put(STORE.LOCATION_KEY_STORE, location.id, location.id);
-        await this.db.put(STORE.LOCATION_STORE, location, location.id);
+    async addLocation(locationKeyValue: Asset.LocationKeyValue) {
+        const id = locationKeyValue.key.locationID;
+        const key = locationKeyValue.key;
+        const location = locationKeyValue.value;
+        await this.db.put(STORE.LOCATION_KEY_STORE, key, id);
+        await this.db.put(STORE.LOCATION_STORE, location, id);
+    }
+    async deleteLocation(locationID: string) {
+        await this.db.delete(STORE.LOCATION_KEY_STORE, locationID);
+        await this.db.delete(STORE.LOCATION_STORE, locationID);
+    }
+    async addToken(tokenKeyValue: Asset.TokenKeyValue) {
+        const id = tokenKeyValue.key.tokenID;
+        const key = tokenKeyValue.key;
+        const token = tokenKeyValue.value;
+        await this.db.put(STORE.TOKEN_KEY_STORE, key, id);
+        await this.db.put(STORE.TOKEN_STORE, token, id);
+    }
+    async deleteToken(tokenID: string) {
+        await this.db.delete(STORE.TOKEN_KEY_STORE, tokenID);
+        await this.db.delete(STORE.TOKEN_STORE, tokenID);
     }
 }
 let DB: CampaignDBService = null;

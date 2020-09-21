@@ -1,6 +1,6 @@
 <template>
     <div>
-        test
+        <h1>Testing</h1>
     </div>
 </template>
 
@@ -8,6 +8,8 @@
 import Vue from 'vue';
 
 export default Vue.extend({
-
+    mounted() {
+        console.log("Test")
+    }
 })
 </script>

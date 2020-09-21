@@ -1,17 +1,20 @@
-import {PlanarCamera} from "@/Babylon/Engine/Camera"
+import {PlanarCamera} from "@/Babylon/Engine/Camera";
+import {InputBus, inputBus, INPUT_EVENT, InputEvent} from "./InputBus";
 
 enum KEY {
     W = 87,
     S = 83,
     A = 65,
     D = 68,
-    UP = 38,
-    DOWN = 40,
     LEFT = 37,
+    UP = 38,
     RIGHT = 39,
+    DOWN = 40,
+    DELETE = 46,
 }
 
 export class KeyInput implements BABYLON.ICameraInput<PlanarCamera> {
+    inputBus: InputBus;
     camera: PlanarCamera;
     _keys: number[] = [];
     keysUp: KEY[] = [KEY.W, KEY.UP];
@@ -22,6 +25,7 @@ export class KeyInput implements BABYLON.ICameraInput<PlanarCamera> {
     noPreventDefault = false;
     constructor(camera: PlanarCamera) {
         this.camera = camera;
+        this.inputBus = inputBus;
     }
     setCamera(camera: PlanarCamera) {
         this.camera = camera;
@@ -36,12 +40,14 @@ export class KeyInput implements BABYLON.ICameraInput<PlanarCamera> {
         return "FreeCameraKeyboardWalkInput"
     }
     _onLostFocus(e: FocusEvent) {
+        e;
         this._keys = [];
     }
     detachControl(element: HTMLElement | null): void {
         if (this.attached) {
             element.removeEventListener("keydown", this._onKeyDown);
             element.removeEventListener("keyup", this._onKeyUp);
+            this._keys = [];
             // BABYLON.Tools.UnregisterTopRootEvents(
             //     // element.ownerDocument.defaultView,
             //     null,
@@ -49,7 +55,6 @@ export class KeyInput implements BABYLON.ICameraInput<PlanarCamera> {
             //         { name: "blur", handler: this._onLostFocus }
             //     ]
             // );
-            this._keys = [];
         }
         this.attached = false;
     }
@@ -69,7 +74,8 @@ export class KeyInput implements BABYLON.ICameraInput<PlanarCamera> {
         if (this.keysUp.indexOf(evt.keyCode) !== -1 ||
             this.keysDown.indexOf(evt.keyCode) !== -1 ||
             this.keysLeft.indexOf(evt.keyCode) !== -1 ||
-            this.keysRight.indexOf(evt.keyCode) !== -1) {
+            this.keysRight.indexOf(evt.keyCode) !== -1
+            ) {
             const index = this._keys.indexOf(evt.keyCode);
             // Add the key to the queue
             if (index === -1) {
@@ -79,15 +85,23 @@ export class KeyInput implements BABYLON.ICameraInput<PlanarCamera> {
                 evt.preventDefault();
             }
         }
+        else if (evt.keyCode == KEY.DELETE) {
+            const evt: InputEvent = {
+                type: INPUT_EVENT.DELETE,
+            }
+            inputBus.sendEvent(evt);
+        }
     }
     _onKeyUp = (evt: KeyboardEvent) => {
-
         if (!this.attached) return;
+
         // If a movement key was pressed
         if (this.keysUp.indexOf(evt.keyCode) !== -1 ||
             this.keysDown.indexOf(evt.keyCode) !== -1 ||
             this.keysLeft.indexOf(evt.keyCode) !== -1 ||
-            this.keysRight.indexOf(evt.keyCode) !== -1) {
+            this.keysRight.indexOf(evt.keyCode) !== -1 ||
+            evt.keyCode == KEY.DELETE
+            ) {
             const index = this._keys.indexOf(evt.keyCode);
             // Clear the key from the queue
             if (index >= 0) {
@@ -124,6 +138,7 @@ export class KeyInput implements BABYLON.ICameraInput<PlanarCamera> {
                 if (camera.getScene().useRightHandedSystem) {
                     camera.direction.z *= -1;
                 }
+
                 camera.getViewMatrix().invertToRef(camera._cameraTransformMatrix);
                 BABYLON.Vector3.TransformNormalToRef(camera.direction, camera._cameraTransformMatrix, camera._transformedDirection);
                 camera.cameraDirection.addInPlace(camera.direction);

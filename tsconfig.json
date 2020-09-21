@@ -84,7 +84,7 @@
         "paths": {
             "@/*": ["src/*"],
             "@shared/*": ["../vtt_shared/*"],
-            "@store/*": ["./src/store/*"],
+            "@store/*": ["src/Stores/*"],
         },
         "lib": [
             "esnext",
@@ -106,5 +106,6 @@
     ],
     "exclude": [
         "node_modules"
-    ]
+    ],
+    "rules": { "no-empty-interface": false },
 }

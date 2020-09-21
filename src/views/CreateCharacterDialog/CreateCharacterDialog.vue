@@ -137,7 +137,7 @@ import BackgroundList from "./Background/BackgroundList.vue";
 import ClassList from "./Class/ClassList.vue";
 import EquipmentForm from "./Equipment/EquipmentForm.vue";
 import RaceList from "./Race/RaceList.vue";
-import CardWrapper from "../../components/CardWrapper.vue";
+import CardWrapper from "@/views/components/CardWrapper.vue";
 import CreateCharacterStore from "./CreateCharacterStore";
 
 export default Vue.extend({

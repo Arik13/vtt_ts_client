@@ -1,4 +1,4 @@
-import RadioFormElement from "../../../../components/RadioFormElement"
+import RadioFormElement from "@/views/components/RadioFormElement"
 import GenericRaceForm from "../GenericRaceForm.vue";
 import Subrace from "../Subrace.vue"
 

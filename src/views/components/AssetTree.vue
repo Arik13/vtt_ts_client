@@ -9,13 +9,15 @@
                 <v-list dense striped height="100%">
                     <v-list-item-group height="100%">
                         <v-list-item
-                            v-for="(element, i) in assets" :key="element.id" @contextmenu="show(element.id, $event)" :class="zebraStyle(i)"
-                            @click="menuBus(assetClickEventCode, element.id)"
+                            v-for="(element, i) in assets"
+                            :key="element.id"
+                            :class="zebraStyle(i)"
+                            @contextmenu="show(element.id, $event)"
+                            @click="menuBus(assetClickEventName, element.id)"
                         >
                             {{ element.name }}
                         </v-list-item>
                     </v-list-item-group>
-
                 </v-list>
             </v-card-text>
         </v-card>
@@ -32,7 +34,7 @@
             <v-list dense striped style="padding: 0px; margin: 0px;">
                 <v-list-item-group>
                     <v-list-item v-for="(menuItem, i) in menuItems" :key="i" :style="menuItem.style">
-                        <v-list-item-title @click="menuBus(menuItem.eventCode, menuedItemID)">
+                        <v-list-item-title @click="menuBus(menuItem.eventName, menuedItemID)">
                             {{ menuItem.title }}
                         </v-list-item-title>
                     </v-list-item>
@@ -52,11 +54,10 @@
 */
 
 import Vue from "vue"
-import draggable from 'vuedraggable';
 
 type MenuItem = {
     title: string;
-    eventCode: string;
+    eventName: string;
 }
 
 export default Vue.extend({
@@ -75,15 +76,15 @@ export default Vue.extend({
         search: null,
         menuItems: null,
         menuBus: null,
-        assetClickEventCode: null,
+        assetClickEventName: null,
     },
     methods: {
-        show(id: string, e: any) {
+        show(id: string, event: MouseEvent) {
             this.menuedItemID = id;
-            e.preventDefault()
+            event.preventDefault()
             this.showMenu = false
-            this.x = e.clientX
-            this.y = e.clientY
+            this.x = event.clientX
+            this.y = event.clientY
             this.$nextTick(() => {
                 this.showMenu = true
             })

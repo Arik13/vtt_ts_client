@@ -1,12 +1,12 @@
-import RadioFormElement from "../../../../components/RadioFormElement";
-import ExpandingRadioForm from "../../../../components/ExpandingRadioForm.vue";
+import RadioFormElement from "@/views/components/RadioFormElement";
+import ExpandingRadioForm from "@/views/components/ExpandingRadioForm.vue";
 import ClassForm from "../ClassForm.vue";
-import CappedMultipleSelectBox from "../../../../components/CappedMultipleSelectBox.vue";
-import {WEAPON_LIST, WEAPON_STRINGS, getSimpleWeaponsStrings} from "../../../../dnd/Weapons";
-import {ATTRIBUTE_DATA} from "../../../../dnd/Attribute";
-import {ITEM_STRINGS} from "../../../../dnd/Items";
-import {getCantripStringsArray} from "../../../../dnd/Spells/Sorcerer/Cantrips";
-import {getSpells1StringsArray} from "../../../../dnd/Spells/Sorcerer/Spells1";
+import CappedMultipleSelectBox from "@/views/components/CappedMultipleSelectBox.vue";
+import {WEAPON_LIST, WEAPON_STRINGS, getSimpleWeaponsStrings} from "@/dnd/Weapons";
+import {ATTRIBUTE_DATA} from "@/dnd/Attribute";
+import {ITEM_STRINGS} from "@/dnd/Items";
+import {getCantripStringsArray} from "@/dnd/Spells/Sorcerer/Cantrips";
+import {getSpells1StringsArray} from "@/dnd/Spells/Sorcerer/Spells1";
 
 const sorcerousOriginData = [
     new RadioFormElement(

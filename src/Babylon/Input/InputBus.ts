@@ -2,8 +2,8 @@
     The input managers
 */
 
-export interface InputReciever {
-    recieveEvent(evt: InputEvent): void;
+export interface InputReceiver {
+    receiveEvent(evt: InputEvent): void;
 }
 export interface InputEvent {
     type: INPUT_EVENT;
@@ -18,16 +18,19 @@ export enum INPUT_EVENT {
     LEFT_UP = 2,
     LEFT_DOWN_MOVE = 3,
     LEFT_UP_MOVE = 4,
+    WHEEL_FORWARDS = 5,
+    WHEEL_BACKWARDS = 6,
+    DELETE = 7,
 }
 
 export class InputBus {
-    recievers: InputReciever[] = [];
-    registerReciever(reciever: InputReciever) {
-        this.recievers.push(reciever);
+    receivers: InputReceiver[] = [];
+    registerReceiver(receiver: InputReceiver) {
+        this.receivers.push(receiver);
     }
     sendEvent(evt: InputEvent) {
-        for (const key in this.recievers) {
-            this.recievers[key].recieveEvent(evt);
+        for (const key in this.receivers) {
+            this.receivers[key].receiveEvent(evt);
         }
     }
 

@@ -15,16 +15,18 @@ export class Location implements LocationViewListener { // Controller
         mapMeshData: MeshData,
         )
     {
-        this.view = new LocationView(
-            engine,
-            this,
-            canvas,
-        );
         this.model = new LocationModel(
             locationData.files * locationData.tileWidth,
             locationData.ranks * locationData.tileLength,
             locationData.files,
             locationData.ranks,
+        );
+        this.view = new LocationView(
+            engine,
+            this,
+            canvas,
+            this.model.getWidth(),
+            this.model.getHeight(),
         );
         this.view.addMap (
             mapMeshData,

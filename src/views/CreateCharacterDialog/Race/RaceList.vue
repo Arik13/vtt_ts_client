@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import ExpandingRadioForm from "../../../components/ExpandingRadioForm.vue"
+import ExpandingRadioForm from "@/views/components/ExpandingRadioForm.vue"
 
 // Races
 import AasimarData from "./RaceData/Aasimar"
