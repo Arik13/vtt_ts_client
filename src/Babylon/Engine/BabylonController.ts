@@ -44,7 +44,7 @@ class BabylonController implements InputReceiver {
         });
         locationStore.subscribe({
             added: () => {console.log();},
-            deleted: (id) => {id; console.log();},
+            deleted: (id) => {id; },
             updated: (id: string, event: LOCATION_EVENT.LocationEvent) => {
                 if (id != this.activeLocationID) return;
                 switch(event.eventName) {
@@ -88,9 +88,10 @@ class BabylonController implements InputReceiver {
     }
     receiveEvent(evt: InputEvent) {
         switch(evt.type) {
-            case INPUT_EVENT.LEFT_DOWN:
+            case INPUT_EVENT.LEFT_DOWN: {
                 return this.getActiveView().trySelect();
-            case INPUT_EVENT.LEFT_DOWN_MOVE:
+            }
+            case INPUT_EVENT.LEFT_DOWN_MOVE: {
                 if (this.getActiveView().hasSelection()) {
                     const view = this.getActiveView();
                     const model = this.getActiveModel();
@@ -101,18 +102,21 @@ class BabylonController implements InputReceiver {
                     }
                 }
                 break;
-            case INPUT_EVENT.LEFT_UP_MOVE:
+            }
+            case INPUT_EVENT.LEFT_UP_MOVE: {
                 break;
+            }
             // case INPUT_EVENT.WHEEL_FORWARDS:
             //     this.getActiveView().zoomIn();
             //     break;
             // case INPUT_EVENT.WHEEL_BACKWARDS:
             //     this.getActiveView().zoomOut();
             //     break;
-            case INPUT_EVENT.DELETE:
+            case INPUT_EVENT.DELETE: {
                 // this.getActiveView().zoomOut();
                 console.log("Delete");
                 break;
+            }
         }
     }
     resize() {
