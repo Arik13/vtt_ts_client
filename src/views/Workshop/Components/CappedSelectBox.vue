@@ -1,31 +1,26 @@
 <template>
-    <v-select
-        dark
-        outlined
-        v-model="selectedItems"
-        multiple
-        menu-props="dark"
-        :items="items"
-        :label="propData.label"
-        :max="propData.maxSelectable"
-        :change="handleSelection()"
-      >
-      </v-select>
+    <div>
+        <h3 v-if="prop.header" style="margin: 0px 0px 10px 0px">{{prop.header}}</h3>
+        <v-select
+            outlined
+            v-model="selectedItems"
+            multiple
+            :items="items"
+            :label="prop.label"
+            :max="prop.maxSelectable"
+            :change="handleSelection()"
+        />
+    </div>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, { PropType } from "vue";
+import {COMPONENT_NAME, COMPONENT_PROP} from "../ComponentTypes"
 
 export default Vue.extend({
-    props: [
-        "propData"
-        /*
-            propData expects:
-                - items (an array of strings)
-                - label (The label shown on the component before any selections are made)
-                - maxSelectable (The max number of items that can be selected)
-        */
-    ],
+    props: {
+        prop: {type: Object as PropType<COMPONENT_PROP.ChooseSome>}
+    },
     data: () => ({
         selectedItems: [],
         items: [],
@@ -34,7 +29,7 @@ export default Vue.extend({
     methods: {
         handleSelection() {
             // Selections are not used up, enable all items
-            if (this.selectedItems.length != this.propData.numberSelectable) {
+            if (this.selectedItems.length != this.prop.maxSelectable) {
                 for (let i = 0; i < this.items.length; i++) {
                     this.items[i].disabled = false;
                 }
@@ -50,9 +45,9 @@ export default Vue.extend({
         }
     },
     mounted() {
-        for (let i = 0; i < this.propData.items.length; i++) {
+        for (let i = 0; i < this.prop.choices.length; i++) {
             this.items.push({
-                text: this.propData.items[i],
+                text: this.prop.choices[i].text,
                 disabled: false,
             });
         }

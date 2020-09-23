@@ -1,12 +1,19 @@
 <template>
-    <div>
-        <component
-            v-for="(cd, i) in prop.cds"
-            :key="i"
-            :is="getComponent(cd)"
-            :prop="getProp(cd)"
-        />
-    </div>
+    <v-container>
+        <v-card>
+            <v-card-title v-if="prop.header">
+                {{ prop.header }}
+            </v-card-title>
+            <v-card-text>
+                <component
+                    v-for="(cd, i) in prop.cds"
+                    :key="i"
+                    :is="getComponent(cd)"
+                    :prop="getProp(cd)"
+                />
+            </v-card-text>
+        </v-card>
+    </v-container>
 </template>
 
 <script lang="ts">
@@ -24,16 +31,12 @@ export default Vue.extend({
     },
     methods: {
         getComponent(cd: ComponentDefinition) {
-            const component = componentMap.get(cd.componentType);
+            const component = componentMap.get(cd.name);
             return component;
         },
         getProp(cd: ComponentDefinition) {
-            // console.log(cd);
-            return cd.componentProp;
+            return cd.prop;
         },
     },
-    mounted() {
-        // console.log(this.prop);
-    }
 })
 </script>

@@ -176,8 +176,7 @@ class BabylonController implements InputReceiver {
                 );
             })
         const t1 = performance.now();
-        console.log("Call to doSomething took " + (t1 - t0) + " milliseconds.");
-        // Return
+        console.log(`Created the location "${locationData.name}" in ${Math.round(t1 - t0)} milliseconds.`);
         return location;
     }
     private createImageURL(imageID: string) {

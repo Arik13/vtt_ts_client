@@ -1,10 +1,10 @@
 <template>
     <div>
         <h3>
-            {{ prop.title }}
+            {{ prop.header }}
         </h3>
-        <p>
-            {{ prop.text }}
+        <p v-for="(paragraph, i) in prop.paragraphs" :key="i">
+            {{ paragraph }}
         </p>
     </div>
 </template>
@@ -15,7 +15,7 @@ import {COMPONENT_PROP} from "../ComponentTypes";
 
 export default Vue.extend({
     props: {
-        prop: {type: Object as PropType<COMPONENT_PROP.Paragraph>}
-    }
+        prop: {type: Object as PropType<COMPONENT_PROP.TextBlock>}
+    },
 })
 </script>

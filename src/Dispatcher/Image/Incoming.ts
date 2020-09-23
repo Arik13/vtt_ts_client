@@ -27,8 +27,6 @@ const imageDeleted = async (payload: EVENT_TYPE.IMAGE_DELETED) => {
     directoryStore.delete(payload.directoryID);
 }
 
-console.log("Image handlers added");
-
 
 serverProxy.addHandler(EVENT_NAME.IMAGE_DOWNLOADED, imageDownloaded);
 serverProxy.addHandler(EVENT_NAME.IMAGE_DELETED, imageDeleted);
