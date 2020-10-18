@@ -7,16 +7,22 @@
                 vertical
             >
                 <v-tab
-                    v-for="(tab, i) in prop.tabs"
+                    v-for="(tab, i) in value.tabs"
                     :key="i"
                     :href="`#${tab.header}`"
                 >
                     {{ tab.header }}
                 </v-tab>
-
                 <v-tabs-items v-model="tabModel">
-                    <v-tab-item v-for="(tab, j) in prop.tabs" :key="j" :value="tab.header">
-                        <component v-for="(cd, j) in tab.cds" :key="j" :is="getComponent(cd)" :prop="cd.prop" />
+                    <v-tab-item v-for="(tab, j) in value.tabs" :key="j" :value="tab.header" eager>
+                        <component
+                            v-for="(cd, j) in tab.cds"
+                            :key="j"
+                            :is="getComponent(cd)"
+                            :value="cd.value"
+                            :registerElement="registerElement"
+                            :ref="j"
+                        />
                     </v-tab-item>
                 </v-tabs-items>
             </v-tabs>
@@ -26,12 +32,13 @@
 
 <script lang="ts">
 import Vue, {PropType} from 'vue';
+import DynamicElement from "./DynamicElement.vue";
 import {ComponentDefinition, COMPONENT_NAME, COMPONENT_PROP} from "../ComponentTypes";
 import componentMap from "../ComponentMap";
 
-export default Vue.extend({
+export default DynamicElement.extend({
     props: {
-        prop: {type: Object as PropType<COMPONENT_PROP.Tabs>}
+        value: {type: Object as PropType<COMPONENT_PROP.Tabs>},
     },
     data: () => ({
         tabModel: null,
@@ -39,7 +46,21 @@ export default Vue.extend({
     methods: {
         getComponent(cd: ComponentDefinition) {
             return componentMap.get(cd.name);
+        },
+        setActive() {
+            this.isActive = true;
+            for (const key in this.$refs) {
+                const elGroup = this.$refs[key] as any;
+                for (const groupKey in elGroup) {
+                    const el = elGroup[groupKey] as any;
+                    el.setActive();
+                }
+            }
         }
     },
+    mounted() {
+        this.isActive = true;
+        // this.registerElement("test");
+    }
 })
 </script>

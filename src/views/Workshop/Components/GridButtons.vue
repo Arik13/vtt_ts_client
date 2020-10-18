@@ -1,10 +1,10 @@
 <template>
     <div>
-        <v-row no-gutters v-for="row in prop.rows" :key="row">
-            <v-col v-for="col in prop.columns" :key="col">
+        <v-row no-gutters v-for="row in value.rows" :key="row">
+            <v-col v-for="col in value.columns" :key="col">
                 <v-card @click="clicked(row, col)" height="150px" hover tile>
                     <v-card-title class="justify-center">
-                        {{ getButton(row, col).header }}
+                        {{ getChoice(row, col).header }}
                     </v-card-title>
                 </v-card>
             </v-col>
@@ -16,28 +16,38 @@
 
 <script lang="ts">
 import Vue, {PropType} from "vue";
+import DynamicElement from "./DynamicElement.vue";
 import {ComponentDefinition, COMPONENT_NAME, COMPONENT_PROP} from "../ComponentTypes";
 import componentMap from "../ComponentMap";
 // import {ALIGNMENT_DATA, ALIGNMENT} from "@/dnd/Alignment";
 
-export default Vue.extend({
+export default DynamicElement.extend({
+    data: () => ({
+        choice: null,
+    }),
     props: {
-        prop: {type: Object as PropType<COMPONENT_PROP.GridButtons>}
+        value: {type: Object as PropType<COMPONENT_PROP.GridButtons>},
     },
     methods: {
         clicked(row: number, col: number) {
-            const button = this.getButton(row, col);
-            console.log(button);
+            this.choice = this.getChoice(row, col);
         },
-        getButton(row: number, col: number) {
+        getChoice(row: number, col: number) {
             const i = (row - 1) * (col) + (col - 1);
-            const button = this.prop.buttons[i];
-            return button;
+            const choice = this.value.choices[i];
+            return choice;
         },
+        getSelectedChoice() {
+            return this.choice.data;
+        },
+        setActive() {
+            this.isActive = true;
+        }
     },
     mounted() {
-        console.log("Mounted Grid Buttons: ", this.prop);
-
+        this.isChoiceNode = true;
+        this.choice = this.getChoice(1, 1);
+        this.registerElement(this.getSelectedChoice);
     }
 })
 </script>

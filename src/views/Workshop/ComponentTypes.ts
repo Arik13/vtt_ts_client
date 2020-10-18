@@ -12,6 +12,20 @@ export enum COMPONENT_NAME {
     CHOOSE_MANY_W_SUB = "Choose Many With Sub",
     GRID_BUTTONS = "Grid Buttons",
 }
+
+/*
+    Some choices represent choosing a modification, other choices represent a
+    choosing the value of a parameter of a modification
+*/
+
+/*
+    The absence of the param field means the choice represents a mod itself
+*/
+export interface ChoiceData {
+    modTarget: string;
+    param: string;
+    value: number | string;
+}
 export namespace COMPONENT_PROP {
     export interface TextBlock {
         header: string;
@@ -26,15 +40,15 @@ export namespace COMPONENT_PROP {
         header: string;
         label: string;
         choices: {
-            text: string;
-            choiceID: string;
+            header: string;
+            data: ChoiceData;
         }[];
     }
     export interface ChooseOneWithSub {
         header: string;
         choices: {
+            data: ChoiceData;
             header: string;
-            choiceID: string;
             cds: ComponentDefinition[];
         }[];
     }
@@ -49,9 +63,9 @@ export namespace COMPONENT_PROP {
         header: string;
         rows: number;
         columns: number;
-        buttons: {
+        choices: {
             header: string;
-            choiceID: string;
+            data: ChoiceData;
         }[];
     }
     export type ComponentProp =
@@ -64,27 +78,27 @@ export namespace COMPONENT_PROP {
 }
 export interface TextBlockDefinition {
     name: COMPONENT_NAME.TEXT_BLOCK;
-    prop: COMPONENT_PROP.TextBlock;
+    value: COMPONENT_PROP.TextBlock;
 }
 export interface DynamicListDefinition {
     name: COMPONENT_NAME.DYNAMIC_LIST;
-    prop: COMPONENT_PROP.DynamicList;
+    value: COMPONENT_PROP.DynamicList;
 }
 export interface ChooseSomeDefinition {
     name: COMPONENT_NAME.CHOOSE_SOME;
-    prop: COMPONENT_PROP.ChooseSome;
+    value: COMPONENT_PROP.ChooseSome;
 }
 export interface ChooseOneWithSubDefinition {
     name: COMPONENT_NAME.CHOOSE_ONE_W_SUB;
-    prop: COMPONENT_PROP.ChooseOneWithSub;
+    value: COMPONENT_PROP.ChooseOneWithSub;
 }
 export interface TabsDefinition {
     name: COMPONENT_NAME.TABS;
-    prop: COMPONENT_PROP.Tabs;
+    value: COMPONENT_PROP.Tabs;
 }
 export interface GridButtonsDefinition {
     name: COMPONENT_NAME.GRID_BUTTONS;
-    prop: COMPONENT_PROP.GridButtons;
+    value: COMPONENT_PROP.GridButtons;
 }
 export type ComponentDefinition =
     TextBlockDefinition |

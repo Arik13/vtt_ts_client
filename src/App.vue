@@ -47,6 +47,7 @@
 
 import Vue from 'vue';
 import {campaignStore} from "@/Stores/CampaignStore";
+import {ROUTE} from "./router/index"
 
 interface NavItem {
     title: string;
@@ -69,12 +70,13 @@ export default Vue.extend({
         },
         navItems(): NavItem[] {
             return [
-                { title: "Log In", icon: "how_to_reg", route: "/login", show: !this.isLoggedIn},
-                { title: "Signup", icon: "how_to_reg", route: "/signup", show: !this.isLoggedIn},
-                { title: "Log Out", icon: "exit_to_app", route: "/logout", show: this.isLoggedIn},
-                { title: "Creator", icon: "exit_to_app", route: "/campaigncreator", show: this.isLoggedIn},
-                { title: "Editor", icon: "exit_to_app", route: "/campaigneditor", show: (this.isLoggedIn && (!!campaignStore))},
-                { title: "Selector", icon: "exit_to_app", route: "/campaignselector", show: this.isLoggedIn},
+                { title: "Log In", icon: "how_to_reg", route: ROUTE.LOGIN, show: !this.isLoggedIn},
+                { title: "Signup", icon: "how_to_reg", route: ROUTE.SIGNUP, show: !this.isLoggedIn},
+                { title: "Log Out", icon: "exit_to_app", route: ROUTE.LOGOUT, show: this.isLoggedIn},
+                { title: "Creator", icon: "exit_to_app", route: ROUTE.CAMPAIGN_CREATOR, show: this.isLoggedIn},
+                { title: "Editor", icon: "exit_to_app", route: ROUTE.CAMPAIGN_EDITOR, show: (this.isLoggedIn && (!!campaignStore))},
+                { title: "Selector", icon: "exit_to_app", route: ROUTE.CAMPAIGN_SELECTOR, show: this.isLoggedIn},
+                { title: "Forms", icon: "exit_to_app", route: ROUTE.FORM_CREATOR, show: this.isLoggedIn},
             ];
         }
     },

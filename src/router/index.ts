@@ -9,11 +9,12 @@ import CampaignEditor from "@/views/CampaignEditor.vue";
 import CampaignCreator from "@/views/CampaignCreator.vue";
 import CampaignSelector from "@/views/CampaignSelector.vue";
 import Home from "@/views/Home.vue";
-import Test from "@/views/Workshop/Test.vue";
+// import Test from "@/views/Workshop/Test.vue";
 import Login from "@/views/Login.vue";
 import Logout from "@/views/Logout.vue";
 import Signup from "@/views/Signup.vue";
 import LoadingScreen from "@/views/LoadingScreen.vue";
+import FormCreator from "@/views/FormCreator.vue";
 
 Vue.use(VueRouter);
 
@@ -27,11 +28,12 @@ export enum ROUTE {
     CAMPAIGN_CREATOR = "/campaigncreator",
     CAMPAIGN_SELECTOR = "/campaignselector",
     LOADING_SCREEN = "/loading",
+    FORM_CREATOR = "/formcreator",
 }
 
 const routes: Array<RouteConfig> = [
     {path: ROUTE.HOME, components: {default: Home}, meta: {title: "Home"}},
-    {path: ROUTE.TEST, components: {default: Test}, meta: {title: "Test"}},
+    // {path: ROUTE.TEST, components: {default: Test}, meta: {title: "Test"}},
     {path: ROUTE.LOGIN, components: {default: Login}, meta: {title: "Login"}},
     {path: ROUTE.LOGOUT, components: {default: Logout}, meta: {title: "Logout"}},
     {path: ROUTE.SIGNUP, components: {default: Signup}, meta: {title: "Signup"}},
@@ -40,6 +42,7 @@ const routes: Array<RouteConfig> = [
     {path: ROUTE.CAMPAIGN_CREATOR, components: {default: CampaignCreator}, meta: {title: "Campaign Creator"}},
     {path: ROUTE.CAMPAIGN_SELECTOR, components: {default: CampaignSelector}, meta: {title: "Campaign Selector"}},
     {path: `${ROUTE.LOADING_SCREEN}/:ID`, components: {default: LoadingScreen}, meta: {title: "Loading"}},
+    {path: ROUTE.FORM_CREATOR, components: {default: FormCreator}, meta: {title: "Form Creator"}},
 ];
 
 const router = new VueRouter({

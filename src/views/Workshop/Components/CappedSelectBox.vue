@@ -1,13 +1,13 @@
 <template>
     <div>
-        <h3 v-if="prop.header" style="margin: 0px 0px 10px 0px">{{prop.header}}</h3>
+        <h3 v-if="value.header" style="margin: 0px 0px 10px 0px">{{value.header}}</h3>
         <v-select
             outlined
             v-model="selectedItems"
             multiple
             :items="items"
-            :label="prop.label"
-            :max="prop.maxSelectable"
+            :label="value.label"
+            :max="value.maxSelectable"
             :change="handleSelection()"
         />
     </div>
@@ -15,11 +15,12 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
+import DynamicElement from "./DynamicElement.vue";
 import {COMPONENT_NAME, COMPONENT_PROP} from "../ComponentTypes"
 
-export default Vue.extend({
+export default DynamicElement.extend({
     props: {
-        prop: {type: Object as PropType<COMPONENT_PROP.ChooseSome>}
+        value: {type: Object as PropType<COMPONENT_PROP.ChooseSome>},
     },
     data: () => ({
         selectedItems: [],
@@ -29,7 +30,7 @@ export default Vue.extend({
     methods: {
         handleSelection() {
             // Selections are not used up, enable all items
-            if (this.selectedItems.length != this.prop.maxSelectable) {
+            if (this.selectedItems.length != this.value.maxSelectable) {
                 for (let i = 0; i < this.items.length; i++) {
                     this.items[i].disabled = false;
                 }
@@ -42,12 +43,16 @@ export default Vue.extend({
                     }
                 }
             }
+        },
+        getSelectedChoice() {
+            // return this.selectedItems
         }
     },
     mounted() {
-        for (let i = 0; i < this.prop.choices.length; i++) {
+        this.isChoiceNode = true;
+        for (let i = 0; i < this.value.choices.length; i++) {
             this.items.push({
-                text: this.prop.choices[i].text,
+                text: this.value.choices[i].header,
                 disabled: false,
             });
         }
