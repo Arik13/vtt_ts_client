@@ -1,4 +1,5 @@
 import { Component } from 'vue';
+import cds from './cds';
 
 export enum COMPONENT_NAME {
     TEXT_BLOCK = "Text Block",
@@ -22,7 +23,7 @@ export enum COMPONENT_NAME {
     The absence of the param field means the choice represents a mod itself
 */
 export interface ChoiceData {
-    modTarget: string;
+    actionTarget: string;
     param: string;
     value: number | string;
 }
@@ -47,8 +48,8 @@ export namespace COMPONENT_PROP {
     export interface ChooseOneWithSub {
         header: string;
         choices: {
-            data: ChoiceData;
             header: string;
+            data: ChoiceData;
             cds: ComponentDefinition[];
         }[];
     }

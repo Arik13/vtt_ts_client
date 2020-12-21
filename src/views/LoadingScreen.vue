@@ -24,8 +24,8 @@ export default Vue.extend({
                 // TODO Optimization: The join and load events can be merged in order to cut travel time latency in half
                 await dispatcher.join(campaignID, userStore.userID, () => {
                     dispatcher.loadCampaign(campaignID, () => {
-                        this.$store.state.campaignID = campaignID;
-                            this.$router.push({ path: `/campaigneditor/${campaignID}` });
+                        // this.$store.state.campaignID = campaignID;
+                        this.$router.push({ path: `/campaigneditor/${campaignID}` });
                     });
                 });
             }

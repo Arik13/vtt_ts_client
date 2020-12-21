@@ -2,6 +2,7 @@
     <div>
         <h3 v-if="value.header" style="margin: 0px 0px 10px 0px">{{value.header}}</h3>
         <v-select
+            dark
             outlined
             v-model="selectedItems"
             multiple

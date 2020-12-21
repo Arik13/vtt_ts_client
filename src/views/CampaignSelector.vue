@@ -34,7 +34,9 @@
 
 <script lang="ts">
 import Vue from "vue"
-import {ACTION, ACTION_ARG} from "@/Stores/vuex/actions";
+import {campaignStore} from "@/Stores/CampaignStore";
+import {userStore} from "@/Stores/UserStore";
+import dispatcher from '@/Dispatcher/Dispatcher';
 
 interface CampaignData {
     name: string;
@@ -50,29 +52,21 @@ export default Vue.extend({
             this.$router.push({ path: `/loading/${campaign.ID}` });
         },
         deleteCampaign(campaign: CampaignData) {
-            const payload: ACTION_ARG.ACCESS_RESOURCE = {
-                method: "DELETE",
-                route: `campaigns/${campaign.ID}`,
-                callback: () => {
+            dispatcher.deleteCampaign(
+                campaign.ID,
+                () => {
                     const index = this.campaigns.findIndex((campaignData: CampaignData) => {
                         return campaignData.ID == campaign.ID;
                     });
                     this.campaigns.splice(index, 1);
-                    console.log("Deleted campaign");
                 }
-            };
-            this.$store.dispatch(ACTION.ACCESS_RESOURCE, payload);
+            );
         }
     },
     mounted() {
-        const payload: ACTION_ARG.ACCESS_RESOURCE = {
-            method: "GET",
-            route: `users/${this.$store.state.userID}/campaigns`,
-            callback: (result: CampaignData[]) => {
-                this.campaigns = result;
-            }
-        };
-        this.$store.dispatch(ACTION.ACCESS_RESOURCE, payload);
+        dispatcher.getCampaigns((result: CampaignData[]) => {
+            this.campaigns = result;
+        });
     }
 });
 </script>

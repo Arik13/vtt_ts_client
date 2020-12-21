@@ -41,7 +41,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ACTION, ACTION_ARG } from '@/Stores/vuex/actions';
+import dispatcher from '@/Dispatcher/Dispatcher';
 
 // TODO: Create password and username validation
 export default Vue.extend({
@@ -76,19 +76,9 @@ export default Vue.extend({
         //     form.resetValidation()
         // },
         signup() {
-            const payload: ACTION_ARG.ACCESS_RESOURCE = {
-                method: "POST",
-                route: "/users",
-                data: {
-                    email: this.email,
-                    password: this.password,
-                    username: this.username,
-                },
-                callback: () => {
-                    this.$router.push({ path: 'login' })
-                }
-            }
-            this.$store.dispatch(ACTION.ACCESS_RESOURCE, payload);
+            dispatcher.signup(this.email, this.password, this.username, () => {
+                this.$router.push({ path: 'login' })
+            });
         },
     },
 });

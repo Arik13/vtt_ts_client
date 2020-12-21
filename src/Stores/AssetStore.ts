@@ -1,14 +1,11 @@
-import {Asset} from "@shared/Assets/Asset";
+import * as Asset from "@shared/Assets/Asset";
 import {Subscriber} from "./Subscriber";
-import {ServerProxy} from "./ServerProxy";
 
 export abstract class AssetStore<T extends Asset.Asset> {
-    serverProxy: ServerProxy;
     subscribers: Subscriber[] = [];
     assets: Map<string, T> = new Map();
     name: string;
-    constructor(name: string, serverProxy: ServerProxy) {
-        this.serverProxy = serverProxy;
+    constructor(name: string) {
         this.name = name;
     }
     subscribe(subscriber: Subscriber) {

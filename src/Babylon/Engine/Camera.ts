@@ -30,8 +30,7 @@ export class PlanarCamera extends BABYLON.UniversalCamera {
         minZ: number,
         speed: number,
         angle: number,
-        )
-    {
+    ) {
         super(name, position, scene);
         this.setTarget(target);
         this.direction = new BABYLON.Vector3(Math.cos(this.angle), 0, Math.sin(this.angle));

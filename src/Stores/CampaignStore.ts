@@ -3,6 +3,7 @@
     It also provides a way to interface with the campaign serverside
 */
 
+import * as Asset from "@shared/Assets/Asset";
 import {Subscriber} from "./Subscriber";
 
 export enum CAMPAIGN_EVENT {
@@ -17,12 +18,16 @@ class CampaignStore {
     name: string;
     subscribers: Subscriber[] = [];
     activeLocationID: string;
-    constructor(campaignID: string, name: string, activeLocationID: string) {
-        this.activeLocationID = activeLocationID;
-        this.campaignID = campaignID;
-        this.name = name;
+    INITIALIZED = "INITIALIZED";
+    REMOVED = "REMOVED";
+    clientConfig: Asset.ClientConfig.Data;
+    constructor() {
+        this.activeLocationID = null;
+        this.campaignID = null;
+        this.name = null;
+        this.clientConfig = null;
     }
-    addSubscriber(subscriber: Subscriber) {
+    subscribe(subscriber: Subscriber) {
         this.subscribers.push(subscriber);
     }
     setActiveLocation(locationID: string) {
@@ -32,24 +37,45 @@ class CampaignStore {
             subscriber.updated(locationID, CAMPAIGN_EVENT.ACTIVE_LOCATION_UPDATED);
         })
     }
+    setCampaign(campaignID: string, name: string, activeLocationID: string, clientConfig: Asset.ClientConfig.Data) {
+        this.activeLocationID = activeLocationID;
+        this.campaignID = campaignID;
+        this.name = name;
+        this.clientConfig = clientConfig;
+        this.subscribers.forEach((subscriber: Subscriber) => {
+            subscriber.notify(this.INITIALIZED, null);
+        });
+    }
+    reset() {
+        this.campaignID = null;
+        this.name = null;
+        this.activeLocationID = null;
+        this.clientConfig = null;
+        this.subscribers.forEach((subscriber: Subscriber) => {
+            subscriber.notify(this.REMOVED, null);
+        });
+    }
+    updateClientConfig(clientConfig: Asset.ClientConfig.Data) {
+        this.clientConfig = clientConfig;
+    }
 }
 
-let campaignStore: CampaignStore = null;
+const campaignStore: CampaignStore = new CampaignStore();
 
-const initCampaignStore = (
-    campaignID: string,
-    name: string,
-    activeLocationID: string,
-) => {
-    campaignStore = new CampaignStore(
-        campaignID,
-        name,
-        activeLocationID,
-    );
-    return campaignStore;
-}
+// const initCampaignStore = (
+//     campaignID: string,
+//     name: string,
+//     activeLocationID: string,
+// ) => {
+//     campaignStore = new CampaignStore(
+//         campaignID,
+//         name,
+//         activeLocationID,
+//     );
+//     return campaignStore;
+// }
 
 export {
     campaignStore,
-    initCampaignStore,
+    // initCampaignStore,
 }

@@ -27,9 +27,11 @@
                     <v-btn @click="submitForm">
                         Login
                     </v-btn>
+                    <!-- <v-btn @click="test">test</v-btn> -->
                 </v-form>
             </v-card-text>
         </v-card>
+        <!-- <location-viewer :state="state"></location-viewer> -->
     </v-container>
 </template>
 
@@ -50,16 +52,28 @@ export default Vue.extend({
             password: "testing",
             passwordRules: [],
             form: this.$refs.form as HTMLFormElement,
+            state: {
+                mapImageSrc: "",
+                location: {
+                    name: "Name",
+                    model: {
+                        ranks: 5,
+                        files: 5,
+                        tileWidth: 5,
+                        tileLength: 5,
+                    }
+                }
+            },
         }
     },
     methods: {
         async submitForm() {
-            const result = await dispatcher.login(this.email, this.password);
-            this.$store.state.isLoggedIn = true;
-            if (result) {
-                console.log("Logging in");
-                this.$router.push({ path: 'campaignselector' })
-            }
+            const result = await dispatcher.login(this.email, this.password, (success: boolean) => {
+                if (success) {
+                    // this.$store.state.isLoggedIn = true;
+                    this.$router.push({ path: 'campaignselector' })
+                }
+            });
         },
         validate() {
             if (this.form.validate()) {

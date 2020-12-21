@@ -8,6 +8,13 @@ enum MOUSE_BUTTON {
     RIGHT = 2,
 }
 
+const MOUSE_STATE = {
+    LEFT: false,
+    MIDDLE: false,
+    RIGHT: false,
+    MOVING: false,
+}
+
 export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
     inputBus: InputBus;
     isAttached = false;
@@ -21,7 +28,6 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
     previousPosition: {x: number; y: number};
     pickPlane: BABYLON.Mesh
     pickedMesh: BABYLON.AbstractMesh;
-    isDown: boolean;
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     private _observer: BABYLON.Observer<any> = null;
     constructor(camera: PlanarCamera, touchEnabled: boolean) {
@@ -46,8 +52,7 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
     getTypeName() {
         return "FreeCameraSearchInput";
     }
-    attachControl(element: HTMLElement, noPreventDefault?: boolean): void {
-        element;
+    attachControl(noPreventDefault?: boolean): void {
         if (this.isAttached || !this.camera) return;
         this._observer = this.camera.getScene().onPointerObservable.add(
             this.pointerInput,
@@ -55,8 +60,8 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
         this.noPreventDefault = noPreventDefault;
         this.isAttached = true;
     }
-    detachControl(element: HTMLElement): void {
-        if (this._observer && element && this.isAttached) {
+    detachControl() {
+        if (this._observer && this.isAttached) {
             this.camera.getScene().onPointerObservable.remove(this._observer);
             this._observer = null;
             this.previousPosition = null;
@@ -67,22 +72,13 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
         if (!this.isAttached) return;
     }
     handlePointerDown(pointerInfo: BABYLON.PointerInfo, eventState: BABYLON.EventState) {
-        eventState;
-        this.isDown = true;
-
         const evt = pointerInfo.event as PointerEvent;
         this.buttonsPressed.push(evt.button);
         if (this.buttonsPressed.includes(MOUSE_BUTTON.LEFT)) {
+            MOUSE_STATE.LEFT = true;
             inputBus.sendEvent({
                 type: INPUT_EVENT.LEFT_DOWN
             });
-        }
-        try {
-            const el = evt.srcElement as HTMLElement;
-            el.setPointerCapture(evt.pointerId);
-        }
-        catch (e) {
-            // Nothing to do with the error. Execution will continue.
         }
         this.previousPosition = {
             x: evt.clientX,
@@ -95,17 +91,21 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
         }
     }
     handlePointerUp(pointerInfo: BABYLON.PointerInfo, eventState: BABYLON.EventState) {
-        eventState;
-        this.isDown = false;
         const evt = pointerInfo.event as PointerEvent;
+        if (this.buttonsPressed.includes(MOUSE_BUTTON.LEFT)) {
+            if (MOUSE_STATE.MOVING) {
+                inputBus.sendEvent({
+                    type: INPUT_EVENT.LEFT_UP_MOVE
+                });
+                MOUSE_STATE.MOVING = false;
+            }
+            else {
+                inputBus.sendEvent({
+                    type: INPUT_EVENT.LEFT_UP
+                });
+            }
+        }
         this.buttonsPressed.splice(this.buttonsPressed.indexOf(evt.button), 1);
-        try {
-            const el = evt.srcElement as HTMLElement;
-            el.releasePointerCapture(evt.pointerId);
-        }
-        catch (e) {
-            //Nothing to do with the error.
-        }
         this.previousPosition = null;
         if (!this.noPreventDefault) {
             evt.preventDefault();
@@ -114,14 +114,13 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
     handlePointerMove(pointerInfo: BABYLON.PointerInfo, eventState: BABYLON.EventState) {
         eventState;
         if (this.buttonsPressed.includes(MOUSE_BUTTON.LEFT)) {
+            MOUSE_STATE.MOVING = true;
             inputBus.sendEvent({
                 type: INPUT_EVENT.LEFT_DOWN_MOVE
             });
-        }
-        const evt = pointerInfo.event as PointerEvent;
-        if (this.buttonsPressed.includes(MOUSE_BUTTON.LEFT)) {
             return;
         }
+        const evt = pointerInfo.event as PointerEvent;
 
         if (!this.previousPosition || this.camera.getEngine().isPointerLock) {
             return;
@@ -141,13 +140,13 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
         }
     }
     handlePick(pointerInfo: BABYLON.PointerInfo, eventState: BABYLON.EventState) {
-        pointerInfo;
-        eventState;
-        const scene = this.camera.getScene();
-        const pick = scene.pick(scene.pointerX, scene.pointerY, (mesh) => {return mesh !== this.pickPlane && mesh.isPickable});
-        if (pick.hit) {
-        //     this.pickedMesh.showBoundingBox = !this.pickedMesh.showBoundingBox;
-        }
+        // pointerInfo;
+        // eventState;
+        // const scene = this.camera.getScene();
+        // const pick = scene.pick(scene.pointerX, scene.pointerY, (mesh) => {return mesh !== this.pickPlane && mesh.isPickable});
+        // if (pick.hit) {
+        // //     this.pickedMesh.showBoundingBox = !this.pickedMesh.showBoundingBox;
+        // }
     }
     handlePointerWheel(pointerInfo: BABYLON.PointerInfo, eventState: BABYLON.EventState) {
         eventState;
@@ -182,9 +181,7 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
         }
     }
     // handlePointerTap(pointerInfo: BABYLON.PointerInfo, eventState: BABYLON.EventState) {
-    //     // console.log("Tap");
     // }
     // handlePointerDoubleTap(pointerInfo: BABYLON.PointerInfo, eventState: BABYLON.EventState) {
-    //     // console.log("Double Tap");
     // }
 }

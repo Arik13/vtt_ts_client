@@ -1,6 +1,6 @@
 <template>
-    <v-container>
-        <v-card>
+    <!-- <v-container> -->
+        <v-card dark flat>
             <v-card-title v-if="value.header">
                 {{ value.header }}
             </v-card-title>
@@ -15,7 +15,7 @@
                 />
             </v-card-text>
         </v-card>
-    </v-container>
+    <!-- </v-container> -->
 </template>
 
 <script lang="ts">

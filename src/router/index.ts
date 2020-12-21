@@ -4,7 +4,7 @@
 
 import Vue from 'vue'
 import VueRouter, {RouteConfig} from 'vue-router'
-import Store from "@/Stores/vuex/vuex";
+// import Store from "@/Stores/vuex/vuex";
 import CampaignEditor from "@/views/CampaignEditor.vue";
 import CampaignCreator from "@/views/CampaignCreator.vue";
 import CampaignSelector from "@/views/CampaignSelector.vue";
@@ -15,6 +15,9 @@ import Logout from "@/views/Logout.vue";
 import Signup from "@/views/Signup.vue";
 import LoadingScreen from "@/views/LoadingScreen.vue";
 import FormCreator from "@/views/FormCreator.vue";
+import ScriptEditor from "@/views/ScriptEditor.vue";
+import DynamicViewBinder from "@/views/DynamicViewBinder.vue";
+import { userStore, AuthData } from '@/Stores/UserStore';
 
 Vue.use(VueRouter);
 
@@ -29,6 +32,8 @@ export enum ROUTE {
     CAMPAIGN_SELECTOR = "/campaignselector",
     LOADING_SCREEN = "/loading",
     FORM_CREATOR = "/formcreator",
+    SCRIPT_EDITOR = "/scripteditor",
+    DYNAMIC_VIEW_BINDER = "/dynamicviewbinder",
 }
 
 const routes: Array<RouteConfig> = [
@@ -43,6 +48,8 @@ const routes: Array<RouteConfig> = [
     {path: ROUTE.CAMPAIGN_SELECTOR, components: {default: CampaignSelector}, meta: {title: "Campaign Selector"}},
     {path: `${ROUTE.LOADING_SCREEN}/:ID`, components: {default: LoadingScreen}, meta: {title: "Loading"}},
     {path: ROUTE.FORM_CREATOR, components: {default: FormCreator}, meta: {title: "Form Creator"}},
+    {path: ROUTE.SCRIPT_EDITOR, components: {default: ScriptEditor}, meta: {title: "Script Editor"}},
+    {path: ROUTE.DYNAMIC_VIEW_BINDER, components: {default: DynamicViewBinder}, meta: {title: "Dynamic View Binder"}},
 ];
 
 const router = new VueRouter({
@@ -52,13 +59,13 @@ const router = new VueRouter({
 })
 
 // If the user is trying to go to a route other than login, logout or signup, and they are not logged in, redirect them to login
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
     if (
         to.meta.title != "Login" &&
         to.meta.title != "Signup" &&
         to.meta.title != "Logout" &&
         to.meta.title != "Test" &&
-        !Store.state.isLoggedIn
+        !userStore.isLoggedIn
     ) {
         router.push({ path: ROUTE.LOGIN });
     }

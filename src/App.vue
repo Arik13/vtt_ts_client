@@ -1,7 +1,9 @@
 <template>
     <v-app dark>
         <!-- Navigation drawer on the left -->
-        <v-navigation-drawer app dark v-model="drawer"></v-navigation-drawer>
+        <v-navigation-drawer app dark v-model="drawer">
+
+        </v-navigation-drawer>
 
         <!-- App bar, on the top, contains important links -->
         <v-app-bar app dark>
@@ -36,6 +38,7 @@
                 <router-view />
             </v-card>
         </v-main>
+        <dialog-manager />
     </v-app>
 </template>
 
@@ -47,7 +50,9 @@
 
 import Vue from 'vue';
 import {campaignStore} from "@/Stores/CampaignStore";
-import {ROUTE} from "./router/index"
+import {userStore, UserStore} from "@/Stores/UserStore";
+import {ROUTE} from "./router/index";
+import DialogManager from "@/views/Dialogs/DialogManager.vue";
 
 interface NavItem {
     title: string;
@@ -61,22 +66,29 @@ export default Vue.extend({
     data: () => ({
         avatarURL: "https://st2.depositphotos.com/1104517/11967/v/950/depositphotos_119675554-stock-illustration-male-avatar-profile-picture-vector.jpg",
         // Controls if the nav drawer is open or not
-        drawer: false
+        drawer: false,
+        isLoggedIn: false,
+        isCampaignInitialized: false,
     }),
+    components: {
+        "dialog-manager": DialogManager
+    },
     computed: {
-        isLoggedIn(): boolean {
-            return this.$store.state.isLoggedIn;
-            // return (this.$store.state.authToken);
-        },
+        // isLoggedIn(): boolean {
+        //     return this.$store.state.isLoggedIn;
+        //     // return (this.$store.state.authToken);
+        // },
         navItems(): NavItem[] {
             return [
                 { title: "Log In", icon: "how_to_reg", route: ROUTE.LOGIN, show: !this.isLoggedIn},
                 { title: "Signup", icon: "how_to_reg", route: ROUTE.SIGNUP, show: !this.isLoggedIn},
                 { title: "Log Out", icon: "exit_to_app", route: ROUTE.LOGOUT, show: this.isLoggedIn},
                 { title: "Creator", icon: "exit_to_app", route: ROUTE.CAMPAIGN_CREATOR, show: this.isLoggedIn},
-                { title: "Editor", icon: "exit_to_app", route: ROUTE.CAMPAIGN_EDITOR, show: (this.isLoggedIn && (!!campaignStore))},
-                { title: "Selector", icon: "exit_to_app", route: ROUTE.CAMPAIGN_SELECTOR, show: this.isLoggedIn},
-                { title: "Forms", icon: "exit_to_app", route: ROUTE.FORM_CREATOR, show: this.isLoggedIn},
+                { title: "Selector", icon: "exit_to_app", route: ROUTE.CAMPAIGN_SELECTOR, show: (this.isLoggedIn)},
+                { title: "Campaign", icon: "exit_to_app", route: ROUTE.CAMPAIGN_EDITOR, show: (this.isLoggedIn && this.isCampaignInitialized)},
+                { title: "Forms", icon: "exit_to_app", route: ROUTE.FORM_CREATOR, show: (this.isLoggedIn && this.isCampaignInitialized)},
+                { title: "Scripts", icon: "exit_to_app", route: ROUTE.SCRIPT_EDITOR, show: (this.isLoggedIn && this.isCampaignInitialized)},
+                { title: "Binder", icon: "exit_to_app", route: ROUTE.DYNAMIC_VIEW_BINDER, show: (this.isLoggedIn && this.isCampaignInitialized)},
             ];
         }
     },
@@ -85,10 +97,42 @@ export default Vue.extend({
     },
     // Retrieves user token and id for auto login
     mounted() {
+        campaignStore.subscribe({
+            added: () => {},
+            deleted: () => {},
+            updated: () => {},
+            notify: (eventName: string) => {
+                switch(eventName) {
+                    case (campaignStore.INITIALIZED): {
+                        this.isCampaignInitialized = true;
+                        break;
+                    }
+                    case (campaignStore.REMOVED): {
+                        this.isCampaignInitialized = false;
+                        break;
+                    }
 
-        this.$store.state.authToken = localStorage.getItem("authToken");
-        this.$store.state.userID = localStorage.getItem("userID");
-        this.$store.state.campaignID = localStorage.getItem("campaignID");
+                }
+            }
+        });
+        userStore.subscribe({
+            added: () => {},
+            deleted: () => {},
+            updated: () => {},
+            notify: (eventName: string) => {
+                switch(eventName) {
+                    case (userStore.LOGGED_IN): {
+                        this.isLoggedIn = true;
+                        break;
+                    }
+                    case (userStore.LOGGED_OUT): {
+                        this.isLoggedIn = false;
+                        break;
+                    }
+
+                }
+            }
+        });
     },
 });
 </script>

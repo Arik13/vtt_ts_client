@@ -11,13 +11,14 @@
 import {INPUT_EVENT, inputBus, InputEvent, InputReceiver} from "@/Babylon/Input/InputBus";
 import {MeshData} from "./MeshData";
 import {Location} from "@/Babylon/Locations/Location";
-import {Asset} from "@shared/Assets/Asset"
+import * as Asset from "@shared/Assets/Asset"
 import "babylonjs";
 
-import {locationStore, LOCATION_EVENT_NAME, LOCATION_EVENT as LOCATION_EVENT} from "@/Stores/LocationStore";
+import {locationStore, LOCATION_EVENT_NAME, LOCATION_EVENT} from "@/Stores/LocationStore";
 import {campaignStore, CampaignSubscriber, CAMPAIGN_EVENT} from "@/Stores/CampaignStore";
 import {imageStore} from "@/Stores/ImageStore";
 import { tokenStore } from '@/Stores/TokenStore';
+import dispatcher from '@/Dispatcher/Dispatcher';
 // import {tokenStore} from "@/Stores/TokenStore";
 
 class BabylonController implements InputReceiver {
@@ -45,6 +46,7 @@ class BabylonController implements InputReceiver {
         locationStore.subscribe({
             added: () => {console.log();},
             deleted: (id) => {id; },
+            notify: () => {},
             updated: (id: string, event: LOCATION_EVENT.LocationEvent) => {
                 if (id != this.activeLocationID) return;
                 switch(event.eventName) {
@@ -53,20 +55,36 @@ class BabylonController implements InputReceiver {
                         const tokenData = tokenEvent.tokenData;
                         const tokenMeshData: MeshData = {
                             texturePath: this.createImageURL(tokenData.imageID),
-                            meshName: tokenData.imageID,
+                            meshName: tokenData.id,
                             materialName: tokenData.imageID
                         }
                         this.getActiveLocation().addToken(
-                            tokenData.model.position.x,
-                            tokenData.model.position.z,
+                            tokenData.tokenModel.position.x,
+                            tokenData.tokenModel.position.z,
                             tokenMeshData,
                         );
+                        break;
+                    }
+                    case (LOCATION_EVENT_NAME.TOKEN_UPDATED): {
+                        const tokenEvent = event as LOCATION_EVENT.TokenUpdatedEvent;
+                        const tokenData = tokenEvent.tokenData;
+                        // const tokenMeshData: MeshData = {
+                        //     texturePath: this.createImageURL(tokenData.imageID),
+                        //     meshName: tokenData.id,
+                        //     materialName: tokenData.imageID
+                        // }
+                        this.activeLocation.updateToken(tokenData.id, tokenData);
+                        // this.getActiveLocation().addToken(
+                        //     tokenData.model.position.x,
+                        //     tokenData.model.position.z,
+                        //     tokenMeshData,
+                        // );
                         break;
                     }
                 }
             }
         });
-        const campaignSubscriber: CampaignSubscriber = {
+        campaignStore.subscribe({
             added: () => {
                 console.log();
             },
@@ -80,8 +98,7 @@ class BabylonController implements InputReceiver {
                         break;
                 }
             }
-        }
-        campaignStore.addSubscriber(campaignSubscriber)
+        })
         if (campaignStore.activeLocationID) {
             this.setActiveLocation(campaignStore.activeLocationID);
         }
@@ -89,21 +106,48 @@ class BabylonController implements InputReceiver {
     receiveEvent(evt: InputEvent) {
         switch(evt.type) {
             case INPUT_EVENT.LEFT_DOWN: {
-                return this.getActiveView().trySelect();
+                return this.activeLocation.trySelect();
             }
             case INPUT_EVENT.LEFT_DOWN_MOVE: {
-                if (this.getActiveView().hasSelection()) {
-                    const view = this.getActiveView();
-                    const model = this.getActiveModel();
-                    const currentPosition = view.getCurrentCursorPosition();
+                if (this.activeLocation.hasSelection()) {
+                    const location = this.activeLocation;
+                    const currentPosition = location.getGroundPosition();
                     if (currentPosition) {
-                        const newPosition = model.findClosestTileCenter(currentPosition);
-                        view.setSelectionPosition(newPosition);
+                        const pickedMesh = this.activeLocation.pickedMesh;
+                        const currentTilePosition = pickedMesh.position;
+                        const newPosition = this.activeLocation.findClosestTileCenter(currentPosition);
+                        if (
+                            currentTilePosition.x != newPosition.x ||
+                            currentTilePosition.z != newPosition.z
+                        ) {
+                            location.setSelectionPosition(newPosition);
+                        }
                     }
                 }
                 break;
             }
+            case INPUT_EVENT.LEFT_UP: {
+                break;
+            }
             case INPUT_EVENT.LEFT_UP_MOVE: {
+                if (this.activeLocation.hasSelection()) {
+                    const location = this.activeLocation;
+                    let startPos = this.activeLocation.pickStartingPosition;
+                    startPos = this.activeLocation.findClosestTileCenter(startPos);
+                    let endPos = location.getGroundPosition();
+                    location.pickStartingPosition = endPos;
+                    endPos = this.activeLocation.findClosestTileCenter(endPos);
+                    if (
+                        startPos.x != endPos.x ||
+                        startPos.z != endPos.z
+                    ) {
+                        const mesh = this.activeLocation.pickedMesh;
+                        const token = tokenStore.get(mesh.id);
+                        token.tokenModel.position = this.activeLocation.convertToRankFilePos(endPos);
+                        dispatcher.updateToken(this.activeLocationID, token);
+                    }
+                }
+
                 break;
             }
             // case INPUT_EVENT.WHEEL_FORWARDS:
@@ -127,11 +171,6 @@ class BabylonController implements InputReceiver {
             return this.activeLocation.view;
         }
     }
-    getActiveModel() {
-        if (this.activeLocation) {
-            return this.activeLocation.model;
-        }
-    }
     getActiveLocation() {
         return this.activeLocation;
     }
@@ -143,40 +182,39 @@ class BabylonController implements InputReceiver {
         const locationData = locationStore.get(id);
         if (locationData) {
             if (this.activeLocation) {
-                this.getActiveView().detachControl();
+                this.activeLocation.detachControl();
             }
             this.activeLocation = this.createLocation(this.engine, this.canvas, locationData);
-            this.getActiveView().attachControl();
+            this.activeLocation.attachControl();
         }
     }
     private createLocation(
         engine: BABYLON.Engine,
         canvas: HTMLCanvasElement,
-        locationData: Asset.LocationData,
-        )
-    {
-        const t0 = performance.now();
+        locationData: Asset.Location.Data,
+    ) {
+        // const t0 = performance.now();
         const url = this.createImageURL(locationData.mapImageID);
         const locationMapName = locationData.name + " Map";
         const mapMeshData = new MeshData(url, locationMapName, locationMapName);
 
         // Create location
-        const location = new Location(engine, canvas, locationData.model, mapMeshData);
+        const location = new Location(engine, canvas, locationData.locationModel, mapMeshData);
         locationData.tokenIDs.forEach((tokenID: string) => {
             const tokenData = tokenStore.get(tokenID);
             const tokenMeshData: MeshData = {
                 texturePath: this.createImageURL(tokenData.imageID),
-                meshName: tokenData.imageID,
+                meshName: tokenData.id,
                 materialName: tokenData.imageID
             }
             location.addToken(
-                tokenData.model.position.x,
-                tokenData.model.position.z,
+                tokenData.tokenModel.position.x,
+                tokenData.tokenModel.position.z,
                 tokenMeshData,
-                );
-            })
-        const t1 = performance.now();
-        console.log(`Created the location "${locationData.name}" in ${Math.round(t1 - t0)} milliseconds.`);
+            );
+        })
+        // const t1 = performance.now();
+        // console.log(`Created the location "${locationData.name}" in ${Math.round(t1 - t0)} milliseconds.`);
         return location;
     }
     private createImageURL(imageID: string) {

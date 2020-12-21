@@ -139,10 +139,7 @@ export default Vue.extend({
             const event: CHAT_EVENT_TYPE.SEND_MESSAGE = {
                 content: this.message
             }
-            serverProxy.emit(CHAT_EVENT_NAME.SEND_MESSAGE, event, (reply) => {
-                console.log("Send Message Reply: ", reply);
-            });
-            console.log("Message: ", this.message);
+            serverProxy.emit(CHAT_EVENT_NAME.SEND_MESSAGE, event, (reply) => {});
             this.message = null;
         },
         clearMessage() {
@@ -206,19 +203,16 @@ export default Vue.extend({
         }
     },
     mounted() {
-        this.userID = this.$store.state.userID;
-        console.log("Mounted Chat");
+        // this.userID = this.$store.state.userID;
         serverProxy.addHandler(CHAT_EVENT_NAME.MESSAGE_RECIEVED, (reply: CHAT_EVENT_TYPE.MESSAGE_RECIEVED) => {
             const message = reply.message;
             message.timestamp = new Date(message.timestamp);
             this.messages.push(message)
-            console.log("Message Recieved: ", reply);
         })
         const loadEvent: CHAT_EVENT_TYPE.LOAD_CHAT = {
 
         }
         serverProxy.emit(CHAT_EVENT_NAME.LOAD_CHAT, loadEvent, (messages: Chat.Message[]) => {
-            console.log("Chat Loaded");
             messages.forEach(message => {
                 message.timestamp = new Date(message.timestamp);
             });
@@ -226,7 +220,6 @@ export default Vue.extend({
             this.$nextTick(() => {
                 const objDiv = this.$refs.messageWindow as HTMLElement;
                 objDiv.scrollTop = objDiv.scrollHeight;
-                console.log(objDiv.scrollTop)
             });
         });
     }

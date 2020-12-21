@@ -1,5 +1,12 @@
 <script lang="ts">
 import Vue, { PropType } from 'vue'
+export interface DynamicElement {
+    activeChildren: DynamicElement[];
+    isChoiceNode: boolean;
+    isActive: boolean;
+    traverseActiveChoices: (visit: (node: any) => void) => void;
+    setActive: () => void;
+}
 export default Vue.extend({
     data: () => ({
         activeChildren: [],
@@ -11,9 +18,6 @@ export default Vue.extend({
         registerElement: {type: Function as PropType<(formInterface: any) => void>},
     },
     methods: {
-        test() {
-            console.log("test");
-        },
         traverseActiveChoices(visit: (node: any) => void) {
             if (!this.isActive) return;
             if (this.isChoiceNode) {

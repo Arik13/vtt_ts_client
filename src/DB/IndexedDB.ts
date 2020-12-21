@@ -2,11 +2,11 @@ import {
     openDB,
     IDBPDatabase,
     DBSchema,
-    // deleteDB,
+    deleteDB,
     // wrap,
     // unwrap,
 } from 'idb';
-import {Asset} from "@shared/Assets/Asset";
+import * as Asset from "@shared/Assets/Asset";
 
 export enum STORE {
     IMAGE_STORE = "imageStore",
@@ -15,33 +15,30 @@ export enum STORE {
     LOCATION_KEY_STORE = "locationKeyStore",
     TOKEN_STORE = "tokenStore",
     TOKEN_KEY_STORE = "tokenKeyStore",
+    SCRIPT_STORE = "scriptStore",
+    SCRIPT_KEY_STORE = "scriptKeyStore",
+    DYNAMIC_COMPONENT_STORE = "dynamicComponentStore",
+    DYNAMIC_COMPONENT_KEY_STORE = "dynamicComponentKeyStore",
+    STATE_OBJECT_STORE = "stateObjectStore",
+    STATE_OBJECT_KEY_STORE = "stateObjectKeyStore",
 }
 
 interface ClientDB extends DBSchema {
-    imageStore: {
-        key: string;
-        value: Asset.ImageInfo;
-    };
-    imageKeyStore: {
-        key: string;
-        value: string;
-    };
-    locationStore: {
-        key: string;
-        value: Asset.LocationData;
-    };
-    locationKeyStore: {
-        key: string;
-        value: Asset.LocationKey;
-    };
-    tokenStore: {
-        key: string;
-        value: Asset.TokenData;
-    };
-    tokenKeyStore: {
-        key: string;
-        value: Asset.TokenKey;
-    };
+    // Asset Stores
+    imageStore:                 {key: string; value: Asset.ImageInfo};
+    locationStore:              {key: string; value: Asset.Location.Data};
+    tokenStore:                 {key: string; value: Asset.Token.Data};
+    scriptStore:                {key: string; value: Asset.Script.Data};
+    dynamicComponentStore:      {key: string; value: Asset.DynamicComponent.Data};
+    stateObjectStore:           {key: string; value: Asset.StateObject.Data};
+
+    // Key Stores
+    imageKeyStore:              {key: string; value: string};
+    locationKeyStore:           {key: string; value: Asset.Key};
+    tokenKeyStore:              {key: string; value: Asset.Key};
+    scriptKeyStore:             {key: string; value: Asset.Key};
+    dynamicComponentKeyStore:   {key: string; value: Asset.Key};
+    stateObjectKeyStore:        {key: string; value: Asset.Key};
 }
 
 const DB_VERSION = 1;
@@ -55,7 +52,7 @@ class CampaignDBService {
     }
     async open() {
         // Delete for debugging purposes
-        // await deleteDB(this.campaignID);
+        await deleteDB(this.campaignID);
         this.db = await openDB(
             this.campaignID,
             DB_VERSION,
@@ -63,26 +60,51 @@ class CampaignDBService {
                 upgrade(db, oldVersion, newVersion, transaction) {
                     transaction;
                     console.log(`Upgrading DB from version ${oldVersion} to version ${newVersion}`);
+
+                    // Asset Stores
                     db.createObjectStore(STORE.IMAGE_STORE);
-                    db.createObjectStore(STORE.IMAGE_KEY_STORE);
                     db.createObjectStore(STORE.LOCATION_STORE);
-                    db.createObjectStore(STORE.LOCATION_KEY_STORE);
                     db.createObjectStore(STORE.TOKEN_STORE);
+                    db.createObjectStore(STORE.SCRIPT_STORE);
+                    db.createObjectStore(STORE.DYNAMIC_COMPONENT_STORE);
+                    db.createObjectStore(STORE.STATE_OBJECT_STORE);
+
+                    // Key Stores
+                    db.createObjectStore(STORE.IMAGE_KEY_STORE);
+                    db.createObjectStore(STORE.LOCATION_KEY_STORE);
                     db.createObjectStore(STORE.TOKEN_KEY_STORE);
+                    db.createObjectStore(STORE.SCRIPT_KEY_STORE);
+                    db.createObjectStore(STORE.DYNAMIC_COMPONENT_KEY_STORE);
+                    db.createObjectStore(STORE.STATE_OBJECT_KEY_STORE);
                 },
             }
         );
         return true;
     }
-    async getSyncKeys(): Promise<Asset.AssetSyncKeys> {
-        const assetDependencies: Asset.AssetSyncKeys = {
+    async getSyncKeys(): Promise<Asset.SyncKeys> {
+        const assetDependencies: Asset.SyncKeys = {
             imageKeys: await this.db.getAll(STORE.IMAGE_KEY_STORE),
             locationKeys: await this.db.getAll(STORE.LOCATION_KEY_STORE),
             tokenKeys: await this.db.getAll(STORE.TOKEN_KEY_STORE),
+            scriptKeys: await this.db.getAll(STORE.SCRIPT_KEY_STORE),
+            dynamicComponentKeys: await this.db.getAll(STORE.DYNAMIC_COMPONENT_KEY_STORE),
+            soKeys: await this.db.getAll(STORE.STATE_OBJECT_KEY_STORE),
         }
         return assetDependencies;
     }
-    async syncAssets(assets: Asset.AssetSyncGroup) {
+    private async syncAsset(assetStore: STORE, keyStore: STORE, data: {toAdd: any[]; toRemove: Asset.Key[]}, queryList: Promise<any>[]) {
+        // Add new assets
+        data.toAdd.forEach(async (keyVal: any) => {
+            queryList.push(this.db.put(keyStore, keyVal.key, keyVal.key.id));
+            queryList.push(this.db.put(assetStore, keyVal.value, keyVal.key.id));
+        });
+        // Remove extraneous assets
+        data.toRemove.forEach(async (key: Asset.Key) => {
+            queryList.push(this.db.delete(STORE.LOCATION_KEY_STORE, key.id));
+            queryList.push(this.db.delete(STORE.LOCATION_STORE, key.id));
+        });
+    }
+    async syncAssets(assets: Asset.SyncGroup) {
         const queryList: Promise<string | void>[] = [];
 
         // Add new images
@@ -98,36 +120,11 @@ class CampaignDBService {
             queryList.push(this.db.delete(STORE.IMAGE_STORE, value));
         });
 
-        // Add new locations
-        // console.log("Sync Location Data: ", assets.locationData);
-        assets.locationData.toAdd.forEach(async (locationKeyValue: Asset.LocationKeyValue) => {
-            const id = locationKeyValue.key.locationID;
-            const key = locationKeyValue.key;
-            const location = locationKeyValue.value;
-            queryList.push(this.db.put(STORE.LOCATION_KEY_STORE, key, id));
-            queryList.push(this.db.put(STORE.LOCATION_STORE, location, id));
-        });
-
-        // Remove extraneous locations
-        assets.locationData.toRemove.forEach(async (value: Asset.LocationKey) => {
-            queryList.push(this.db.delete(STORE.LOCATION_KEY_STORE, value.locationID));
-            queryList.push(this.db.delete(STORE.LOCATION_STORE, value.locationID));
-        });
-
-        assets.tokenData.toAdd.forEach(async (tokenKeyValue: Asset.TokenKeyValue) => {
-            const id = tokenKeyValue.key.tokenID;
-            const key = tokenKeyValue.key;
-            const token = tokenKeyValue.value;
-            queryList.push(this.db.put(STORE.TOKEN_KEY_STORE, key, id));
-            queryList.push(this.db.put(STORE.TOKEN_STORE, token, id));
-        });
-
-        // Remove extraneous tokens
-        assets.tokenData.toRemove.forEach(async (value: Asset.TokenKey) => {
-            queryList.push(this.db.delete(STORE.TOKEN_KEY_STORE, value.tokenID));
-            queryList.push(this.db.delete(STORE.TOKEN_STORE, value.tokenID));
-        });
-
+        this.syncAsset(STORE.LOCATION_STORE, STORE.LOCATION_KEY_STORE, assets.locationData, queryList);
+        this.syncAsset(STORE.TOKEN_STORE, STORE.TOKEN_KEY_STORE, assets.tokenData, queryList);
+        this.syncAsset(STORE.SCRIPT_STORE, STORE.SCRIPT_KEY_STORE, assets.scriptData, queryList);
+        this.syncAsset(STORE.DYNAMIC_COMPONENT_STORE, STORE.DYNAMIC_COMPONENT_KEY_STORE, assets.dcData, queryList);
+        this.syncAsset(STORE.STATE_OBJECT_STORE, STORE.STATE_OBJECT_KEY_STORE, assets.soData, queryList);
         await Promise.all(queryList);
     }
 
@@ -139,37 +136,65 @@ class CampaignDBService {
             locationKeyStore: await this.db.getAll(STORE.LOCATION_KEY_STORE),
             tokenStore: await this.db.getAll(STORE.TOKEN_STORE),
             tokenKeyStore: await this.db.getAll(STORE.TOKEN_KEY_STORE),
+            scriptStore: await this.db.getAll(STORE.SCRIPT_STORE),
+            scriptKeyStore: await this.db.getAll(STORE.SCRIPT_KEY_STORE),
+            dynamicComponentStore: await this.db.getAll(STORE.DYNAMIC_COMPONENT_STORE),
+            dynamicComponentKeyStore: await this.db.getAll(STORE.DYNAMIC_COMPONENT_KEY_STORE),
+            stateObjectStore: await this.db.getAll(STORE.STATE_OBJECT_STORE),
+            stateObjectKeyStore: await this.db.getAll(STORE.STATE_OBJECT_KEY_STORE),
         }
     }
+    private async putAsset(assetStore: STORE, keyStore: STORE, key: Asset.Key, asset: any) {
+        await Promise.all([
+            this.db.put(keyStore, key, key.id),
+            this.db.put(assetStore, asset, key.id),
+        ]);
+    }
     async addImage(image: Asset.ImageInfo) {
-        await this.db.put(STORE.IMAGE_KEY_STORE, image.id, image.id);
-        await this.db.put(STORE.IMAGE_STORE, image, image.id);
+        await Promise.all([
+            this.db.put(STORE.IMAGE_KEY_STORE, image.id, image.id),
+            this.db.put(STORE.IMAGE_STORE, image, image.id),
+        ]);
     }
-    async deleteImage(imageID: string) {
-        await this.db.delete(STORE.IMAGE_KEY_STORE, imageID);
-        await this.db.delete(STORE.IMAGE_STORE, imageID);
+    async addLocation(keyVal: Asset.Location.KeyValue) {
+        await this.putAsset(STORE.LOCATION_STORE, STORE.LOCATION_KEY_STORE, keyVal.key, keyVal.value);
     }
-    async addLocation(locationKeyValue: Asset.LocationKeyValue) {
-        const id = locationKeyValue.key.locationID;
-        const key = locationKeyValue.key;
-        const location = locationKeyValue.value;
-        await this.db.put(STORE.LOCATION_KEY_STORE, key, id);
-        await this.db.put(STORE.LOCATION_STORE, location, id);
+    async addToken(keyVal: Asset.Token.KeyValue) {
+        await this.putAsset(STORE.TOKEN_STORE, STORE.TOKEN_KEY_STORE, keyVal.key, keyVal.value);
     }
-    async deleteLocation(locationID: string) {
-        await this.db.delete(STORE.LOCATION_KEY_STORE, locationID);
-        await this.db.delete(STORE.LOCATION_STORE, locationID);
+    async addScript(keyVal: Asset.Script.KeyValue) {
+        await this.putAsset(STORE.SCRIPT_STORE, STORE.SCRIPT_KEY_STORE, keyVal.key, keyVal.value);
     }
-    async addToken(tokenKeyValue: Asset.TokenKeyValue) {
-        const id = tokenKeyValue.key.tokenID;
-        const key = tokenKeyValue.key;
-        const token = tokenKeyValue.value;
-        await this.db.put(STORE.TOKEN_KEY_STORE, key, id);
-        await this.db.put(STORE.TOKEN_STORE, token, id);
+    async addDynamicComponent(keyVal: Asset.DynamicComponent.KeyValue) {
+        await this.putAsset(STORE.DYNAMIC_COMPONENT_STORE, STORE.DYNAMIC_COMPONENT_KEY_STORE, keyVal.key, keyVal.value);
     }
-    async deleteToken(tokenID: string) {
-        await this.db.delete(STORE.TOKEN_KEY_STORE, tokenID);
-        await this.db.delete(STORE.TOKEN_STORE, tokenID);
+    async addStateObject(keyVal: Asset.StateObject.KeyValue) {
+        await this.putAsset(STORE.STATE_OBJECT_STORE, STORE.STATE_OBJECT_KEY_STORE, keyVal.key, keyVal.value);
+    }
+
+    async deleteImage(id: string) {
+        await this.db.delete(STORE.IMAGE_KEY_STORE, id);
+        await this.db.delete(STORE.IMAGE_STORE, id);
+    }
+    async deleteLocation(id: string) {
+        await this.db.delete(STORE.LOCATION_KEY_STORE, id);
+        await this.db.delete(STORE.LOCATION_STORE, id);
+    }
+    async deleteToken(id: string) {
+        await this.db.delete(STORE.TOKEN_KEY_STORE, id);
+        await this.db.delete(STORE.TOKEN_STORE, id);
+    }
+    async deleteScript(id: string) {
+        await this.db.delete(STORE.SCRIPT_KEY_STORE, id);
+        await this.db.delete(STORE.SCRIPT_STORE, id);
+    }
+    async deleteDynamicComponent(id: string) {
+        await this.db.delete(STORE.DYNAMIC_COMPONENT_KEY_STORE, id);
+        await this.db.delete(STORE.DYNAMIC_COMPONENT_STORE, id);
+    }
+    async deleteStateObject(id: string) {
+        await this.db.delete(STORE.DYNAMIC_COMPONENT_KEY_STORE, id);
+        await this.db.delete(STORE.DYNAMIC_COMPONENT_STORE, id);
     }
 }
 let DB: CampaignDBService = null;

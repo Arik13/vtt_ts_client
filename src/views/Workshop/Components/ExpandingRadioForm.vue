@@ -1,5 +1,5 @@
 <template>
-    <v-card tile style="margin: 0px 0px 20px 0px; padding: 0px;">
+    <v-card flat tile style="margin: 0px 0px 20px 0px; padding: 0px;">
         <template v-if="value.header">
             <v-card-title>
                 {{value.header}}

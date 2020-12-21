@@ -16,7 +16,7 @@
                     <v-card height="100%" width="100%" dark tile>
                         <v-card-title>The bottom pane</v-card-title>
                         <v-card-text>
-                            <create-character-dialog />
+                            <!-- <create-character-dialog /> -->
                         </v-card-text>
                     </v-card>
                 </pane>
@@ -57,16 +57,15 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
-import AssetManager from "./AssetManager.vue";
+import AssetManager from "./AssetManager/AssetManager.vue";
 import CampaignCanvas from "./CampaignCanvas.vue";
-import CreateCharacterDialog from "./CreateCharacterDialog/CreateCharacterDialog.vue";
 import Chat from "./Chat.vue";
 
 // @ts-ignore
 import { Splitpanes, Pane } from "splitpanes";
 import 'splitpanes/dist/splitpanes.css';
 
-import {campaignStore} from "@/Stores/CampaignStore"
+import {campaignStore} from "@/Stores/CampaignStore";
 
 enum TAB {
     ASSET_MANAGER = "Assets",
@@ -77,7 +76,6 @@ enum TAB {
     components: {
         "asset-manager": AssetManager,
         "campaign-canvas": CampaignCanvas,
-        "create-character-dialog": CreateCharacterDialog,
         Splitpanes,
         Pane,
         Chat,

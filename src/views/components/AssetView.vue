@@ -11,9 +11,11 @@
                     :directory="directory"
                     :depth="0"
                     :assetViewController="assetViewController"
+                    @click="menuBus(assetClickEventName, directory)"
                 />
             </v-card-text>
         </v-card>
+        <!-- Asset Menu -->
         <v-menu
             dark
             v-if="showAssetMenu"
@@ -28,13 +30,15 @@
             <v-list dense striped style="padding: 0px; margin: 0px;">
                 <v-list-item-group>
                     <v-list-item v-for="(menuItem, i) in menuItems" :key="i" :style="menuItem.style">
-                        <v-list-item-title @click="menuBus(menuItem.eventName, menuedItemID)">
+                        <v-list-item-title @click="menuBus(menuItem.name, menuedItemID)">
                             {{ menuItem.title }}
                         </v-list-item-title>
                     </v-list-item>
                 </v-list-item-group>
             </v-list>
         </v-menu>
+
+        <!-- Folder Menu -->
         <v-menu
             dark
             v-if="showFolderMenu"
@@ -48,7 +52,7 @@
         >
             <v-list dense striped style="padding: 0px; margin: 0px;">
                 <v-list-item-group>
-                    <v-list-item v-for="(menuItem, i) in folderMenuItems" :key="i" :style="menuItem.style" @click="menuBus(menuItem.eventName, menuedItemID)">
+                    <v-list-item v-for="(menuItem, i) in folderMenuItems" :key="i" :style="menuItem.style" @click="menuBus(menuItem.name, menuedItemID)">
                         <v-list-item-title>
                             {{ menuItem.title }}
                         </v-list-item-title>
@@ -61,8 +65,8 @@
 
 <script lang="ts">
 import { Directory } from '@shared/Directories/Directory';
-import Vue from 'vue'
-import AssetTree from "./AssetTree2.vue"
+import Vue, { PropType } from 'vue'
+import AssetTree from "./AssetTree.vue"
 import dispatcher from '@/Dispatcher/Dispatcher';
 
 export interface AssetViewController {
@@ -70,11 +74,12 @@ export interface AssetViewController {
     dragStartEvent: (e: DragEvent, directory: Directory) => void;
     dragEnterEvent: (e: DragEvent, directory: Directory) => void;
     dropEvent: (e: DragEvent, directory: Directory) => void;
+    clickEvent: (directory: Directory) => void;
 }
 
 type MenuItem = {
     title: string;
-    eventName: string;
+    name: string;
 }
 
 export default Vue.extend({
@@ -97,8 +102,8 @@ export default Vue.extend({
         search: null,
         folderMenuItems: null,
         menuItems: null,
-        menuBus: null,
-        assetClickEventName: null,
+        menuBus: null as PropType<(eventName: string, itemID: string) => void>,
+        assetClickEventName: null as PropType<string>,
         directory: null,
     },
     components: {
@@ -127,30 +132,11 @@ export default Vue.extend({
             },
             dropEvent: (event: DragEvent, dropNode: Directory) => {
                 dispatcher.moveDirectory(this.draggedNode, dropNode);
-                // let insertionIndex = 0;
-                // if (dropNode.itemID) {
-                //     insertionIndex = dropNode.parent.children.findIndex(node => {
-                //         return node.id == dropNode.id;
-                //     }) + 1;
-                //     dropNode = dropNode.parent;
-                // }
-
-                // let dragNode = this.draggedNode;
-                // // directoryStore.moveDirectory(dropNode.id, dragNode.id);
-                // let isAncestor = (superNode: Directory, subNode: Directory): boolean => {
-                //     if (superNode.id == subNode.id) return true;
-                //     if (!subNode.parent) return false;
-                //     return isAncestor(superNode, subNode.parent);
-                // }
-                // if (isAncestor(dragNode, dropNode)) return;
-
-                // let dragParentNode = dragNode.parent;
-                // let dragIndex = dragParentNode.children.findIndex((dropNode: Directory) => {
-                //     return dropNode.id == this.draggedNode.id;
-                // });
-                // dragParentNode.children.splice(dragIndex, 1);
-                // dropNode.children.splice(insertionIndex, 0, dragNode);
-                // dragNode.parent = dropNode;
+            },
+            clickEvent: (directory: Directory) => {
+                if (directory.itemID) {
+                    this.menuBus(this.assetClickEventName, directory.id);
+                }
             }
         }
     }

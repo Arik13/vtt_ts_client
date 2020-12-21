@@ -1,9 +1,9 @@
-import {Asset} from "@shared/Assets/Asset";
+import * as Asset from "@shared/Assets/Asset";
 import {AssetStore} from "./AssetStore";
-import {serverProxy} from "./ServerProxy";
 
 export enum LOCATION_EVENT_NAME {
     TOKEN_ADDED = "TokenAdded",
+    TOKEN_UPDATED = "TokenUpdated",
 }
 
 export namespace LOCATION_EVENT {
@@ -11,13 +11,16 @@ export namespace LOCATION_EVENT {
         eventName: LOCATION_EVENT_NAME;
     }
     export interface TokenAddedEvent extends LocationEvent {
-        tokenData: Asset.TokenData;
+        tokenData: Asset.Token.Data;
+    }
+    export interface TokenUpdatedEvent extends LocationEvent {
+        tokenData: Asset.Token.Data;
     }
 }
 
-class LocationStore extends AssetStore<Asset.LocationData> {
+class LocationStore extends AssetStore<Asset.Location.Data> {
     constructor() {
-        super("Location Store", serverProxy);
+        super("Location Store");
     }
 }
 

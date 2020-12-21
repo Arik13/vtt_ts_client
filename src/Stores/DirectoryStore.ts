@@ -26,10 +26,23 @@ class DirectoryStore {
     getDirectory(dirID: string) {
         return this.directoryMap.get(dirID);
     }
-    attachChild(dir: Directory, parentID: string) {
-        const parentDir = this.directoryMap.get(parentID);
-        dir.parent = parentDir;
-        parentDir.children.push(dir);
+    attachChild(dirSchema: Dir.DirectorySchema, parentID: string) {
+        const parent = this.directoryMap.get(parentID);
+        const children: Directory[] = [];
+        if (dirSchema.children) {
+            dirSchema.children.forEach((childID: string) => {
+                children.push(this.directoryMap.get(childID));
+            })
+        }
+        const dir: Directory = {
+            id: dirSchema.id,
+            name: dirSchema.name,
+            parent,
+            children,
+            itemID: dirSchema.itemID,
+            isOpen: true,
+        }
+        parent.children.push(dir);
         this.directoryMap.set(dir.id, dir);
     }
     delete(dirID: string) {

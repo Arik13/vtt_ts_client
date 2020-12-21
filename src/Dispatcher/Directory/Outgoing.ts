@@ -7,9 +7,7 @@ export const createDirectory = async (name: string, parentID: string) => {
         name: name,
     }
     /* eslint-disable  @typescript-eslint/no-explicit-any */
-    serverProxy.emit(DIRECTORY_EVENT_NAME.CREATE_DIRECTORY, event, (result: any) => {
-        console.log("Directory Created: ", result);
-    });
+    serverProxy.emit(DIRECTORY_EVENT_NAME.CREATE_DIRECTORY, event, (result: any) => {});
 }
 
 export const moveDirectory = async (moveDir: Directory, targetDir: Directory) => {
@@ -18,7 +16,12 @@ export const moveDirectory = async (moveDir: Directory, targetDir: Directory) =>
         targetDirectoryID: targetDir.id,
     }
     /* eslint-disable  @typescript-eslint/no-explicit-any */
-    serverProxy.emit(DIRECTORY_EVENT_NAME.MOVE_DIRECTORY, event, (result: any) => {
-        console.log("Moving Directory: ", result);
-    });
+    serverProxy.emit(DIRECTORY_EVENT_NAME.MOVE_DIRECTORY, event, (result: any) => {});
+}
+export const deleteDirectory = async (directoryID: string) => {
+    const event: DIRECTORY_EVENT_TYPE.DELETE_DIRECTORY = {
+        directoryID
+    }
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
+    serverProxy.emit(DIRECTORY_EVENT_NAME.DELETE_DIRECTORY, event, (result: any) => {});
 }

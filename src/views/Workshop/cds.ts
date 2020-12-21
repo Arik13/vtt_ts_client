@@ -33,16 +33,16 @@ const raceForm: ChooseOneWithSubDefinition = {
         // modTarget: "Race",
         // param: ""
         choices: [
-            {data: {modTarget: "aasimar", param: null, value: null}, cds: [], header: "Aasimar"},
-            {data: {modTarget: "dragonborn", param: null, value: null}, cds: [], header: "Dragonborn"},
-            {data: {modTarget: "dwarf", param: null, value: null}, cds: [], header: "Dwarf"},
-            {data: {modTarget: "elf", param: null, value: null}, cds: [], header: "Elf"},
-            {data: {modTarget: "gnome", param: null, value: null}, cds: [], header: "Gnome"},
-            {data: {modTarget: "halfelf", param: null, value: null}, cds: [], header: "HalfElf"},
-            {data: {modTarget: "halfling", param: null, value: null}, cds: [], header: "Halfling"},
-            {data: {modTarget: "halforc", param: null, value: null}, cds: [], header: "HalfOrc"},
-            {data: {modTarget: "human", param: null, value: null}, cds: [], header: "Human"},
-            {data: {modTarget: "tiefling", param: null, value: null}, cds: [], header: "Tiefling"},
+            {data: {actionTarget: "aasimar", param: null, value: null}, cds: [], header: "Aasimar"},
+            {data: {actionTarget: "dragonborn", param: null, value: null}, cds: [], header: "Dragonborn"},
+            {data: {actionTarget: "dwarf", param: null, value: null}, cds: [], header: "Dwarf"},
+            {data: {actionTarget: "elf", param: null, value: null}, cds: [], header: "Elf"},
+            {data: {actionTarget: "gnome", param: null, value: null}, cds: [], header: "Gnome"},
+            {data: {actionTarget: "halfelf", param: null, value: null}, cds: [], header: "HalfElf"},
+            {data: {actionTarget: "halfling", param: null, value: null}, cds: [], header: "Halfling"},
+            {data: {actionTarget: "halforc", param: null, value: null}, cds: [], header: "HalfOrc"},
+            {data: {actionTarget: "human", param: null, value: null}, cds: [], header: "Human"},
+            {data: {actionTarget: "tiefling", param: null, value: null}, cds: [], header: "Tiefling"},
 
         ]
     },
@@ -54,9 +54,9 @@ const aasimarSubRaceForm: ChooseOneWithSubDefinition = {
         // modTarget: "AasimarSubRace",
         // modTarget: "AasimarSubRace",
         choices: [
-            {data: {modTarget: "protector", param: null, value: null}, cds: [], header: "Protector"},
-            {data: {modTarget: "scourge", param: null, value: null}, cds: [], header: "Scourge"},
-            {data: {modTarget: "fallen", param: null, value: null}, cds: [], header: "Fallen"},
+            {data: {actionTarget: "protector", param: null, value: null}, cds: [], header: "Protector"},
+            {data: {actionTarget: "scourge", param: null, value: null}, cds: [], header: "Scourge"},
+            {data: {actionTarget: "fallen", param: null, value: null}, cds: [], header: "Fallen"},
         ]
     },
 }
@@ -181,15 +181,15 @@ const alignmentButtons: GridButtonsDefinition = {
         rows: 3,
         columns: 3,
         choices: [
-            {data: {modTarget: "alignment", param: "alignment", value: "lawful_good"}, header: "Lawful Good"},
-            {data: {modTarget: "alignment", param: "alignment", value: "neutral_good"}, header: "Neutral Good"},
-            {data: {modTarget: "alignment", param: "alignment", value: "chaotic_good"}, header: "Chaotic Good"},
-            {data: {modTarget: "alignment", param: "alignment", value: "lawful_neutral"}, header: "Lawful Neutral"},
-            {data: {modTarget: "alignment", param: "alignment", value: "true_neutral"}, header: "True Neutral"},
-            {data: {modTarget: "alignment", param: "alignment", value: "chaotic_neutral"}, header: "Chaotic Neutral"},
-            {data: {modTarget: "alignment", param: "alignment", value: "lawful_evil"}, header: "Lawful Evil"},
-            {data: {modTarget: "alignment", param: "alignment", value: "neutral_evil"}, header: "Neutral Evil"},
-            {data: {modTarget: "alignment", param: "alignment", value: "chaotic_evil"}, header: "Chaotic Evil"},
+            {data: {actionTarget: "alignment", param: "alignment", value: "lawful_good"}, header: "Lawful Good"},
+            {data: {actionTarget: "alignment", param: "alignment", value: "neutral_good"}, header: "Neutral Good"},
+            {data: {actionTarget: "alignment", param: "alignment", value: "chaotic_good"}, header: "Chaotic Good"},
+            {data: {actionTarget: "alignment", param: "alignment", value: "lawful_neutral"}, header: "Lawful Neutral"},
+            {data: {actionTarget: "alignment", param: "alignment", value: "true_neutral"}, header: "True Neutral"},
+            {data: {actionTarget: "alignment", param: "alignment", value: "chaotic_neutral"}, header: "Chaotic Neutral"},
+            {data: {actionTarget: "alignment", param: "alignment", value: "lawful_evil"}, header: "Lawful Evil"},
+            {data: {actionTarget: "alignment", param: "alignment", value: "neutral_evil"}, header: "Neutral Evil"},
+            {data: {actionTarget: "alignment", param: "alignment", value: "chaotic_evil"}, header: "Chaotic Evil"},
         ]
     }
 }

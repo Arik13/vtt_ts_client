@@ -9,7 +9,7 @@ import Vue from 'vue';
 
 export default Vue.extend({
     mounted() {
-        console.log("Test")
+        console.log("Home")
     }
 })
 </script>

@@ -1,10 +1,11 @@
 <template>
-    <v-card flat dense tile height="100%">
+    <v-card dark flat dense tile height="100%">
         <v-card-text >
             <v-tabs
                 v-model="tabModel"
                 width="100%"
                 vertical
+                dark
             >
                 <v-tab
                     v-for="(tab, i) in value.tabs"
@@ -13,8 +14,8 @@
                 >
                     {{ tab.header }}
                 </v-tab>
-                <v-tabs-items v-model="tabModel">
-                    <v-tab-item v-for="(tab, j) in value.tabs" :key="j" :value="tab.header" eager>
+                <v-tabs-items v-model="tabModel" dark>
+                    <v-tab-item v-for="(tab, j) in value.tabs" :key="j" :value="tab.header" eager dark>
                         <component
                             v-for="(cd, j) in tab.cds"
                             :key="j"
@@ -59,8 +60,7 @@ export default DynamicElement.extend({
         }
     },
     mounted() {
-        this.isActive = true;
-        // this.registerElement("test");
+        this.setActive();
     }
 })
 </script>

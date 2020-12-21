@@ -8,13 +8,13 @@
                 ref="form"
                 v-model="valid"
                 :lazy-validation="true"
-                >
+            >
                 <v-text-field
                     :rules="campaignNameRules"
                     v-model="campaignName"
                     label="Campaign Name"
                     required
-                    />
+                />
                 <v-btn @click="submitForm">
                     Create
                 </v-btn>
@@ -24,6 +24,8 @@
 </template>
 
 <script lang="ts">
+import { serverProxy } from '@/Stores/ServerProxy';
+import { userStore } from '@/Stores/UserStore';
 import Vue from "vue"
 
 export default Vue.extend({
@@ -36,18 +38,21 @@ export default Vue.extend({
     },
     methods: {
         submitForm() {
-            const payload = {
-                method: "POST",
-                route: "campaigns",
-                data: {
-                    name: this.campaignName,
-                    userID: this.$store.state.userID,
+            serverProxy.request(
+                {
+                    method: "POST",
+                    route: "campaigns",
+                    data: {
+                        name: this.campaignName,
+                        userID: userStore.userID,
+                    },
                 },
-                callback: () => {
+                () => {
                     this.$router.push({ path: 'campaignselector' })
                 }
-            };
-            this.$store.dispatch('accessResource', payload);
+            );
+            // const payload = ;
+            // this.$store.dispatch('accessResource', payload);
         },
         validate() {
             const form = this.$refs.form as HTMLFormElement;

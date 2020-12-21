@@ -1,18 +1,399 @@
 [
     {
-        "name": "Text Block",
-        "value": {
-            "header": "Age",
-            "paragraphs": ["Aasimar mature at the same rate as humans, but they can live up to 160 years"]
-        }
-    },
-    {
-        "name": "Text Block",
-        "value": {
-            "header": "Languages",
-            "paragraphs": ["You can speak, read, and write Common and Celestial"]
-        }
+      "name": "Tabs",
+      "value": {
+        "header": "Tabs Component",
+        "tabs": [
+          {
+            "header": "Race",
+            "cds": [
+              {
+                "name": "Choose One With Sub",
+                "value": {
+                  "header": "Choose a Race",
+                  "choices": [
+                    {
+                      "data": {
+                        "actionTarget": "aasimar",
+                        "param": null,
+                        "value": null
+                      },
+                      "cds": [
+                        {
+                          "name": "Choose One With Sub",
+                          "value": {
+                            "header": "Choose a Sub Race",
+                            "choices": [
+                              {
+                                "data": {
+                                  "actionTarget": "protector",
+                                  "param": null,
+                                  "value": null
+                                },
+                                "cds": [
+                                  {
+                                    "name": "Text Block",
+                                    "value": {
+                                      "header": "Ability Score Increase",
+                                      "paragraphs": [
+                                        "Your Wisdom Score increases by 1."
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "name": "Text Block",
+                                    "value": {
+                                      "header": "Radiant Soul",
+                                      "paragraphs": [
+                                        "Starting at 3rd level, you can use your action to unleash the divine energy within yourself, causing your eyes to glimmer and two luminous, incorporeal wings to sprout from your back. Your transformation lasts for 1 minute or until you end it as a bonus action. During it, you have a flying speed of 30 feet, and once on each of your turns, you can deal extra radiant damage to one modTarget when you deal damage to it with an attack or a spell. The extra radiant damage equals your level. Once you use this trait, you can't use it again until you finish a long rest."
+                                      ]
+                                    }
+                                  }
+                                ],
+                                "header": "Protector"
+                              },
+                              {
+                                "data": {
+                                  "actionTarget": "scourge",
+                                  "param": null,
+                                  "value": null
+                                },
+                                "cds": [
+                                  {
+                                    "name": "Text Block",
+                                    "value": {
+                                      "header": "Ability Score Increase",
+                                      "paragraphs": [
+                                        "Your Constitution Score increases by 1."
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "name": "Text Block",
+                                    "value": {
+                                      "header": "Radiant Consumption",
+                                      "paragraphs": [
+                                        "Starting at 3rd level, you can use your action to unleash the divine energy within yourself, causing a searing light to radiate from you, pour out of your eyes and mouth, and threaten to char you. Your transformation lasts for 1 minute or until you end it as a bonus action. During it, you shed bright light in a 10-foot radius and dim light for an additional 10 feet, and at the end of each of your turns, you and each creature within 10 feet of you take radiant damage equal to half your level (rounded up). In addition, once on each of your turns, you can deal extra radiant damage to one modTarget when you deal damage to it with an attack or a spell. The extra radiant damage equals your level. Once you use this trait, you can't use it again until you finish a long rest."
+                                      ]
+                                    }
+                                  }
+                                ],
+                                "header": "Scourge"
+                              },
+                              {
+                                "data": {
+                                  "actionTarget": "fallen",
+                                  "param": null,
+                                  "value": null
+                                },
+                                "cds": [
+                                  {
+                                    "name": "Text Block",
+                                    "value": {
+                                      "header": "Ability Score Increase",
+                                      "paragraphs": [
+                                        "Your Strength Score increases by 1."
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "name": "Text Block",
+                                    "value": {
+                                      "header": "Necrotic Shroud",
+                                      "paragraphs": [
+                                        "Starting at 3rd level, you can use your action to unleash the divine energy within yourself, causing your eyes to turn into pools of darkness and two skeletal, ghostly, flightless wings to sprout from your back. The instant you transform, other creatures within 10 feet of you that can see you must each succeed on a Charisma saving throw (DC 8 + your proficiency bonus + your Charisma modifier) or become frightened of you until the end of your next turn. Your transformation lasts for 1 minute or until you end it as a bonus action. During it, once on each of your turns, you can deal extra necrotic damage to one modTarget when you deal damage to it with an attack or a spell. The extra necrotic damage equals your level. Once you use this trait, you can't use it again until you finish a long rest."
+                                      ]
+                                    }
+                                  }
+                                ],
+                                "header": "Fallen"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Text Block",
+                          "value": {
+                            "header": "Ability Score Increase",
+                            "paragraphs": [
+                              "Your Charisma score increases by 2."
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Text Block",
+                          "value": {
+                            "header": "Age",
+                            "paragraphs": [
+                              "Aasimar mature at the same rate as humans, but they can live up to 160 years"
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Text Block",
+                          "value": {
+                            "header": "Alignment",
+                            "paragraphs": [
+                              "Imbued with celestial power, most aasimar are good. Outcast aasimar are most often neutral or even evil"
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Text Block",
+                          "value": {
+                            "header": "Size",
+                            "paragraphs": [
+                              "Aasimar have the same range of height and weight as humans. Your size is Medium"
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Text Block",
+                          "value": {
+                            "header": "Speed",
+                            "paragraphs": [
+                              "Your base walking speed is 30 feet"
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Text Block",
+                          "value": {
+                            "header": "Darkvision",
+                            "paragraphs": [
+                              "Blessed with a radiant soul, your vision can easily cut through darkness. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray"
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Text Block",
+                          "value": {
+                            "header": "Celestial Resistance",
+                            "paragraphs": [
+                              "You have resistance to necrotic damage and radiant damage"
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Text Block",
+                          "value": {
+                            "header": "Healing Hands",
+                            "paragraphs": [
+                              "As an action, you can touch a creature and cause it to regain a number of hit points equal to your level. Once you use this trait, you can't use it again until you finish a long rest"
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Text Block",
+                          "value": {
+                            "header": "Light Bearer",
+                            "paragraphs": [
+                              "You know the Light cantrip. Charisma is your spellcasting ability for it"
+                            ]
+                          }
+                        },
+                        {
+                          "name": "Text Block",
+                          "value": {
+                            "header": "Languages",
+                            "paragraphs": [
+                              "You can speak, read, and write Common and Celestial"
+                            ]
+                          }
+                        }
+                      ],
+                      "header": "Aasimar"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "dragonborn",
+                        "param": null,
+                        "value": null
+                      },
+                      "cds": [],
+                      "header": "Dragonborn"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "dwarf",
+                        "param": null,
+                        "value": null
+                      },
+                      "cds": [],
+                      "header": "Dwarf"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "elf",
+                        "param": null,
+                        "value": null
+                      },
+                      "cds": [],
+                      "header": "Elf"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "gnome",
+                        "param": null,
+                        "value": null
+                      },
+                      "cds": [],
+                      "header": "Gnome"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "halfelf",
+                        "param": null,
+                        "value": null
+                      },
+                      "cds": [],
+                      "header": "HalfElf"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "halfling",
+                        "param": null,
+                        "value": null
+                      },
+                      "cds": [],
+                      "header": "Halfling"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "halforc",
+                        "param": null,
+                        "value": null
+                      },
+                      "cds": [],
+                      "header": "HalfOrc"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "human",
+                        "param": null,
+                        "value": null
+                      },
+                      "cds": [],
+                      "header": "Human"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "tiefling",
+                        "param": null,
+                        "value": null
+                      },
+                      "cds": [],
+                      "header": "Tiefling"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "header": "Background",
+            "cds": []
+          },
+          {
+            "header": "Alignment",
+            "cds": [
+              {
+                "name": "Grid Buttons",
+                "value": {
+                  "header": "Alignment",
+                  "rows": 3,
+                  "columns": 3,
+                  "choices": [
+                    {
+                      "data": {
+                        "actionTarget": "alignment",
+                        "param": "alignment",
+                        "value": "lawful_good"
+                      },
+                      "header": "Lawful Good"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "alignment",
+                        "param": "alignment",
+                        "value": "neutral_good"
+                      },
+                      "header": "Neutral Good"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "alignment",
+                        "param": "alignment",
+                        "value": "chaotic_good"
+                      },
+                      "header": "Chaotic Good"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "alignment",
+                        "param": "alignment",
+                        "value": "lawful_neutral"
+                      },
+                      "header": "Lawful Neutral"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "alignment",
+                        "param": "alignment",
+                        "value": "true_neutral"
+                      },
+                      "header": "True Neutral"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "alignment",
+                        "param": "alignment",
+                        "value": "chaotic_neutral"
+                      },
+                      "header": "Chaotic Neutral"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "alignment",
+                        "param": "alignment",
+                        "value": "lawful_evil"
+                      },
+                      "header": "Lawful Evil"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "alignment",
+                        "param": "alignment",
+                        "value": "neutral_evil"
+                      },
+                      "header": "Neutral Evil"
+                    },
+                    {
+                      "data": {
+                        "actionTarget": "alignment",
+                        "param": "alignment",
+                        "value": "chaotic_evil"
+                      },
+                      "header": "Chaotic Evil"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "header": "Class",
+            "cds": []
+          },
+          {
+            "header": "Ability Scores",
+            "cds": []
+          },
+          {
+            "header": "Equipment",
+            "cds": []
+          }
+        ]
+      }
     }
-]
-
-// [{"name":"Tabs","value":{"header":"Tabs Component","tabs":[{"header":"Race","cds":[{"name":"Choose One With Sub","value":{"header":"Choose a Race","choices":[{"header":"Aasimar","choiceID":"","cds":[{"name":"Choose One With Sub","value":{"header":"Choose a Sub Race","choices":[{"header":"Protector","choiceID":"","cds":[{"name":"Text Block","value":{"header":"Ability Score Increase","paragraphs":["Your Wisdom Score increases by 1."]}},{"name":"Text Block","value":{"header":"Radiant Soul","paragraphs":["Starting at 3rd level, you can use your action to unleash the divine energy within yourself, causing your eyes to glimmer and two luminous, incorporeal wings to sprout from your back. Your transformation lasts for 1 minute or until you end it as a bonus action. During it, you have a flying speed of 30 feet, and once on each of your turns, you can deal extra radiant damage to one target when you deal damage to it with an attack or a spell. The extra radiant damage equals your level. Once you use this trait, you can't use it again until you finish a long rest."]}}]},{"header":"Scourge","choiceID":"","cds":[{"name":"Text Block","value":{"header":"Ability Score Increase","paragraphs":["Your Constitution Score increases by 1."]}},{"name":"Text Block","value":{"header":"Radiant Consumption","paragraphs":["Starting at 3rd level, you can use your action to unleash the divine energy within yourself, causing a searing light to radiate from you, pour out of your eyes and mouth, and threaten to char you. Your transformation lasts for 1 minute or until you end it as a bonus action. During it, you shed bright light in a 10-foot radius and dim light for an additional 10 feet, and at the end of each of your turns, you and each creature within 10 feet of you take radiant damage equal to half your level (rounded up). In addition, once on each of your turns, you can deal extra radiant damage to one target when you deal damage to it with an attack or a spell. The extra radiant damage equals your level. Once you use this trait, you can't use it again until you finish a long rest."]}}]},{"header":"Fallen","choiceID":"","cds":[{"name":"Text Block","value":{"header":"Ability Score Increase","paragraphs":["Your Strength Score increases by 1."]}},{"name":"Text Block","value":{"header":"Necrotic Shroud","paragraphs":["Starting at 3rd level, you can use your action to unleash the divine energy within yourself, causing your eyes to turn into pools of darkness and two skeletal, ghostly, flightless wings to sprout from your back. The instant you transform, other creatures within 10 feet of you that can see you must each succeed on a Charisma saving throw (DC 8 + your proficiency bonus + your Charisma modifier) or become frightened of you until the end of your next turn. Your transformation lasts for 1 minute or until you end it as a bonus action. During it, once on each of your turns, you can deal extra necrotic damage to one target when you deal damage to it with an attack or a spell. The extra necrotic damage equals your level. Once you use this trait, you can't use it again until you finish a long rest."]}}]}]}},{"name":"Text Block","value":{"header":"Ability Score Increase","paragraphs":["Your Charisma score increases by 2."]}},{"name":"Text Block","value":{"header":"Age","paragraphs":["Aasimar mature at the same rate as humans, but they can live up to 160 years"]}},{"name":"Text Block","value":{"header":"Alignment","paragraphs":["Imbued with celestial power, most aasimar are good. Outcast aasimar are most often neutral or even evil"]}},{"name":"Text Block","value":{"header":"Size","paragraphs":["Aasimar have the same range of height and weight as humans. Your size is Medium"]}},{"name":"Text Block","value":{"header":"Speed","paragraphs":["Your base walking speed is 30 feet"]}},{"name":"Text Block","value":{"header":"Darkvision","paragraphs":["Blessed with a radiant soul, your vision can easily cut through darkness. You can see in dim light within 60 feet of you as if it were bright light, and in darkness as if it were dim light. You can't discern color in darkness, only shades of gray"]}},{"name":"Text Block","value":{"header":"Celestial Resistance","paragraphs":["You have resistance to necrotic damage and radiant damage"]}},{"name":"Text Block","value":{"header":"Healing Hands","paragraphs":["As an action, you can touch a creature and cause it to regain a number of hit points equal to your level. Once you use this trait, you can't use it again until you finish a long rest"]}},{"name":"Text Block","value":{"header":"Light Bearer","paragraphs":["You know the Light cantrip. Charisma is your spellcasting ability for it"]}},{"name":"Text Block","value":{"header":"Languages","paragraphs":["You can speak, read, and write Common and Celestial"]}}]},{"header":"Dragonborn","choiceID":"","cds":[]},{"header":"Dwarf","choiceID":"","cds":[]},{"header":"Elf","choiceID":"","cds":[]},{"header":"Gnome","choiceID":"","cds":[]},{"header":"HalfElf","choiceID":"","cds":[]},{"header":"Halfling","choiceID":"","cds":[]},{"header":"HalfOrc","choiceID":"","cds":[]},{"header":"Human","choiceID":"","cds":[]},{"header":"Tiefling","choiceID":"","cds":[]}]}}]},{"header":"Background","cds":[]},{"header":"Alignment","cds":[{"name":"Grid Buttons","value":{"header":"Alignment","rows":3,"columns":3,"buttons":[{"header":"Lawful Good","choiceID":""},{"header":"Neutral Good","choiceID":""},{"header":"Chaotic Good","choiceID":""},{"header":"Lawful Neutral","choiceID":""},{"header":"True Neutral","choiceID":""},{"header":"Chaotic Neutral","choiceID":""},{"header":"Lawful Evil","choiceID":""},{"header":"Neutral Evil","choiceID":""},{"header":"Chaotic Evil","choiceID":""}]}}]},{"header":"Class","cds":[]},{"header":"Ability Scores","cds":[]},{"header":"Equipment","cds":[]}]}}]
+  ]

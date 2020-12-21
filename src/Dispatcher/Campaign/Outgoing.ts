@@ -3,35 +3,26 @@ import { createCampaignDBService } from '@/DB/IndexedDB';
 import { EVENT_TYPE, EVENT_NAME } from '@shared/Events/Events';
 
 import {DB} from "@/DB/IndexedDB";
-import { Asset } from '@shared/Assets/Asset';
+import * as Asset from "@shared/Assets/Asset";
 import {imageStore} from "@/Stores/ImageStore";
 import {locationStore} from "@/Stores/LocationStore";
 import {tokenStore} from "@/Stores/TokenStore";
 import {directoryStore} from "@/Stores/DirectoryStore";
-import { campaignStore, initCampaignStore } from '@/Stores/CampaignStore';
+import { campaignStore } from '@/Stores/CampaignStore';
 import {arrayBufferToString} from "@/Util/arrayBufferToString";
 import { Directory } from '@shared/Directories/Directory';
 import * as Flatted from 'flatted';
+import { scriptStore } from '@/Stores/ScriptStore';
+import { userStore } from '@/Stores/UserStore';
+import { dcStore } from '@/Stores/DynamicComponentStore';
+import { stateObjectStore } from '@/Stores/StateObjectStore';
 
 export const join = async (campaignID: string, userID: string, callback: () => void) => {
-
     const event: EVENT_TYPE.JOIN = {
         campaignID,
         userID
     };
     await serverProxy.emit(EVENT_NAME.JOIN, event, callback);
-
-    // const payload: ACTION_ARG.TRIGGER_EVENT = {
-    //     eventName: EVENT_NAME.JOIN,
-    //     event: event,
-    //     callback: (res: any) => {
-            // dispatcher.loadCampaign(campaignID, () => {
-            //     this.$store.state.campaignID = campaignID;
-            //         this.$router.push({ path: `/campaigneditor/${campaignID}` });
-            // });
-    //     }
-    // };
-    // this.$store.dispatch(ACTION.TRIGGER_EVENT, payload);
 }
 
 export const loadCampaign = async(campaignID: string, callback: () => void) => {
@@ -39,24 +30,26 @@ export const loadCampaign = async(campaignID: string, callback: () => void) => {
     const loadCampaignEvent: EVENT_TYPE.LOAD_CAMPAIGN = {
         syncGroup: await DB.getSyncKeys()
     }
+
     serverProxy.emit(EVENT_NAME.LOAD_CAMPAIGN, loadCampaignEvent, async (reply: ArrayBuffer[]) => {
         // Server replies with all uncached campaign assets. However, socket io can't mix json and binary in a single emit.
         // Therefore, the accompanying json data has to be encoded as binary to be sent in a single reply.
         // The json data will always be the last element in the array buffer. Need to convert it from binary first to use.
-        const metaBinary: ArrayBuffer = reply.pop();
-        const metaData: Asset.AssetSyncGroup = Flatted.parse(arrayBufferToString(metaBinary));
-        // console.log("MetaData: ", metaData)
+        const binarySyncGroup: ArrayBuffer = reply.pop();
+        const syncGroup: Asset.SyncGroup = Flatted.parse(arrayBufferToString(binarySyncGroup));
 
         const imageBuffers: ArrayBuffer[] = reply;
 
         // Image data and buffers were decoupled for transmission. Need to reattach them so they can be put in the db together.
-        const imageMetaData = metaData.imageData;
+        const imageMetaData = syncGroup.imageData;
         for (let i = 0; i < imageMetaData.toAdd.length; i++) {
             imageMetaData.toAdd[i].fileBuffer = imageBuffers[i];
         }
         // Sync assets from server with front end db
-        await DB.syncAssets(metaData);
-        initCampaignStore(campaignID, metaData.campaignData.name, metaData.campaignData.activeLocationID);
+        console.log("Deserialized Sync Group: ", syncGroup);
+
+        await DB.syncAssets(syncGroup);
+        campaignStore.setCampaign(campaignID, syncGroup.campaignData.name, syncGroup.campaignData.activeLocationID, syncGroup.clientConfig);
 
         const assets = await DB.getAssets();
 
@@ -64,6 +57,9 @@ export const loadCampaign = async(campaignID: string, callback: () => void) => {
         imageStore.setAll(assets.imageStore);
         locationStore.setAll(assets.locationStore);
         tokenStore.setAll(assets.tokenStore);
+        scriptStore.setAll(assets.scriptStore);
+        dcStore.setAll(assets.dynamicComponentStore);
+        stateObjectStore.setAll(assets.stateObjectStore);
         const setIsOpen = (directory: Directory) => {
             if (directory.itemID) return;
             directory.isOpen = true;
@@ -73,7 +69,7 @@ export const loadCampaign = async(campaignID: string, callback: () => void) => {
                 })
             }
         }
-        const rootDir = metaData.directory
+        const rootDir = syncGroup.directory;
         setIsOpen(rootDir);
         directoryStore.setRoot(rootDir);
         callback();
@@ -89,4 +85,25 @@ export const setActiveLocation = (locationID: string) => {
         console.log("Updating Active Location: ", reply);
     });
     campaignStore.setActiveLocation(locationID);
+}
+export const getCampaigns = (callback: (result: any) => void) => {
+    serverProxy.request({
+        method: "GET",
+        route: `users/${userStore.userID}/campaigns`,
+        data: null,
+    }, callback);
+}
+export const deleteCampaign = (campaignID: string, callback: () => void) => {
+    serverProxy.request({
+        method: "DELETE",
+        route: `campaigns/${campaignID}`,
+        data: null,
+    }, callback);
+    if (campaignStore.campaignID == campaignID) {
+        campaignStore.reset();
+    }
+}
+export const updateClientConfig = (clientConfig: Asset.ClientConfig.Data, callback: () => void) => {
+    const event: EVENT_TYPE.UPDATE_CLIENT_CONFIG = {clientConfig};
+    serverProxy.emit(EVENT_NAME.UPDATE_CLIENT_CONFIG, event, callback)
 }
