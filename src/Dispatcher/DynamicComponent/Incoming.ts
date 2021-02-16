@@ -7,20 +7,20 @@ import {Asset} from "@shared/Assets/Asset";
 import {DB} from "@/DB/IndexedDB";
 import { dcStore } from '@/Stores/DynamicComponentStore';
 
-const dynamicComponentCreated = async (event: EVENT_TYPE.DYNAMIC_COMPONENT_CREATED) => {
+export const dynamicComponentCreated = async (event: EVENT_TYPE.DYNAMIC_COMPONENT_CREATED) => {
     await DB.addDynamicComponent(event.keyValue);
-    dcStore.add(event.keyValue.value);
     directoryStore.attachChild(event.directory, event.parentID);
+    return dcStore.add(event.keyValue.value);
 }
 
-const dynamicComponentUpdated = async (event: EVENT_TYPE.DYNAMIC_COMPONENT_UPDATED) => {
+export const dynamicComponentUpdated = async (event: EVENT_TYPE.DYNAMIC_COMPONENT_UPDATED) => {
     const dir = directoryStore.getDirectory(event.directoryID);
     let dc = dcStore.get(event.dynamicComponent.id);
     dc = event.dynamicComponent;
     dir.name = event.dynamicComponent.name;
 }
 
-const dynamicComponentDeleted = async (event: EVENT_TYPE.DYNAMIC_COMPONENT_DELETED) => {
+export const dynamicComponentDeleted = async (event: EVENT_TYPE.DYNAMIC_COMPONENT_DELETED) => {
     await DB.deleteDynamicComponent(event.dcID);
     dcStore.deleted(event.dcID);
     directoryStore.delete(event.directoryID);

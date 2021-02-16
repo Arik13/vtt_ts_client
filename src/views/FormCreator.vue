@@ -4,13 +4,16 @@
     <v-card dark height="100%" ref="scriptEditor">
         <splitpanes :push-other-panes="false" height="100%">
             <pane :min-size="40">
-                <div style="margin: 20px">
+                <div style="margin: 20px" height="100%">
                     <v-text-field
                         v-model="activeCD.name"
                         label="Filename"
                         outlined
                         :disabled="!activeCD.id"
                     />
+                    <v-label>
+                        CD ID: {{ activeCD.id }}
+                    </v-label><br>
                     <v-btn @click="saveScript()" :disabled="!activeCD.id">
                         Save Script
                     </v-btn>
@@ -27,7 +30,7 @@
                     />
                 </div>
             </pane>
-            <pane :min-size="25" :size="25">
+            <pane :min-size="25" :size="25" height="100%">
                 <asset-view
                     v-if="directory"
                     title="Component Definitions"
@@ -70,13 +73,38 @@ import { spawnCreateDirectoryDialog } from './Dialogs/DialogFactories';
 import { dcStore } from '@/Stores/DynamicComponentStore';
 
 
-
-interface FormInterface {
-    target: string;
-}
-
 const genBlankCD = () => {
     return {id: "", name: "", cd: ""};
+}
+
+const assembleCD = (cd: any) => {
+    for (let key in cd) {
+        if (
+            cd[key] &&
+            (typeof(cd[key]) == "object" ||
+            Array.isArray(cd[key]))
+        ) {
+            let cdID = null;
+            let cdKey = null;
+            if (cd[key].cds && typeof(cd[key].cds) == "string") {
+                cdID = cd[key].cds;
+                cdKey = "cds";
+            }
+            else if (cd[key].choices && typeof(cd[key].choices) == "string") {
+                cdID = cd[key].choices;
+                cdKey = "choices";
+            }
+            if (cdID) {
+                let storeCD = dcStore.get(cdID).cd;
+                let subCD = JSON.parse(JSON.stringify(storeCD));
+                assembleCD(subCD);
+                cd[key][cdKey] = subCD;
+            }
+            else {
+                assembleCD(cd[key]);
+            }
+        }
+    }
 }
 
 export default Vue.extend({
@@ -86,15 +114,13 @@ export default Vue.extend({
         },
         input: "test",
         nextKey: 0,
-        // choices: {},
-        formInterfaces: [],
         directory: null,
         textAreaHeight: null,
         activeCD: genBlankCD() as Asset.DynamicComponent.Data,
         activeCDDirectory: null,
         folderMenuItems: [
-            MENU_ITEMS.CREATE_DIRECTORY,
             MENU_ITEMS.CREATE_COMPONENT,
+            MENU_ITEMS.CREATE_DIRECTORY,
             MENU_ITEMS.DELETE_DIRECTORY,
         ],
         menuItems: [
@@ -116,9 +142,12 @@ export default Vue.extend({
             try {
                 this.nextKey++;
                 const dialog = dialogMap.get(DIALOG_NAME.DYNAMIC_COMPONENT);
+                let cdOriginal = this.activeCD.cd;
+                let cd = JSON.parse(JSON.stringify(cdOriginal))
+                assembleCD(cd);
                 dialog.state.cds = {
                     header: "",
-                    cds: this.activeCD.cd,
+                    cds: cd,
                 };
 
                 dialog.show((state) => {
@@ -126,15 +155,12 @@ export default Vue.extend({
                 })
             }
             catch (error) {
-                console.log("Syntax Error");
+                console.log(error);
             }
         },
         tabber(event: Event) {
             if (!event) return;
             event.preventDefault();
-        },
-        registerElement(formInterface: any) {
-            this.formInterfaces.push(formInterface);
         },
         menuHandler(eventName: MENU_ITEM_NAME, dirID: string) {
             switch(eventName) {
@@ -159,8 +185,6 @@ export default Vue.extend({
                     this.activeCDDirectory = dirID;
                     const dc = dcStore.get(cdID);
                     this.activeCD = dc;
-                    console.log("", dc.cd);
-
                     this.json = dc.cd;
                     break;
                 }

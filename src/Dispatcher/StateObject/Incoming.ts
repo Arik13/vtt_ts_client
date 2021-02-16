@@ -22,9 +22,9 @@ const stateObjectUpdated = async (event: EVENT_TYPE.STATE_OBJECT_UPDATED) => {
 }
 
 const stateObjectDeleted = async (event: EVENT_TYPE.STATE_OBJECT_DELETED) => {
-    // await DB.deleteDynamicComponent(event.dcID);
-    // dcStore.deleted(event.dcID);
-    // directoryStore.delete(event.directoryID);
+    await DB.deleteStateObject(event.soID);
+    stateObjectStore.deleted(event.soID);
+    directoryStore.delete(event.directoryID);
 }
 
 serverProxy.addHandler(EVENT_NAME.STATE_OBJECT_CREATED, stateObjectCreated);

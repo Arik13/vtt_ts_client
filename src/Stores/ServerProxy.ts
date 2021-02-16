@@ -30,11 +30,16 @@ export class ServerProxy {
     handlerMap: Map<EventName, EventHandler> = new Map();
     // Handlers for events coming from server
     // TODO: refactor into a server proxy object
-    async emit(eventName: EventName, event: EVENT_TYPE.EVENT_TYPE, callback: EventHandler) {
-        // console.log("_____________________________________________________");
+    async emit(eventName: EventName, event: EVENT_TYPE.EVENT_TYPE, callback?: EventHandler) {
         console.log(`Emitting ${eventName} event: `, event);
-        // console.log("_____________________________________________________");
-        this.socket.emit(eventName, event, callback);
+        return new Promise<void>(resolve => {
+            this.socket.emit(eventName, event, (payload: any) => {
+                if (callback) {
+                    callback(payload);
+                }
+                resolve(payload);
+            });
+        });
     }
     // async get() {
 
@@ -59,15 +64,15 @@ export class ServerProxy {
 
         // Copy user headers into payload
         Object.assign(finalPayload.headers, payload.headers);
-
-        // console.log("_____________________________________________________");
         console.log(`Sending ${finalPayload.method} request to ${finalPayload.url}: `, finalPayload);
-        // console.log("_____________________________________________________");
 
         // Send http request then call callback
-        const res = await this.axios(finalPayload)
+        const res = await this.axios(finalPayload);
         if (callback) {
             callback(res.data);
+        }
+        else {
+            return res.data;
         }
     }
     async requestNoAuth(payload: any, callback: any) {

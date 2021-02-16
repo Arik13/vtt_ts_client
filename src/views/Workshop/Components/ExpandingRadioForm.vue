@@ -29,7 +29,6 @@
                                 :key="j"
                                 :is="getComponent(cd)"
                                 :value="cd.value"
-                                :registerElement="registerElement"
                                 :ref="i"
                             />
                         </v-expansion-panel-content>
@@ -43,52 +42,70 @@
 <script lang="ts">
 import Vue, {PropType} from "vue";
 import DynamicElement from "./DynamicElement.vue";
-import {ComponentDefinition, COMPONENT_NAME, COMPONENT_PROP} from "../ComponentTypes";
+import {ChoiceData, ComponentDefinition, COMPONENT_NAME, COMPONENT_PROP} from "../ComponentTypes";
 import componentMap from "../ComponentMap";
 
 export default DynamicElement.extend({
     data: () => ({
-        radioSelection: 0,
+        radioSelection: null,
     }),
     props: {
         value: {type: Object as PropType<COMPONENT_PROP.ChooseOneWithSub>},
     },
     methods: {
-        getComponent(cd: ComponentDefinition) {
-            return componentMap.get(cd.name);
-        },
-        getSelectedChoice() {
-            return this.value.choices[this.radioSelection].data;
-        },
-        isChildActive(index: number): boolean {
-            return this.radioSelection == index;
+        getSelectedChoice(this) {
+            // let choice: ChoiceData = {
+            //     param: this.value.param,
+            //     value: this.value.choices[this.radioSelection].value
+            // }
+            return {
+                param: this.value.param,
+                value: this.value.choices[this.radioSelection].value
+            };
         },
         setActive() {
             this.isActive = true;
             const firstElGroup = this.$refs[this.radioSelection] as any;
+
             for (const key in firstElGroup) {
                 const node = firstElGroup[key];
                 node.setActive();
             }
+        },
+        setInactive() {
+            this.isActive = false;
+            const firstElGroup = this.$refs[this.radioSelection] as any;
+
+            for (const key in firstElGroup) {
+                const node = firstElGroup[key];
+                node.setInactive();
+            }
+        },
+        reset() {
+            this.radioSelection = null;
+        },
+        validate() {
+            return this.radioSelection !== null
         }
     },
     watch: {
         radioSelection(newSelec: number, oldSelec: number) {
             const oldNodeGroup = this.$refs[oldSelec] as any;
             const newNodeGroup = this.$refs[newSelec] as any;
+
             for (const key in oldNodeGroup) {
                 const node = oldNodeGroup[key];
                 node.isActive = false;
             }
+
             for (const key in newNodeGroup) {
                 const node = newNodeGroup[key];
-                node.isActive = true;
+                node.setActive();
             }
         }
     },
     mounted() {
         this.isChoiceNode = true;
-        this.setActive();
     }
 });
 </script>

@@ -27,6 +27,7 @@ class DirectoryStore {
         return this.directoryMap.get(dirID);
     }
     attachChild(dirSchema: Dir.DirectorySchema, parentID: string) {
+        if (this.directoryMap.get(dirSchema.id)) return;
         const parent = this.directoryMap.get(parentID);
         const children: Directory[] = [];
         if (dirSchema.children) {
@@ -44,6 +45,7 @@ class DirectoryStore {
         }
         parent.children.push(dir);
         this.directoryMap.set(dir.id, dir);
+        return this.directoryMap.get(dir.id);
     }
     delete(dirID: string) {
         const dir = this.directoryMap.get(dirID);

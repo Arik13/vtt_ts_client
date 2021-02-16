@@ -9,7 +9,7 @@
             v-for="(dialog, i) in dialogs"
             :key="i"
             :is="dialog.component"
-            :d="storeDialog(dialog.name, dialog.prop)"
+            :d="initDialog(dialog.name, dialog.prop)"
             :ref="dialog.name"
         />
     </div>
@@ -24,7 +24,7 @@ export default Vue.extend({
         dialogs,
     }),
     methods: {
-        storeDialog(name: string, d: DialogObject<any>) {
+        initDialog(name: string, d: DialogObject<any>) {
             dialogMap.set(name, d);
             return d;
         }

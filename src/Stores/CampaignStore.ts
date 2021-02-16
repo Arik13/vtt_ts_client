@@ -42,6 +42,7 @@ class CampaignStore {
         this.campaignID = campaignID;
         this.name = name;
         this.clientConfig = clientConfig;
+
         this.subscribers.forEach((subscriber: Subscriber) => {
             subscriber.notify(this.INITIALIZED, null);
         });
@@ -57,6 +58,7 @@ class CampaignStore {
     }
     updateClientConfig(clientConfig: Asset.ClientConfig.Data) {
         this.clientConfig = clientConfig;
+        return this.clientConfig;
     }
 }
 

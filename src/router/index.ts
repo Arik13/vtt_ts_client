@@ -9,7 +9,7 @@ import CampaignEditor from "@/views/CampaignEditor.vue";
 import CampaignCreator from "@/views/CampaignCreator.vue";
 import CampaignSelector from "@/views/CampaignSelector.vue";
 import Home from "@/views/Home.vue";
-// import Test from "@/views/Workshop/Test.vue";
+import Test from "@/views/Workshop/Test.vue";
 import Login from "@/views/Login.vue";
 import Logout from "@/views/Logout.vue";
 import Signup from "@/views/Signup.vue";
@@ -38,7 +38,7 @@ export enum ROUTE {
 
 const routes: Array<RouteConfig> = [
     {path: ROUTE.HOME, components: {default: Home}, meta: {title: "Home"}},
-    // {path: ROUTE.TEST, components: {default: Test}, meta: {title: "Test"}},
+    {path: ROUTE.TEST, components: {default: Test}, meta: {title: "Test"}},
     {path: ROUTE.LOGIN, components: {default: Login}, meta: {title: "Login"}},
     {path: ROUTE.LOGOUT, components: {default: Logout}, meta: {title: "Logout"}},
     {path: ROUTE.SIGNUP, components: {default: Signup}, meta: {title: "Signup"}},

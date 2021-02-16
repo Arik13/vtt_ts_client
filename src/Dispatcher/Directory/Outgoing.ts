@@ -1,13 +1,19 @@
 import { serverProxy} from '@/Stores/ServerProxy';
 import {DIRECTORY_EVENT_NAME, DIRECTORY_EVENT_TYPE, Directory} from "@shared/Directories/Directory";
+import {directoryCreated} from "./Incoming";
 
 export const createDirectory = async (name: string, parentID: string) => {
     const event: DIRECTORY_EVENT_TYPE.CREATE_DIRECTORY = {
         parentID: parentID,
         name: name,
     }
+    // serverProxy.emit(DIRECTORY_EVENT_NAME.CREATE_DIRECTORY, event, (result: any) => {});
     /* eslint-disable  @typescript-eslint/no-explicit-any */
-    serverProxy.emit(DIRECTORY_EVENT_NAME.CREATE_DIRECTORY, event, (result: any) => {});
+    return new Promise<Directory>((resolve, reject) => {
+        serverProxy.emit(DIRECTORY_EVENT_NAME.CREATE_DIRECTORY, event, async (payload: any) => {
+            payload.success? resolve(directoryCreated(payload.event)) : reject(null);
+        });
+    })
 }
 
 export const moveDirectory = async (moveDir: Directory, targetDir: Directory) => {

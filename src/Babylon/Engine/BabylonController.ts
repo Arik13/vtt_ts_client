@@ -19,8 +19,6 @@ import {campaignStore, CampaignSubscriber, CAMPAIGN_EVENT} from "@/Stores/Campai
 import {imageStore} from "@/Stores/ImageStore";
 import { tokenStore } from '@/Stores/TokenStore';
 import dispatcher from '@/Dispatcher/Dispatcher';
-// import {tokenStore} from "@/Stores/TokenStore";
-
 class BabylonController implements InputReceiver {
     engine: BABYLON.Engine;
     canvas: HTMLCanvasElement;
@@ -39,9 +37,7 @@ class BabylonController implements InputReceiver {
 
         // Register a render loop to repeatedly render the scene
         this.engine.runRenderLoop(() => {
-            if (this.activeLocation) {
-                this.activeLocation.render();
-            }
+            if (this.activeLocation) this.activeLocation.render();
         });
         locationStore.subscribe({
             added: () => {console.log();},
@@ -68,17 +64,12 @@ class BabylonController implements InputReceiver {
                     case (LOCATION_EVENT_NAME.TOKEN_UPDATED): {
                         const tokenEvent = event as LOCATION_EVENT.TokenUpdatedEvent;
                         const tokenData = tokenEvent.tokenData;
-                        // const tokenMeshData: MeshData = {
-                        //     texturePath: this.createImageURL(tokenData.imageID),
-                        //     meshName: tokenData.id,
-                        //     materialName: tokenData.imageID
-                        // }
                         this.activeLocation.updateToken(tokenData.id, tokenData);
-                        // this.getActiveLocation().addToken(
-                        //     tokenData.model.position.x,
-                        //     tokenData.model.position.z,
-                        //     tokenMeshData,
-                        // );
+                        break;
+                    }
+                    case (LOCATION_EVENT_NAME.TOKEN_DELETED): {
+                        const tokenEvent = event as LOCATION_EVENT.TokenDeleteEvent;
+                        this.activeLocation.deleteToken(tokenEvent.tokenID);
                         break;
                     }
                 }
@@ -115,7 +106,13 @@ class BabylonController implements InputReceiver {
                     if (currentPosition) {
                         const pickedMesh = this.activeLocation.pickedMesh;
                         const currentTilePosition = pickedMesh.position;
-                        const newPosition = this.activeLocation.findClosestTileCenter(currentPosition);
+                        let newPosition = this.activeLocation.findClosestTileCenter(currentPosition);
+                        if (this.activeLocation.snapToGridEnabled) {
+                            newPosition = this.activeLocation.findClosestTileCenter(currentPosition);
+                        }
+                        else {
+                            newPosition = currentPosition;
+                        }
                         if (
                             currentTilePosition.x != newPosition.x ||
                             currentTilePosition.z != newPosition.z
@@ -133,10 +130,17 @@ class BabylonController implements InputReceiver {
                 if (this.activeLocation.hasSelection()) {
                     const location = this.activeLocation;
                     let startPos = this.activeLocation.pickStartingPosition;
-                    startPos = this.activeLocation.findClosestTileCenter(startPos);
+                    console.log("BEfore: ", startPos);
+                    if (this.activeLocation.snapToGridEnabled) {
+                        startPos = this.activeLocation.findClosestTileCenter(startPos);
+                    }
+                    console.log("After snap: ", startPos);
                     let endPos = location.getGroundPosition();
                     location.pickStartingPosition = endPos;
-                    endPos = this.activeLocation.findClosestTileCenter(endPos);
+                    // endPos = this.activeLocation.findClosestTileCenter(endPos);
+                    if (this.activeLocation.snapToGridEnabled) {
+                        endPos = this.activeLocation.findClosestTileCenter(endPos);
+                    }
                     if (
                         startPos.x != endPos.x ||
                         startPos.z != endPos.z
@@ -157,6 +161,12 @@ class BabylonController implements InputReceiver {
             //     this.getActiveView().zoomOut();
             //     break;
             case INPUT_EVENT.DELETE: {
+                if (this.activeLocation.hasSelection()) {
+                    let tokenID = this.activeLocation.pickedMesh.id;
+                    console.log("TokenID: ", tokenID);
+
+                    dispatcher.deleteToken(tokenID, this.activeLocationID);
+                }
                 // this.getActiveView().zoomOut();
                 console.log("Delete");
                 break;
@@ -165,11 +175,6 @@ class BabylonController implements InputReceiver {
     }
     resize() {
         this.engine.resize();
-    }
-    getActiveView() {
-        if (this.activeLocation) {
-            return this.activeLocation.view;
-        }
     }
     getActiveLocation() {
         return this.activeLocation;

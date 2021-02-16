@@ -4,6 +4,7 @@ import {serverProxy} from "@/Stores/ServerProxy";
 import {EVENT_NAME, EVENT_TYPE} from "@shared/Events/Events";
 import {DB} from "@/DB/IndexedDB";
 import { scriptStore } from '@/Stores/ScriptStore';
+import { stateObjectStore } from "@/Stores/StateObjectStore";
 
 export const createStateObject = (stateObject: Asset.StateObject.Data, directoryID: string, callback: (reply: any) => void) => {
     const event: EVENT_TYPE.CREATE_STATE_OBJECT = {
@@ -24,13 +25,13 @@ export const createStateObject = (stateObject: Asset.StateObject.Data, directory
 //     /* eslint-disable  @typescript-eslint/no-explicit-any */
 //     serverProxy.emit(EVENT_NAME.UPDATE_SCRIPT, event, (reply: any) => {});
 // }
-export const deleteStateObject = async (scriptID: string, directoryID: string) => {
-    // // scriptStore.deleted(scriptID);
-    // // await DB.deleteScript(scriptID);
-    // const event: EVENT_TYPE.DELETE_SCRIPT = {
-    //     scriptID,
-    //     directoryID,
-    // }
+export const deleteStateObject = async (soID: string, directoryID: string, callback: (reply: any) => void) => {
+    stateObjectStore.deleted(soID);
+    await DB.deleteStateObject(soID);
+    const event: EVENT_TYPE.DELETE_STATE_OBJECT = {
+        soID,
+        directoryID,
+    }
     // /* eslint-disable  @typescript-eslint/no-explicit-any */
-    // serverProxy.emit(EVENT_NAME.DELETE_SCRIPT, event, (reply: any) => {});
+    serverProxy.emit(EVENT_NAME.DELETE_STATE_OBJECT, event, callback);
 }

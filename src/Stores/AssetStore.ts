@@ -28,12 +28,16 @@ export abstract class AssetStore<T extends Asset.Asset> {
     get(id: string): T {
         return this.assets.get(id);
     }
-    add(asset: T): void {
+    add(asset: T): T {
         if (this.assets.get(asset.id)) return;
         this.assets.set(asset.id, asset);
         this.subscribers.forEach((subscriber) => {
             subscriber.added(asset.id);
         });
+        return this.assets.get(asset.id);
+    }
+    set(asset: T) {
+        this.assets.set(asset.id, asset);
     }
     deleted(id: string): void {
         const asset = this.assets.get(id);
@@ -43,6 +47,11 @@ export abstract class AssetStore<T extends Asset.Asset> {
         });
         this.assets.delete(id);
     }
+    // find(predicate: (value: any) => boolean) {
+    //     this.assets.forEach((value) => {
+    //         if (predicate(value)) return value;
+    //     })
+    // }
 }
 
 

@@ -37,26 +37,22 @@ import Vue from "vue"
 import {campaignStore} from "@/Stores/CampaignStore";
 import {userStore} from "@/Stores/UserStore";
 import dispatcher from '@/Dispatcher/Dispatcher';
-
-interface CampaignData {
-    name: string;
-    ID: string;
-}
+import * as Asset from "@shared/Assets/Asset";
 
 export default Vue.extend({
     data: () => ({
-        campaigns: null as CampaignData[],
+        campaigns: null as Asset.CampaignData[],
     }),
     methods: {
-        startCampaign(campaign: CampaignData) {
-            this.$router.push({ path: `/loading/${campaign.ID}` });
+        startCampaign(campaign: Asset.CampaignData) {
+            this.$router.push({ path: `/loading/${campaign.id}` });
         },
-        deleteCampaign(campaign: CampaignData) {
+        deleteCampaign(campaign: Asset.CampaignData) {
             dispatcher.deleteCampaign(
-                campaign.ID,
+                campaign.id,
                 () => {
-                    const index = this.campaigns.findIndex((campaignData: CampaignData) => {
-                        return campaignData.ID == campaign.ID;
+                    const index = this.campaigns.findIndex((campaignData: Asset.CampaignData) => {
+                        return campaignData.id == campaign.id;
                     });
                     this.campaigns.splice(index, 1);
                 }
@@ -64,7 +60,7 @@ export default Vue.extend({
         }
     },
     mounted() {
-        dispatcher.getCampaigns((result: CampaignData[]) => {
+        dispatcher.getCampaigns((result: Asset.CampaignData[]) => {
             this.campaigns = result;
         });
     }

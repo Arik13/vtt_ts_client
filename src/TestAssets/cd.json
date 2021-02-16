@@ -14,9 +14,8 @@
                   "choices": [
                     {
                       "data": {
-                        "actionTarget": "aasimar",
-                        "param": null,
-                        "value": null
+                        "param": "race",
+                        "value": "aasimar"
                       },
                       "cds": [
                         {
@@ -26,9 +25,8 @@
                             "choices": [
                               {
                                 "data": {
-                                  "actionTarget": "protector",
-                                  "param": null,
-                                  "value": null
+                                  "param": "subrace",
+                                  "value": "protector"
                                 },
                                 "cds": [
                                   {
@@ -54,9 +52,8 @@
                               },
                               {
                                 "data": {
-                                  "actionTarget": "scourge",
-                                  "param": null,
-                                  "value": null
+                                  "param": "subrace",
+                                  "value": "scourge"
                                 },
                                 "cds": [
                                   {
@@ -82,9 +79,8 @@
                               },
                               {
                                 "data": {
-                                  "actionTarget": "fallen",
-                                  "param": null,
-                                  "value": null
+                                  "param": "subrace",
+                                  "value": "fallen"
                                 },
                                 "cds": [
                                   {
@@ -206,8 +202,7 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "dragonborn",
-                        "param": null,
+                        "param": "dragonborn",
                         "value": null
                       },
                       "cds": [],
@@ -215,8 +210,7 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "dwarf",
-                        "param": null,
+                        "param": "dwarf",
                         "value": null
                       },
                       "cds": [],
@@ -224,8 +218,7 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "elf",
-                        "param": null,
+                        "param": "elf",
                         "value": null
                       },
                       "cds": [],
@@ -233,8 +226,7 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "gnome",
-                        "param": null,
+                        "param": "gnome",
                         "value": null
                       },
                       "cds": [],
@@ -242,8 +234,7 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "halfelf",
-                        "param": null,
+                        "param": "halfelf",
                         "value": null
                       },
                       "cds": [],
@@ -251,8 +242,7 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "halfling",
-                        "param": null,
+                        "param": "halfling",
                         "value": null
                       },
                       "cds": [],
@@ -260,8 +250,7 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "halforc",
-                        "param": null,
+                        "param": "halforc",
                         "value": null
                       },
                       "cds": [],
@@ -269,8 +258,7 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "human",
-                        "param": null,
+                        "param": "human",
                         "value": null
                       },
                       "cds": [],
@@ -278,8 +266,7 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "tiefling",
-                        "param": null,
+                        "param": "tiefling",
                         "value": null
                       },
                       "cds": [],
@@ -306,7 +293,6 @@
                   "choices": [
                     {
                       "data": {
-                        "actionTarget": "alignment",
                         "param": "alignment",
                         "value": "lawful_good"
                       },
@@ -314,7 +300,6 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "alignment",
                         "param": "alignment",
                         "value": "neutral_good"
                       },
@@ -322,7 +307,6 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "alignment",
                         "param": "alignment",
                         "value": "chaotic_good"
                       },
@@ -330,7 +314,6 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "alignment",
                         "param": "alignment",
                         "value": "lawful_neutral"
                       },
@@ -338,7 +321,6 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "alignment",
                         "param": "alignment",
                         "value": "true_neutral"
                       },
@@ -346,7 +328,6 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "alignment",
                         "param": "alignment",
                         "value": "chaotic_neutral"
                       },
@@ -354,7 +335,6 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "alignment",
                         "param": "alignment",
                         "value": "lawful_evil"
                       },
@@ -362,7 +342,6 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "alignment",
                         "param": "alignment",
                         "value": "neutral_evil"
                       },
@@ -370,7 +349,6 @@
                     },
                     {
                       "data": {
-                        "actionTarget": "alignment",
                         "param": "alignment",
                         "value": "chaotic_evil"
                       },

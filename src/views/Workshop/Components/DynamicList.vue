@@ -10,9 +10,10 @@
                     :key="i"
                     :is="getComponent(cd)"
                     :value="getProp(cd)"
-                    :registerElement="registerElement"
                     :ref="i"
                 />
+                <br>
+                    <!-- :registerElement="registerElement" -->
             </v-card-text>
         </v-card>
     <!-- </v-container> -->
@@ -33,10 +34,6 @@ export default DynamicElement.extend({
         value: {type: Object as PropType<COMPONENT_PROP.DynamicList>},
     },
     methods: {
-        getComponent(cd: ComponentDefinition) {
-            const component = componentMap.get(cd.name);
-            return component;
-        },
         getProp(cd: ComponentDefinition) {
             return cd.value;
         },
@@ -49,6 +46,19 @@ export default DynamicElement.extend({
                     el.setActive();
                 }
             }
+        },
+        setInactive() {
+            this.isActive = false;
+            for (const key in this.$refs) {
+                const elGroup = this.$refs[key] as any;
+                for (const groupKey in elGroup) {
+                    const el = elGroup[groupKey] as any;
+                    el.setInactive();
+                }
+            }
+        },
+        reset() {
+
         }
     },
     mounted() {

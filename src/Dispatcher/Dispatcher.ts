@@ -16,8 +16,9 @@ import {
 import {
     createLocation,
     deleteLocation,
-    addToken,
+    createToken,
     updateToken,
+    deleteToken,
 } from "./Location/Outgoing";
 
 import {
@@ -56,6 +57,12 @@ import {
     deleteStateObject,
 } from "./StateObject/Outgoing";
 
+import {
+    createRoll,
+    updateRoll,
+    deleteRoll,
+} from "./Roll/Outgoing";
+
 
 ////////////////////////////////
 
@@ -75,8 +82,9 @@ export default {
     // LOCATIONS
     createLocation,
     deleteLocation,
-    addToken,
+    createToken,
     updateToken,
+    deleteToken,
 
     // DIRECTORIES
     createDirectory,
@@ -102,10 +110,15 @@ export default {
     updateDynamicComponent,
     deleteDynamicComponent,
 
-    // DYNAMIC COMPONENTS
+    // STATE OBJECTS
     createStateObject,
     // updateStateObject,
     deleteStateObject,
+
+    // ROLL
+    createRoll,
+    updateRoll,
+    deleteRoll,
 }
 
 // INCOMING ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -117,3 +130,4 @@ import "./Script/Incoming";
 import "./DynamicComponent/Incoming";
 import "./StateObject/Incoming";
 import "./Game/Incoming";
+import "./Roll/Incoming";

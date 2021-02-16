@@ -17,7 +17,7 @@
 <script lang="ts">
 import Vue, {PropType} from "vue";
 import DynamicElement from "./DynamicElement.vue";
-import {ComponentDefinition, COMPONENT_NAME, COMPONENT_PROP} from "../ComponentTypes";
+import {ChoiceData, ComponentDefinition, COMPONENT_NAME, COMPONENT_PROP} from "../ComponentTypes";
 import componentMap from "../ComponentMap";
 // import {ALIGNMENT_DATA, ALIGNMENT} from "@/dnd/Alignment";
 
@@ -37,17 +37,31 @@ export default DynamicElement.extend({
             const choice = this.value.choices[i];
             return choice;
         },
-        getSelectedChoice() {
-            return this.choice.data;
+        getSelectedChoice(): ChoiceData {
+            // return this.choice.data;
+            return {
+                param: this.value.param,
+                value: this.choice.value,
+            };
         },
         setActive() {
             this.isActive = true;
+        },
+        setInactive() {
+            this.isActive = false;
+        },
+        validate() {
+            return this.choice !== null;
+        },
+        reset() {
+            // this.choice = this.getChoice(1, 1);
+            this.choice = null
         }
     },
     mounted() {
         this.isChoiceNode = true;
-        this.choice = this.getChoice(1, 1);
-        this.registerElement(this.getSelectedChoice);
+        // this.choice = this.getChoice(1, 1);
+        // this.registerElement(this.getSelectedChoice);
     }
 })
 </script>

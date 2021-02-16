@@ -21,6 +21,8 @@ export enum STORE {
     DYNAMIC_COMPONENT_KEY_STORE = "dynamicComponentKeyStore",
     STATE_OBJECT_STORE = "stateObjectStore",
     STATE_OBJECT_KEY_STORE = "stateObjectKeyStore",
+    ROLL_STORE = "rollStore",
+    ROLL_KEY_STORE = "rollKeyStore",
 }
 
 interface ClientDB extends DBSchema {
@@ -31,6 +33,7 @@ interface ClientDB extends DBSchema {
     scriptStore:                {key: string; value: Asset.Script.Data};
     dynamicComponentStore:      {key: string; value: Asset.DynamicComponent.Data};
     stateObjectStore:           {key: string; value: Asset.StateObject.Data};
+    rollStore:                  {key: string; value: Asset.Roll.Data};
 
     // Key Stores
     imageKeyStore:              {key: string; value: string};
@@ -39,6 +42,7 @@ interface ClientDB extends DBSchema {
     scriptKeyStore:             {key: string; value: Asset.Key};
     dynamicComponentKeyStore:   {key: string; value: Asset.Key};
     stateObjectKeyStore:        {key: string; value: Asset.Key};
+    rollKeyStore:               {key: string; value: Asset.Key};
 }
 
 const DB_VERSION = 1;
@@ -68,6 +72,7 @@ class CampaignDBService {
                     db.createObjectStore(STORE.SCRIPT_STORE);
                     db.createObjectStore(STORE.DYNAMIC_COMPONENT_STORE);
                     db.createObjectStore(STORE.STATE_OBJECT_STORE);
+                    db.createObjectStore(STORE.ROLL_STORE);
 
                     // Key Stores
                     db.createObjectStore(STORE.IMAGE_KEY_STORE);
@@ -76,6 +81,7 @@ class CampaignDBService {
                     db.createObjectStore(STORE.SCRIPT_KEY_STORE);
                     db.createObjectStore(STORE.DYNAMIC_COMPONENT_KEY_STORE);
                     db.createObjectStore(STORE.STATE_OBJECT_KEY_STORE);
+                    db.createObjectStore(STORE.ROLL_KEY_STORE);
                 },
             }
         );
@@ -89,6 +95,7 @@ class CampaignDBService {
             scriptKeys: await this.db.getAll(STORE.SCRIPT_KEY_STORE),
             dynamicComponentKeys: await this.db.getAll(STORE.DYNAMIC_COMPONENT_KEY_STORE),
             soKeys: await this.db.getAll(STORE.STATE_OBJECT_KEY_STORE),
+            rollKeys: await this.db.getAll(STORE.ROLL_KEY_STORE),
         }
         return assetDependencies;
     }
@@ -125,6 +132,7 @@ class CampaignDBService {
         this.syncAsset(STORE.SCRIPT_STORE, STORE.SCRIPT_KEY_STORE, assets.scriptData, queryList);
         this.syncAsset(STORE.DYNAMIC_COMPONENT_STORE, STORE.DYNAMIC_COMPONENT_KEY_STORE, assets.dcData, queryList);
         this.syncAsset(STORE.STATE_OBJECT_STORE, STORE.STATE_OBJECT_KEY_STORE, assets.soData, queryList);
+        this.syncAsset(STORE.ROLL_STORE, STORE.ROLL_KEY_STORE, assets.rollData, queryList);
         await Promise.all(queryList);
     }
 
@@ -142,6 +150,8 @@ class CampaignDBService {
             dynamicComponentKeyStore: await this.db.getAll(STORE.DYNAMIC_COMPONENT_KEY_STORE),
             stateObjectStore: await this.db.getAll(STORE.STATE_OBJECT_STORE),
             stateObjectKeyStore: await this.db.getAll(STORE.STATE_OBJECT_KEY_STORE),
+            rollStore: await this.db.getAll(STORE.ROLL_STORE),
+            rollKeyStore: await this.db.getAll(STORE.ROLL_KEY_STORE),
         }
     }
     private async putAsset(assetStore: STORE, keyStore: STORE, key: Asset.Key, asset: any) {
@@ -171,6 +181,9 @@ class CampaignDBService {
     async addStateObject(keyVal: Asset.StateObject.KeyValue) {
         await this.putAsset(STORE.STATE_OBJECT_STORE, STORE.STATE_OBJECT_KEY_STORE, keyVal.key, keyVal.value);
     }
+    async addRoll(keyVal: Asset.Roll.KeyValue) {
+        await this.putAsset(STORE.ROLL_STORE, STORE.ROLL_KEY_STORE, keyVal.key, keyVal.value);
+    }
 
     async deleteImage(id: string) {
         await this.db.delete(STORE.IMAGE_KEY_STORE, id);
@@ -195,6 +208,10 @@ class CampaignDBService {
     async deleteStateObject(id: string) {
         await this.db.delete(STORE.DYNAMIC_COMPONENT_KEY_STORE, id);
         await this.db.delete(STORE.DYNAMIC_COMPONENT_STORE, id);
+    }
+    async deleteRoll(id: string) {
+        await this.db.delete(STORE.ROLL_KEY_STORE, id);
+        await this.db.delete(STORE.ROLL_STORE, id);
     }
 }
 let DB: CampaignDBService = null;

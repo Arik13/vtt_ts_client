@@ -7,24 +7,11 @@ import {EVENT_NAME, EVENT_TYPE} from "@shared/Events/Events";
 import {DB} from "@/DB/IndexedDB";
 import {LOCATION_EVENT, LOCATION_EVENT_NAME} from "@/Stores/LocationStore"
 
-// export enum LOCATION_EVENT_NAME {
-//     TOKEN_ADDED = "TokenAdded",
-// }
-
-// export namespace LOCATION_EVENT_TYPE {
-//     export interface LOCATION_EVENT_TYPE {
-//         eventName: LOCATION_EVENT_NAME;
-//     }
-//     export interface TOKEN_ADDED extends LOCATION_EVENT_TYPE {
-//         tokenData: Asset.TokenData;
-//     }
-// }
-
-export const locationDownloaded = async (event: EVENT_TYPE.LOCATION_CREATED) => {
+export const locationCreated = async (event: EVENT_TYPE.LOCATION_CREATED) => {
     directoryStore.attachChild(event.directory, event.parentID);
     const locationKeyValue = event.keyValue;
     await DB.addLocation(locationKeyValue);
-    locationStore.add(locationKeyValue.value);
+    return locationStore.add(locationKeyValue.value);
 }
 
 export const locationDeleted = async (payload: EVENT_TYPE.LOCATION_DELETED) => {
@@ -64,8 +51,24 @@ export const tokenUpdated = async (event: EVENT_TYPE.TOKEN_UPDATED) => {
         }
     });
 }
+export const tokenDeleted = async (event: EVENT_TYPE.TOKEN_DELETED) => {
+    const locationEvent: LOCATION_EVENT.TokenDeleteEvent = {
+        eventName: LOCATION_EVENT_NAME.TOKEN_DELETED,
+        tokenID: event.tokenID,
+    }
 
-serverProxy.addHandler(EVENT_NAME.LOCATION_CREATED, locationDownloaded);
+    locationStore.deleted(event.tokenID);
+    await DB.deleteToken(event.tokenID);
+
+    locationStore.subscribers.forEach((subscriber: Subscriber) => {
+        if (subscriber.updated) {
+            subscriber.updated(event.locationID, locationEvent);
+        }
+    });
+}
+
+serverProxy.addHandler(EVENT_NAME.LOCATION_CREATED, locationCreated);
 serverProxy.addHandler(EVENT_NAME.LOCATION_DELETED, locationDeleted);
 serverProxy.addHandler(EVENT_NAME.TOKEN_CREATED, tokenCreated);
 serverProxy.addHandler(EVENT_NAME.TOKEN_UPDATED, tokenUpdated);
+serverProxy.addHandler(EVENT_NAME.TOKEN_DELETED, tokenDeleted);

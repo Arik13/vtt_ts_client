@@ -22,4 +22,13 @@ componentMap.set(COMPONENT_NAME.TABS, Tabs);
 import GridButtons from "./Components/GridButtons.vue";
 componentMap.set(COMPONENT_NAME.GRID_BUTTONS, GridButtons);
 
+import Roller from "./Components/Roller.vue";
+componentMap.set(COMPONENT_NAME.ROLLER, Roller);
+
+import Table from "./Components/Table.vue";
+componentMap.set(COMPONENT_NAME.TABLE, Table);
+
+import TextField from "./Components/TextField.vue";
+componentMap.set(COMPONENT_NAME.TEXT_FIELD, TextField);
+
 export default componentMap;

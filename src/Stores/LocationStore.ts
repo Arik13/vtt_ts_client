@@ -4,6 +4,7 @@ import {AssetStore} from "./AssetStore";
 export enum LOCATION_EVENT_NAME {
     TOKEN_ADDED = "TokenAdded",
     TOKEN_UPDATED = "TokenUpdated",
+    TOKEN_DELETED = "TokenDeleted",
 }
 
 export namespace LOCATION_EVENT {
@@ -15,6 +16,9 @@ export namespace LOCATION_EVENT {
     }
     export interface TokenUpdatedEvent extends LocationEvent {
         tokenData: Asset.Token.Data;
+    }
+    export interface TokenDeleteEvent extends LocationEvent {
+        tokenID: string;
     }
 }
 

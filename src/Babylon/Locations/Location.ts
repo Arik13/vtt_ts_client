@@ -1,5 +1,5 @@
 import {MeshData} from "@/Babylon/Engine/MeshData";
-import {LocationView, LocationViewListener} from "@/Babylon/Locations/LocationView";
+import {LocationViewListener} from "@/Babylon/Locations/LocationView";
 import {LocationModel} from "@/Babylon/Locations/LocationModel";
 import * as Asset from '@shared/Assets/Asset';
 import lightScene from "@/Babylon/Engine/Lights"
@@ -13,7 +13,7 @@ import * as GUI from 'babylonjs-gui';
 
 export class Location implements LocationViewListener { // Controller
     // model: LocationModel;
-    view: LocationView;
+    // view: LocationView;
     inputs: BABYLON.ICameraInput<PlanarCamera>[];
 
     gridElementWidth: number;
@@ -26,7 +26,7 @@ export class Location implements LocationViewListener { // Controller
     ////////////////////////////////
     scene: BABYLON.Scene;
     // meshes: BABYLON.Mesh[] = [];
-    meshes: Map<string, BABYLON.Mesh> = new Map<string, BABYLON.Mesh>();
+    meshMap: Map<string, BABYLON.Mesh> = new Map<string, BABYLON.Mesh>();
     camera: PlanarCamera;
     canvas: HTMLCanvasElement;
     pickPlane: BABYLON.Mesh;
@@ -34,6 +34,7 @@ export class Location implements LocationViewListener { // Controller
     pickStartingPosition: BABYLON.Vector3;
     pipeline: BABYLON.DefaultRenderingPipeline;
 
+    snapToGridEnabled: boolean;
     constructor(
         engine: BABYLON.Engine,
         canvas: HTMLCanvasElement,
@@ -52,6 +53,7 @@ export class Location implements LocationViewListener { // Controller
         const camera = cameraFactory(this.scene);
         this.scene.cameras = [camera];
         this.camera = camera;
+        this.snapToGridEnabled = true;
 
         lightScene(this.scene);
 
@@ -80,6 +82,10 @@ export class Location implements LocationViewListener { // Controller
             this.scene,
         );
 
+    }
+    deleteToken(id: string) {
+        this.meshMap.get(id).dispose();
+        this.meshMap.delete(id);
     }
     addToken(rank: number, file: number, tokenModel: MeshData) {
         if (!tokenModel) return;
@@ -157,10 +163,10 @@ export class Location implements LocationViewListener { // Controller
             3,
             this.scene,
         );
-        this.meshes.set(mesh.id, mesh);
+        this.meshMap.set(mesh.id, mesh);
     }
     updateToken(id: string, token: Asset.Token.Data) {
-        const tokenMesh = this.meshes.get(id);
+        const tokenMesh = this.meshMap.get(id);
         const position = this.calcRankFilePos(token.tokenModel.position.x, token.tokenModel.position.z);
         tokenMesh.setAbsolutePosition(position);
     }

@@ -5,8 +5,9 @@ import {serverProxy} from "@/Stores/ServerProxy";
 import {EVENT_NAME, EVENT_TYPE} from "@shared/Events/Events";
 import {DB} from "@/DB/IndexedDB";
 import { directoryStore } from '@/Stores/DirectoryStore';
+import {locationCreated} from "./Incoming";
 
-export const createLocation = (location: Location.Data, parentID: string) => {
+export const createLocation = async (location: Location.Data, parentID: string) => {
     if (!location.tokenIDs) {
         location.tokenIDs = [];
     }
@@ -14,10 +15,14 @@ export const createLocation = (location: Location.Data, parentID: string) => {
         location,
         parentID,
     }
-    /* eslint-disable  @typescript-eslint/no-explicit-any */
-    serverProxy.emit(EVENT_NAME.CREATE_LOCATION, event, (reply: any) => {});
+    return new Promise<Asset.Location.Data>((resolve, reject) => {
+        /* eslint-disable  @typescript-eslint/no-explicit-any */
+        serverProxy.emit(EVENT_NAME.CREATE_LOCATION, event, (payload: any) => {
+            payload.success? resolve(locationCreated(payload.event)) : reject(null);
+        });
+    });
 }
-export const addToken = (locationID: string, token: Asset.Token.Data) => {
+export const createToken = (locationID: string, token: Asset.Token.Data) => {
     const event: EVENT_TYPE.CREATE_TOKEN = {
         locationID: locationID,
         token: token,
@@ -41,4 +46,13 @@ export const deleteLocation = async(id: string, dirID: string) => {
     }
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     serverProxy.emit(EVENT_NAME.DELETE_LOCATION, event, (reply: any) => {});
+}
+export const deleteToken = async(tokenID: string, locationID: string) => {
+    // locationStore.deleted(id);
+    const event: EVENT_TYPE.DELETE_TOKEN = {
+        tokenID,
+        locationID,
+    }
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
+    serverProxy.emit(EVENT_NAME.DELETE_TOKEN, event, (reply: any) => {});
 }

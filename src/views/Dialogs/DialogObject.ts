@@ -1,4 +1,3 @@
-
 export class DialogObject<T> {
     on: boolean;
     state: T;
@@ -7,19 +6,24 @@ export class DialogObject<T> {
         this.blankState = blankState;
         this.init();
     }
-    callback: (state: T) => void;
+    callback: (state: T, closeType: "submit" | "dismiss") => void;
     init() {
         this.state = this.createState();
         this.on = false;
     }
-    show(callback?: (state: T) => void) {
+    show(callback?: (state: T, closeType: "submit" | "dismiss") => void) {
         this.callback = callback;
         this.on = true;
     }
     hide(doCallback: boolean) {
         if (doCallback) {
-            this.callback(this.state);
+            this.callback(this.state, "submit");
         }
+        this.resetState();
+        this.on = false;
+    }
+    dismiss() {
+        this.callback(this.state, "dismiss");
         this.resetState();
         this.on = false;
     }

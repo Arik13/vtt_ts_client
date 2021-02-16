@@ -305,7 +305,7 @@ export default Vue.extend({
                                 }
                             },
                         }
-                        dispatcher.addToken(locationID, token);
+                        dispatcher.createToken(locationID, token);
                     });
                     return;
                 }
@@ -321,31 +321,45 @@ export default Vue.extend({
                 }
                 case MENU_ITEM_NAME.CREATE_CHARACTER: {
                     const callback = (reply: any) => {
-                        console.log(reply);
+                        console.log("Reply: ", reply);
 
                         const event = reply.returnPayload as EVENT_TYPE.STATE_OBJECT_CREATED;
                         const so = event.keyValue.value;
                         const dialog = dialogMap.get(DIALOG_NAME.DYNAMIC_COMPONENT);
                         const dcID = campaignStore.clientConfig.createCharacter.dcID;
-                        const dc = dcStore.get(dcID);
+                        // const dc = dcStore.get(dcID);
+                        const dc = dcStore.getAssembledDC(dcID);
+
                         dialog.state.cds = {
                             header: "",
                             cds: dc.cd,
                         };
-                        dialog.show((output: any) => {
-                            const actionTarget = campaignStore.clientConfig.createCharacter.actionTarget;
-                            // console.log("Output: ", output.action);
-
-                            dispatcher.doAction(actionTarget, output.action, [so.id]);
-                            // console.log("State Object Dialog Output: ", output);
-
+                        dialog.show((output: any, eventName: string) => {
+                            if (eventName == "dismiss") {
+                                dispatcher.deleteStateObject(event.keyValue.value.id, event.directory.id, (reply) => {
+                                    console.log("State Object Dismissed");
+                                });
+                            }
+                            else {
+                                const actionTarget = campaignStore.clientConfig.createCharacter.actionTarget;
+                                output.action.characterID = so.id
+                                console.log("Output: ", output.action);
+                                dispatcher.doAction(actionTarget, output.action);
+                            }
                         });
                     }
-                    dispatcher.createStateObject({stateObject: ""}, itemID, callback);
+                    dispatcher.createStateObject({mods: []}, itemID, callback);
                     return;
                 }
                 case MENU_ITEM_NAME.DELETE_CHARACTER: {
-                    console.log("Delete Character (unfinished)");
+                    const dir = directoryStore.getDirectory(itemID);
+                    let so = stateObjectStore.get(dir.itemID)
+                    console.log(so);
+
+                    dispatcher.deleteStateObject(dir.itemID, dir.id, (reply) => {
+                        console.log(reply);
+                        console.log("DELETED!");
+                    });
                     return;
                 }
                 case MENU_ITEM_NAME.VIEW_CHARACTER: {

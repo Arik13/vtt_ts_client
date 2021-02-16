@@ -4,13 +4,16 @@
             <v-tabs
                 v-model="tabModel"
                 width="100%"
-                vertical
+
                 dark
+                scrollable
+                style="padding: 0px; margin: 0px"
             >
                 <v-tab
                     v-for="(tab, i) in value.tabs"
                     :key="i"
                     :href="`#${tab.header}`"
+
                 >
                     {{ tab.header }}
                 </v-tab>
@@ -21,7 +24,6 @@
                             :key="j"
                             :is="getComponent(cd)"
                             :value="cd.value"
-                            :registerElement="registerElement"
                             :ref="j"
                         />
                     </v-tab-item>
@@ -57,6 +59,19 @@ export default DynamicElement.extend({
                     el.setActive();
                 }
             }
+        },
+        setInactive() {
+            this.isActive = true;
+            for (const key in this.$refs) {
+                const elGroup = this.$refs[key] as any;
+                for (const groupKey in elGroup) {
+                    const el = elGroup[groupKey] as any;
+                    el.setInactive();
+                }
+            }
+        },
+        reset() {
+
         }
     },
     mounted() {

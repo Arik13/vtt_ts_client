@@ -6,6 +6,7 @@
         <p v-for="(paragraph, i) in value.paragraphs" :key="i">
             {{ paragraph }}
         </p>
+        <br>
     </div>
 </template>
 
@@ -21,7 +22,10 @@ export default DynamicElement.extend({
     methods: {
         setActive() {
             this.isActive = true;
-        }
+        },
+        setInactive() {
+            this.isActive = false;
+        },
     },
     mounted() {
         this.isActive = false;
