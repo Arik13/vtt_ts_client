@@ -25,6 +25,7 @@ import {ChoiceData, COMPONENT_NAME, COMPONENT_PROP} from "../ComponentTypes"
 export default DynamicElement.extend({
     props: {
         value: {type: Object as PropType<COMPONENT_PROP.TextField>},
+        global: {type: Object as PropType<any>}
     },
     data: () => ({
         text: null

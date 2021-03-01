@@ -15,9 +15,8 @@ export const dynamicComponentCreated = async (event: EVENT_TYPE.DYNAMIC_COMPONEN
 
 export const dynamicComponentUpdated = async (event: EVENT_TYPE.DYNAMIC_COMPONENT_UPDATED) => {
     const dir = directoryStore.getDirectory(event.directoryID);
-    let dc = dcStore.get(event.dynamicComponent.id);
-    dc = event.dynamicComponent;
-    dir.name = event.dynamicComponent.name;
+    let dc = dcStore.get(event.keyValue.value.id);
+    dc = event.keyValue.value;
 }
 
 export const dynamicComponentDeleted = async (event: EVENT_TYPE.DYNAMIC_COMPONENT_DELETED) => {

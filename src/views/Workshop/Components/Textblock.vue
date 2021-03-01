@@ -18,6 +18,7 @@ import {COMPONENT_PROP} from "../ComponentTypes";
 export default DynamicElement.extend({
     props: {
         value: {type: Object as PropType<COMPONENT_PROP.TextBlock>},
+        global: {type: Object as PropType<any>}
     },
     methods: {
         setActive() {

@@ -27,6 +27,7 @@ export default DynamicElement.extend({
     }),
     props: {
         value: {type: Object as PropType<COMPONENT_PROP.GridButtons>},
+        global: {type: Object as PropType<any>}
     },
     methods: {
         clicked(row: number, col: number) {

@@ -11,6 +11,7 @@ export enum MENU_ITEM_TITLE {
     VIEW_LOCATION = "View Location",
 
     CREATE_DIRECTORY = "Create Directory",
+    UPDATE_DIRECTORY = "Rename",
     DELETE_DIRECTORY = "Delete Directory",
 
     CREATE_SCRIPT = "Create Script",
@@ -38,6 +39,7 @@ export enum MENU_ITEM_NAME {
     VIEW_LOCATION = "viewLocation",
 
     CREATE_DIRECTORY = "createDirectory",
+    UPDATE_DIRECTORY = "updateDirectory",
     DELETE_DIRECTORY = "deleteDirectory",
 
     CREATE_SCRIPT = "createScript",
@@ -106,6 +108,10 @@ const menuItems: MENU_ITEMS = {
     CREATE_DIRECTORY: {
         title: MENU_ITEM_TITLE.CREATE_DIRECTORY,
         name: MENU_ITEM_NAME.CREATE_DIRECTORY,
+    },
+    UPDATE_DIRECTORY: {
+        title: MENU_ITEM_TITLE.UPDATE_DIRECTORY,
+        name: MENU_ITEM_NAME.UPDATE_DIRECTORY,
     },
     DELETE_DIRECTORY: {
         title: MENU_ITEM_TITLE.DELETE_DIRECTORY,

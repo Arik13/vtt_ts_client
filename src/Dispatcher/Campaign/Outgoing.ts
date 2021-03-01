@@ -32,6 +32,7 @@ export const loadCampaign = async (campaignID: string, callback?: () => void) =>
     const loadCampaignEvent: EVENT_TYPE.LOAD_CAMPAIGN = {
         syncGroup: await DB.getSyncKeys()
     }
+
     return new Promise<void>(resolve => {
         serverProxy.emit(EVENT_NAME.LOAD_CAMPAIGN, loadCampaignEvent, async (reply: ArrayBuffer[]) => {
             // Server replies with all uncached campaign assets. However, socket io can't mix json and binary in a single emit.
@@ -65,7 +66,7 @@ export const loadCampaign = async (campaignID: string, callback?: () => void) =>
             rollStore.setAll(assets.rollStore);
             const setIsOpen = (directory: Directory) => {
                 if (directory.itemID) return;
-                directory.isOpen = true;
+                directory.isOpen = false;
                 if (directory.children) {
                     directory.children.forEach(subDirectory => {
                         setIsOpen(subDirectory);

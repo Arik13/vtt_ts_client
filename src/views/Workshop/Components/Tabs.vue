@@ -24,6 +24,7 @@
                             :key="j"
                             :is="getComponent(cd)"
                             :value="cd.value"
+                            :global="global"
                             :ref="j"
                         />
                     </v-tab-item>
@@ -42,6 +43,7 @@ import componentMap from "../ComponentMap";
 export default DynamicElement.extend({
     props: {
         value: {type: Object as PropType<COMPONENT_PROP.Tabs>},
+        global: {type: Object as PropType<any>}
     },
     data: () => ({
         tabModel: null,

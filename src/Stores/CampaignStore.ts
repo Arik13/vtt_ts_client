@@ -4,6 +4,7 @@
 */
 
 import * as Asset from "@shared/Assets/Asset";
+import { locationStore } from "./LocationStore";
 import {Subscriber} from "./Subscriber";
 
 export enum CAMPAIGN_EVENT {
@@ -38,7 +39,10 @@ class CampaignStore {
         })
     }
     setCampaign(campaignID: string, name: string, activeLocationID: string, clientConfig: Asset.ClientConfig.Data) {
-        this.activeLocationID = activeLocationID;
+        this.setActiveLocation(activeLocationID);
+        console.log(locationStore);
+
+        // this.activeLocationID = activeLocationID;
         this.campaignID = campaignID;
         this.name = name;
         this.clientConfig = clientConfig;

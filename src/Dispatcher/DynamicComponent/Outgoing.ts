@@ -4,6 +4,7 @@ import {serverProxy} from "@/Stores/ServerProxy";
 import {EVENT_NAME, EVENT_TYPE} from "@shared/Events/Events";
 import {DB} from "@/DB/IndexedDB";
 import {dynamicComponentCreated} from "./Incoming"
+import { directoryStore } from "@/Stores/DirectoryStore";
 
 export const createDynamicComponent = async (dynamicComponent: Asset.DynamicComponent.Data, directoryID: string) => {
     const event: EVENT_TYPE.CREATE_DYNAMIC_COMPONENT = {
@@ -18,6 +19,9 @@ export const createDynamicComponent = async (dynamicComponent: Asset.DynamicComp
 }
 
 export const updateDynamicComponent = async (dynamicComponent: Asset.DynamicComponent.Data, directoryID: string) => {
+    console.log("DC: ", dynamicComponent);
+    console.log("Dir: ", directoryStore.getDirectory(directoryID));
+
     const event: EVENT_TYPE.UPDATE_DYNAMIC_COMPONENT = {
         dynamicComponent,
         directoryID,

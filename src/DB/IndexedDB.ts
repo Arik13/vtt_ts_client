@@ -56,7 +56,7 @@ class CampaignDBService {
     }
     async open() {
         // Delete for debugging purposes
-        await deleteDB(this.campaignID);
+        // await deleteDB(this.campaignID);
         this.db = await openDB(
             this.campaignID,
             DB_VERSION,
@@ -99,32 +99,33 @@ class CampaignDBService {
         }
         return assetDependencies;
     }
-    private async syncAsset(assetStore: STORE, keyStore: STORE, data: {toAdd: any[]; toRemove: Asset.Key[]}, queryList: Promise<any>[]) {
+    private syncAsset(assetStore: STORE, keyStore: STORE, data: {toAdd: any[]; toRemove: Asset.Key[]}, queryList: Promise<any>[]) {
+        // Remove extraneous assets
+        data.toRemove.forEach((key: Asset.Key) => {
+            queryList.push(this.db.delete(keyStore, key.id));
+            queryList.push(this.db.delete(assetStore, key.id));
+        });
+
         // Add new assets
-        data.toAdd.forEach(async (keyVal: any) => {
+        data.toAdd.forEach((keyVal: any) => {
             queryList.push(this.db.put(keyStore, keyVal.key, keyVal.key.id));
             queryList.push(this.db.put(assetStore, keyVal.value, keyVal.key.id));
-        });
-        // Remove extraneous assets
-        data.toRemove.forEach(async (key: Asset.Key) => {
-            queryList.push(this.db.delete(STORE.LOCATION_KEY_STORE, key.id));
-            queryList.push(this.db.delete(STORE.LOCATION_STORE, key.id));
         });
     }
     async syncAssets(assets: Asset.SyncGroup) {
         const queryList: Promise<string | void>[] = [];
 
+        // Remove extraneous images
+        assets.imageData.toRemove.forEach((value: string) => {
+            queryList.push(this.db.delete(STORE.IMAGE_KEY_STORE, value));
+            queryList.push(this.db.delete(STORE.IMAGE_STORE, value));
+        });
+
         // Add new images
-        assets.imageData.toAdd.forEach(async (value: Asset.ImageInfo) => {
+        assets.imageData.toAdd.forEach((value: Asset.ImageInfo) => {
             const id = value.id;
             queryList.push(this.db.put(STORE.IMAGE_KEY_STORE, id, id));
             queryList.push(this.db.put(STORE.IMAGE_STORE, value, id))
-        });
-
-        // Remove extraneous images
-        assets.imageData.toRemove.forEach(async (value: string) => {
-            queryList.push(this.db.delete(STORE.IMAGE_KEY_STORE, value));
-            queryList.push(this.db.delete(STORE.IMAGE_STORE, value));
         });
 
         this.syncAsset(STORE.LOCATION_STORE, STORE.LOCATION_KEY_STORE, assets.locationData, queryList);

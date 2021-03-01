@@ -11,8 +11,17 @@
                         outlined
                         :disabled="!activeCD.id"
                     />
+                    <v-select
+                        :items="stateObjects"
+                        item-text="name"
+                        item-value="id"
+                        v-model="soID"
+                        label="Target State Object"
+                    />
                     <v-label>
-                        CD ID: {{ activeCD.id }}
+                        <div style="color: lightgrey">
+                            CD ID: {{ activeCD.id }}
+                        </div>
                     </v-label><br>
                     <v-btn @click="saveScript()" :disabled="!activeCD.id">
                         Save Script
@@ -47,6 +56,7 @@
 </template>
 
 <script lang="ts">
+
 import Vue from 'vue';
 import "./Workshop/ComponentMap";
 import DynamicList from "./Workshop/Components/DynamicList.vue";
@@ -71,6 +81,10 @@ import { scriptStore } from '@/Stores/ScriptStore';
 import * as Asset from "@shared/Assets/Asset";
 import { spawnCreateDirectoryDialog } from './Dialogs/DialogFactories';
 import { dcStore } from '@/Stores/DynamicComponentStore';
+import { stateObjectStore } from '@/Stores/StateObjectStore';
+
+console.log("VJE: ", VueJsonEditor);
+
 
 
 const genBlankCD = () => {
@@ -112,6 +126,8 @@ export default Vue.extend({
         prop: {
             header: "",
         },
+        stateObjects: [],
+        soID: null,
         input: "test",
         nextKey: 0,
         directory: null,
@@ -143,12 +159,16 @@ export default Vue.extend({
                 this.nextKey++;
                 const dialog = dialogMap.get(DIALOG_NAME.DYNAMIC_COMPONENT);
                 let cdOriginal = this.activeCD.cd;
-                let cd = JSON.parse(JSON.stringify(cdOriginal))
+                let cd = JSON.parse(JSON.stringify(cdOriginal));
                 assembleCD(cd);
                 dialog.state.cds = {
                     header: "",
                     cds: cd,
                 };
+                let so = stateObjectStore.get(this.soID);
+                console.log("FM SO:", so);
+
+                dialog.global = {so};
 
                 dialog.show((state) => {
                     const action = state.action;
@@ -200,7 +220,7 @@ export default Vue.extend({
         },
         saveScript() {
             try {
-                const json = JSON.parse(JSON.stringify(this.json));
+                // const json = JSON.parse(JSON.stringify(this.json));
                 this.activeCD.cd = this.json
                 dispatcher.updateDynamicComponent(this.activeCD, this.activeCDDirectory);
             }
@@ -211,16 +231,17 @@ export default Vue.extend({
         onJsonChange(value: any) {
 
         },
+        initStateObjectData() {
+            this.stateObjects = [];
+            stateObjectStore.forEach((so: any) => {
+                this.stateObjects.push({id: so.id, name: so.name});
+            });
+            this.soID = this.stateObjects[0].id;
+        }
     },
     mounted() {
+        this.initStateObjectData();
         this.directory = directoryStore.getRoot().children[4];
-        // let scriptEditor = this.$refs.scriptEditor as Vue;
-        // let textArea = this.$refs.textarea as Vue;
-        // let scriptEditorEl = scriptEditor.$el;
-        // let textAreaEl = textArea.$el;
-        // let scriptEditorHeight = scriptEditorEl.clientHeight;
-        // let textAreaHeight = textAreaEl.clientHeight;
-        // this.textAreaHeight = String(scriptEditorHeight - textAreaHeight - 100) + "px";
     }
 })
 </script>

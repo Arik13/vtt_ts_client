@@ -1,6 +1,21 @@
 // import { Component } from 'vue';
 // import cds from './cds';
 
+export type DataSelection = {
+    path: string[];
+    useKey: boolean;
+    replaceList: any;
+    whiteList: string[];
+    blackList: string[];
+};
+export interface Style {
+    styleType: "checkbox" | "value" | "label";
+    casing: "titleCase" | "camelCase" | "unchanged" | "snakeCase" | "kebabCase";
+    direction: "horizontal" | "vertical";
+    height: number;
+    width: number;
+}
+
 export enum COMPONENT_NAME {
     TEXT_BLOCK = "Text Block",
     DYNAMIC_LIST = "Dynamic List",
@@ -15,10 +30,16 @@ export enum COMPONENT_NAME {
     GRID_BUTTONS = "Grid Buttons",
     TABLE = "Table",
     TEXT_FIELD = "Text Field",
+
+    OBJECT_VIEWER = "Object Viewer",
+    GRID_LAYOUT = "Grid Layout",
+    VALUE_BOX_GROUP = "Value Box Group",
+    SINGLE_BOX_GROUP = "Single Box Group",
+    TITLE_FIELD_GROUP = "Title Field Group",
+    CUSTOM_TABLE = "Custom Table",
 }
 
 export interface ChoiceData {
-    // actionTarget: string;
     param: string;
     value: number | string | string[] | number[];
 }
@@ -87,15 +108,45 @@ export namespace COMPONENT_PROP {
         widths: string[];
         rows: string[][];
     }
-    export type ComponentProp =
-        TextBlock |
-        DynamicList |
-        ChooseSome |
-        ChooseOneWithSub |
-        Tabs |
-        GridButtons |
-        Roller |
-        Table;
+
+    // VIEWER INTERFACES
+    export interface ObjectViewer {
+        blacklist: string[];
+        whitelist: string[];
+        path: string[];
+        descriptions: any;
+    }
+    export interface ValueBoxGroup {
+        vertical: boolean;
+        itemGap: number;
+        items: {
+            title: {data: DataSelection, style: Style};
+            main: {data: DataSelection, style: Style};
+            sub: {data: DataSelection, style: Style};
+        };
+    }
+    export interface TitleFieldGroup {
+        title: DataSelection;
+        field: DataSelection;
+    }
+    export interface CustomTable {
+        horizontal: boolean;
+        vGap: number;
+        hGap: number;
+        header: string;
+        items: {
+            data: DataSelection;
+            style: Style;
+        }[];
+        // items: {path: string[], itemType: string, itemArgs: any, useKey: boolean, width: number}[];
+    }
+    export interface GridLayout {
+        cols: number;
+        rows: number;
+        vGap: number;
+        hGap: number;
+        items: {col: string, row: string, cds: ComponentDefinition[]}[];
+    }
 }
 export interface TextBlockDefinition {
     name: COMPONENT_NAME.TEXT_BLOCK;

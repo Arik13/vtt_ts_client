@@ -28,6 +28,7 @@
                                 v-for="(cd, j) in choice.cds"
                                 :key="j"
                                 :is="getComponent(cd)"
+                                :global="global"
                                 :value="cd.value"
                                 :ref="i"
                             />
@@ -51,6 +52,7 @@ export default DynamicElement.extend({
     }),
     props: {
         value: {type: Object as PropType<COMPONENT_PROP.ChooseOneWithSub>},
+        global: {type: Object as PropType<any>}
     },
     methods: {
         getSelectedChoice(this) {

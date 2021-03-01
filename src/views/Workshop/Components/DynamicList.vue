@@ -10,6 +10,7 @@
                     :key="i"
                     :is="getComponent(cd)"
                     :value="getProp(cd)"
+                    :global="global"
                     :ref="i"
                 />
                 <br>
@@ -32,6 +33,7 @@ import componentMap from "../ComponentMap";
 export default DynamicElement.extend({
     props: {
         value: {type: Object as PropType<COMPONENT_PROP.DynamicList>},
+        global: {type: Object as PropType<any>}
     },
     methods: {
         getProp(cd: ComponentDefinition) {

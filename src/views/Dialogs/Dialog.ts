@@ -1,6 +1,7 @@
 import LocationViewer from "./ConcreteDialogs/LocationViewer.vue";
 import ImageViewer from "./ConcreteDialogs/ImageViewer.vue";
 import CreateDirectory from "./ConcreteDialogs/CreateDirectory.vue";
+import UpdateDirectory from "./ConcreteDialogs/UpdateDirectory.vue";
 import CreateLocation from "./ConcreteDialogs/CreateLocation.vue";
 import CreateToken from "./ConcreteDialogs/CreateToken.vue";
 import CreateScript from "./ConcreteDialogs/CreateScript.vue";
@@ -18,6 +19,7 @@ export enum DIALOG_NAME {
     CREATE_LOCATION = "createLocation",
     LOCATION_VIEWER = "locationViewer",
     CREATE_DIRECTORY = "createDirectory",
+    UPDATE_DIRECTORY = "updateDirectory",
     DIALOG_OBJECT = "dialogObject",
     CREATE_SCRIPT = "createScript",
     CREATE_COMPONENT = "createComponent",
@@ -34,6 +36,10 @@ export interface ImageViewerState {
 }
 export interface CreateDirectoryState {
     parentID: string;
+    name: string;
+}
+export interface UpdateDirectoryState {
+    directoryID: string;
     name: string;
 }
 export interface CreateLocationState {
@@ -77,6 +83,10 @@ const createDirectoryBlankState = {
     parentID: "",
     name: "New Directory",
 }
+const updateDirectoryBlankState = {
+    directoryID: "",
+    name: "",
+}
 const createLocationBlankState = {
     location: {
         name: "Location 1",
@@ -114,6 +124,7 @@ export const dialogs = [
     {name: DIALOG_NAME.LOCATION_VIEWER, component: LocationViewer, prop: new DialogObject<LocationViewerState>(blankLocationViewerState)},
     {name: DIALOG_NAME.IMAGE_VIEWER, component: ImageViewer, prop: new DialogObject<ImageViewerState>({imageSrc: ""})},
     {name: DIALOG_NAME.CREATE_DIRECTORY, component: CreateDirectory, prop: new DialogObject<CreateDirectoryState>(createDirectoryBlankState)},
+    {name: DIALOG_NAME.UPDATE_DIRECTORY, component: UpdateDirectory, prop: new DialogObject<UpdateDirectoryState>(updateDirectoryBlankState)},
     {name: DIALOG_NAME.CREATE_LOCATION, component: CreateLocation, prop: new DialogObject<CreateLocationState>(createLocationBlankState)},
     {name: DIALOG_NAME.CREATE_TOKEN, component: CreateToken, prop: new DialogObject<CreateTokenState>(createTokenBlankState)},
     {name: DIALOG_NAME.CREATE_SCRIPT, component: CreateScript, prop: new DialogObject<CreateScriptState>(createScriptBlankState)},

@@ -75,6 +75,7 @@ export default DynamicElement.extend({
     }),
     props: {
         value: {type: Object as PropType<COMPONENT_PROP.Roller>},
+        global: {type: Object as PropType<any>}
     },
     components: {
         draggable,

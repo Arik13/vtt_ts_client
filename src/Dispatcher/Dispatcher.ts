@@ -23,8 +23,9 @@ import {
 
 import {
     createDirectory,
-    moveDirectory,
+    updateDirectory,
     deleteDirectory,
+    moveDirectory,
 } from "./Directory/Outgoing";
 
 import {
@@ -88,8 +89,9 @@ export default {
 
     // DIRECTORIES
     createDirectory,
-    moveDirectory,
+    updateDirectory,
     deleteDirectory,
+    moveDirectory,
 
     // USER
     login,

@@ -25,6 +25,7 @@
 
 <script lang="ts">
 import Vue, {PropType} from 'vue'
+import { CreateLocationState } from '../Dialog';
 import {DialogObject} from "../DialogObject";
 
 export default Vue.extend({
@@ -32,7 +33,7 @@ export default Vue.extend({
         imageItems: [],
     }),
     props: {
-        d: Object as PropType<DialogObject<any>>,
+        d: Object as PropType<DialogObject<CreateLocationState>>,
     },
 })
 </script>

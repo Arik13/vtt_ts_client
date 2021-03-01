@@ -1,6 +1,7 @@
 export class DialogObject<T> {
     on: boolean;
     state: T;
+    global: any;
     blankState: T;
     constructor(blankState: T) {
         this.blankState = blankState;
@@ -29,6 +30,7 @@ export class DialogObject<T> {
     }
     resetState() {
         this.state = this.createState();
+        this.global = null;
     }
     setState(state: T) {
         this.state = state;

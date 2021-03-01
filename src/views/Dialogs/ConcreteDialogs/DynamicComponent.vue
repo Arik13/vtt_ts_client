@@ -7,18 +7,14 @@
         @click:outside="handleDismiss()"
     >
         <v-card dark tile max-height="800px" min-height="800px" style="margin: 0; padding: 0;">
-            <!-- <v-card-title>
-
-            </v-card-title> -->
             <v-card-text>
-                <!-- <v-btn @click="d.hide(true)">Create</v-btn> -->
                 <dynamic-list
                     v-if="on"
                     :value="d.state.cds"
+                    :global="d.global"
                     :key="nextKey"
                     ref="form"
                 />
-                    <!-- :registerElement="registerElement" -->
             </v-card-text>
             <v-card-actions>
                 <v-spacer />
@@ -40,15 +36,6 @@ import {ChoiceData} from "@/views/Workshop/ComponentTypes";
 import AssetView from "@/views/components/AssetView.vue";
 import {MENU_ITEMS, MENU_ITEM_NAME} from "@/views/Menus/MenuItems";
 import { DialogObject } from '@/views/Dialogs/DialogObject';
-
-interface FormInterface {
-    target: string;
-}
-interface Choice {
-    param: string;
-    value: any;
-}
-
 
 export default Vue.extend({
     data: () => ({

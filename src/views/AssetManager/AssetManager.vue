@@ -134,11 +134,12 @@ import dispatcher from "@/Dispatcher/Dispatcher";
 import {MENU_ITEMS, MENU_ITEM_NAME} from "@/views/Menus/MenuItems";
 import {DIALOG_NAME, dialogMap, ImageViewerState, CreateLocationState, LocationViewerState} from "@/views/Dialogs/Dialog";
 import {DialogObject} from "@/views/Dialogs/DialogObject";
-import {spawnCreateDirectoryDialog} from "@/views/Dialogs/DialogFactories";
+import {spawnCreateDirectoryDialog, spawnUpdateDirectoryDialog} from "@/views/Dialogs/DialogFactories";
 import { stateObjectStore } from '@/Stores/StateObjectStore';
 import { dcStore } from "@/Stores/DynamicComponentStore";
 import { campaignStore } from "@/Stores/CampaignStore";
 import { EVENT_TYPE } from "@shared/Events/Types";
+import { logDepthDeclaration } from "babylonjs/Shaders/ShadersInclude/logDepthDeclaration";
 
 
 enum TAB {
@@ -184,32 +185,38 @@ export default Vue.extend({
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         imageMenuItems: [
+            MENU_ITEMS.UPDATE_DIRECTORY,
             MENU_ITEMS.CREATE_TOKEN,
             MENU_ITEMS.OPEN_IMAGE,
             MENU_ITEMS.DELETE_IMAGE,
         ],
         imageFolderMenuItems: [
             MENU_ITEMS.CREATE_DIRECTORY,
+            MENU_ITEMS.UPDATE_DIRECTORY,
             MENU_ITEMS.DELETE_DIRECTORY,
             MENU_ITEMS.CREATE_IMAGE,
         ],
         locationMenuItems: [
+            MENU_ITEMS.UPDATE_DIRECTORY,
             MENU_ITEMS.OPEN_LOCATION,
             MENU_ITEMS.DELETE_LOCATION,
             MENU_ITEMS.VIEW_LOCATION,
         ],
         locationFolderMenuItems: [
             MENU_ITEMS.CREATE_DIRECTORY,
+            MENU_ITEMS.UPDATE_DIRECTORY,
             MENU_ITEMS.DELETE_DIRECTORY,
             MENU_ITEMS.CREATE_LOCATION,
         ],
         characterMenuItems: [
             // MENU_ITEMS.OPEN_CHARACTER,
+            MENU_ITEMS.UPDATE_DIRECTORY,
             MENU_ITEMS.DELETE_CHARACTER,
             MENU_ITEMS.VIEW_CHARACTER,
         ],
         characterFolderMenuItems: [
             MENU_ITEMS.CREATE_DIRECTORY,
+            MENU_ITEMS.UPDATE_DIRECTORY,
             MENU_ITEMS.DELETE_DIRECTORY,
             MENU_ITEMS.CREATE_CHARACTER,
         ],
@@ -315,8 +322,23 @@ export default Vue.extend({
                     spawnCreateDirectoryDialog(itemID);
                     return;
                 }
+                case MENU_ITEM_NAME.UPDATE_DIRECTORY: {
+                    spawnUpdateDirectoryDialog(itemID);
+                    return;
+                }
                 case MENU_ITEM_NAME.DELETE_DIRECTORY: {
                     dispatcher.deleteDirectory(itemID);
+                    return;
+                }
+                case MENU_ITEM_NAME.DELETE_CHARACTER: {
+                    const dir = directoryStore.getDirectory(itemID);
+                    let so = stateObjectStore.get(dir.itemID)
+                    console.log(so);
+
+                    dispatcher.deleteStateObject(dir.itemID, dir.id, (reply) => {
+                        console.log(reply);
+                        console.log("DELETED!");
+                    });
                     return;
                 }
                 case MENU_ITEM_NAME.CREATE_CHARACTER: {
@@ -343,31 +365,38 @@ export default Vue.extend({
                             else {
                                 const actionTarget = campaignStore.clientConfig.createCharacter.actionTarget;
                                 output.action.characterID = so.id
-                                console.log("Output: ", output.action);
-                                dispatcher.doAction(actionTarget, output.action);
+                                dispatcher.doAction(actionTarget, output.action, (result: any) => {
+                                    let soFinal = result.result.sos[0] as any;
+                                    if (soFinal && soFinal.name) {
+                                        dispatcher.updateDirectory(event.directory.id, soFinal.name);
+                                    }
+                                });
                             }
                         });
                     }
                     dispatcher.createStateObject({mods: []}, itemID, callback);
                     return;
                 }
-                case MENU_ITEM_NAME.DELETE_CHARACTER: {
-                    const dir = directoryStore.getDirectory(itemID);
-                    let so = stateObjectStore.get(dir.itemID)
-                    console.log(so);
-
-                    dispatcher.deleteStateObject(dir.itemID, dir.id, (reply) => {
-                        console.log(reply);
-                        console.log("DELETED!");
-                    });
-                    return;
-                }
                 case MENU_ITEM_NAME.VIEW_CHARACTER: {
                     const dir = directoryStore.getDirectory(itemID);
                     const so = stateObjectStore.get(dir.itemID);
-                    // console.log("Dir: ", dir);
-                    // console.log(stateObjectStore);
+                    // console.log("SO: ", JSON.stringify(so));
                     console.log("SO: ", so);
+                    const dcID = campaignStore.clientConfig.viewCharacter.dcID;
+                    const dialog = dialogMap.get(DIALOG_NAME.DYNAMIC_COMPONENT);
+                    const dc = dcStore.getAssembledDC(dcID);
+                    dialog.state.cds = {
+                        header: "",
+                        cds: dc.cd,
+                    };
+                    dialog.global = {so};
+                    dialog.show((output: any, eventName: string) => {
+                        if (eventName == "dismiss") {
+                        }
+                        else {
+
+                        }
+                    });
                     // dispatcher.doAction("CreateCharacter", [], [so.id]);
                     return;
                 }
