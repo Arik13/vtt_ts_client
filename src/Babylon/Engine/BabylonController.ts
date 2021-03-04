@@ -18,6 +18,7 @@ import {locationStore, LOCATION_EVENT_NAME, LOCATION_EVENT} from "@/Stores/Locat
 import {campaignStore, CampaignSubscriber, CAMPAIGN_EVENT} from "@/Stores/CampaignStore";
 import {imageStore} from "@/Stores/ImageStore";
 import { tokenStore } from '@/Stores/TokenStore';
+import {createImageURL} from "@/Util/functions"
 import dispatcher from '@/Dispatcher/Dispatcher';
 class BabylonController implements InputReceiver {
     engine: BABYLON.Engine;
@@ -50,7 +51,7 @@ class BabylonController implements InputReceiver {
                         const tokenEvent = event as LOCATION_EVENT.TokenAddedEvent;
                         const tokenData = tokenEvent.tokenData;
                         const tokenMeshData: MeshData = {
-                            texturePath: this.createImageURL(tokenData.imageID),
+                            texturePath: createImageURL(tokenData.imageID),
                             meshName: tokenData.id,
                             materialName: tokenData.imageID
                         }
@@ -199,7 +200,7 @@ class BabylonController implements InputReceiver {
         locationData: Asset.Location.Data,
     ) {
         // const t0 = performance.now();
-        const url = this.createImageURL(locationData.mapImageID);
+        const url = createImageURL(locationData.mapImageID);
         const locationMapName = locationData.name + " Map";
         const mapMeshData = new MeshData(url, locationMapName, locationMapName);
 
@@ -208,7 +209,7 @@ class BabylonController implements InputReceiver {
         locationData.tokenIDs.forEach((tokenID: string) => {
             const tokenData = tokenStore.get(tokenID);
             const tokenMeshData: MeshData = {
-                texturePath: this.createImageURL(tokenData.imageID),
+                texturePath: createImageURL(tokenData.imageID),
                 meshName: tokenData.id,
                 materialName: tokenData.imageID
             }
@@ -221,16 +222,6 @@ class BabylonController implements InputReceiver {
         // const t1 = performance.now();
         // console.log(`Created the location "${locationData.name}" in ${Math.round(t1 - t0)} milliseconds.`);
         return location;
-    }
-    private createImageURL(imageID: string) {
-        // construct map meshdata
-        const mapImageData = imageStore.get(imageID);
-        let url = null;
-        if (mapImageData) {
-            const blob = new Blob([mapImageData.fileBuffer]);
-            url = URL.createObjectURL(blob);
-            return url;
-        }
     }
 }
 let babylonController = null as BabylonController;

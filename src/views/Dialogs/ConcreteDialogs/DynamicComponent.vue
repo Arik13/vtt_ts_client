@@ -6,7 +6,7 @@
         max-width="1000px"
         @click:outside="handleDismiss()"
     >
-        <v-card dark tile max-height="800px" min-height="800px" style="margin: 0; padding: 0;">
+        <v-card dark tile max-height="900px" min-height="900px" style="margin: 0; padding: 0;">
             <v-card-text>
                 <dynamic-list
                     v-if="on"
@@ -28,7 +28,7 @@
 // @ts-ignore
 import { Splitpanes, Pane } from "splitpanes";
 import 'splitpanes/dist/splitpanes.css';
-import Vue, {PropType} from 'vue'
+import Vue, {PropType} from 'vue';
 
 import "@/views/Workshop/ComponentMap";
 import DynamicList from "@/views/Workshop/Components/DynamicList.vue";
@@ -75,7 +75,6 @@ export default Vue.extend({
             });
             if (!isValidSubmission) {
                 console.log("Form is incomplete!");
-
                 return;
             }
             form.traverseActiveChoices((node: any) => {

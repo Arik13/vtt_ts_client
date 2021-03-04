@@ -7,10 +7,10 @@ export type DataSelection = {
     replaceList: any;
     whiteList: string[];
     blackList: string[];
+    case: "titleCase" | "camelCase" | "unchanged" | "snakeCase" | "kebabCase" | "sentenceCase";
 };
 export interface Style {
     styleType: "checkbox" | "value" | "label";
-    casing: "titleCase" | "camelCase" | "unchanged" | "snakeCase" | "kebabCase";
     direction: "horizontal" | "vertical";
     height: number;
     width: number;
@@ -37,6 +37,7 @@ export enum COMPONENT_NAME {
     SINGLE_BOX_GROUP = "Single Box Group",
     TITLE_FIELD_GROUP = "Title Field Group",
     CUSTOM_TABLE = "Custom Table",
+    EXPANSION_GROUP = "Expansion Group",
 }
 
 export interface ChoiceData {
@@ -117,12 +118,22 @@ export namespace COMPONENT_PROP {
         descriptions: any;
     }
     export interface ValueBoxGroup {
+        header: string;
         vertical: boolean;
         itemGap: number;
         items: {
             title: {data: DataSelection, style: Style};
             main: {data: DataSelection, style: Style};
             sub: {data: DataSelection, style: Style};
+        };
+    }
+    export interface ExpansionGroup {
+        header: string;
+        vertical: boolean;
+        itemGap: number;
+        items: {
+            title: {data: DataSelection, style: Style};
+            main: {data: DataSelection, style: Style};
         };
     }
     export interface TitleFieldGroup {

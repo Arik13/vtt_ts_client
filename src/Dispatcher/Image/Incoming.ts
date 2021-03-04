@@ -1,7 +1,7 @@
 import {serverProxy} from "@/Stores/ServerProxy";
 import { directoryStore } from '@/Stores/DirectoryStore';
 import { imageStore } from "@/Stores/ImageStore";
-import {arrayBufferToString} from "@/Util/arrayBufferToString"
+import {arrayBufferToString} from "@/Util/functions"
 import {EVENT_NAME, EVENT_TYPE} from "@shared/Events/Events";
 import * as Asset from "@shared/Assets/Asset";
 import {DB} from "@/DB/IndexedDB";

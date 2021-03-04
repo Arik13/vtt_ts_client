@@ -1,26 +1,22 @@
 <template>
-    <div :style="getBlockStyle()">
-        <div v-if="this.value.header">
-            <h3>
-                {{ this.value.header }}
-            </h3>
-            <v-divider style="padding: 0 0 10px 0" />
-        </div>
-        <div :style="getGridStyle()">
-            <div v-for="(item, i) in items" :key="i" :style="getItemStyle(i + 1)">
-                <div class="box">
-                    <div class="titleItem">
-                        {{ item.title }}
+    <div>
+        <v-expansion-panels accordion dense>
+            <v-expansion-panel v-for="(item, i) in items" :key=i style="background-color: gray">
+                <v-expansion-panel-header class="title">
+                    {{ item.title }}
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <div v-if="Array.isArray(item.main)">
+                        <p v-for="(paragraph, j) in item.main" :key="j">
+                            {{ paragraph }}
+                        </p>
                     </div>
-                    <div class="mainItem">
+                    <p v-else>
                         {{ item.main }}
-                    </div>
-                    <div class="subItem">
-                        {{ item.sub }}
-                    </div>
-                </div>
-            </div>
-        </div>
+                    </p>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+        </v-expansion-panels>
     </div>
 </template>
 
@@ -58,15 +54,11 @@ export default DynamicElement.extend({
                 "justify-content": "start",
                 "grid-auto-columns": `minmax(0, 1fr)`,
                 "grid-auto-rows": `minmax(0, 1fr)`,
-            } as any;
-            return styleObj;
-        },
-        getBlockStyle() {
-            return {
                 "background-color": "gray",
                 "border-radius": "10px",
                 padding: "10px",
-            }
+            } as any;
+            return styleObj;
         },
         getItemStyle(index: number) {
             let styleObj = {
@@ -81,30 +73,20 @@ export default DynamicElement.extend({
 
         let titleArgs = this.value.items.title;
         let mainArgs = this.value.items.main;
-        let subArgs = this.value.items.sub;
 
         let titleData = selectData(titleArgs.data, dataObj);
         let mainData = selectData(mainArgs.data, dataObj);
-        let subData;
-        if (subArgs) {
-            subData = selectData(subArgs.data, dataObj);
-            this.subStyle = this.value.items.sub.style;
-        }
+
         this.titleStyle = this.value.items.title.style;
         this.mainStyle = this.value.items.main.style;
 
         let items: Item[] = [];
-        if (subData) {
-            for (let i = 0; i < titleData.length; i++) {
-                items.push({title: titleData[i], main: mainData[i], sub: subData[i]});
-            }
-        }
-        else {
-            for (let i = 0; i < titleData.length; i++) {
-                items.push({title: titleData[i], main: mainData[i]});
-            }
+        for (let i = 0; i < titleData.length; i++) {
+            items.push({title: titleData[i], main: mainData[i]});
         }
         this.items = items;
+        console.log(items);
+
     }
 })
 </script>

@@ -9,14 +9,12 @@
         <pane :min-size="40">
             <splitpanes horizontal :push-other-panes="false" @resize="resize()">
                 <pane :min-size="40">
-                    <!-- <campaign-canvas :bus="bus" style="height: 100%; width: 100%;" /> -->
                     <campaign-canvas :bus="bus" />
                 </pane>
                 <pane :min-size="25" :size="25">
                     <v-card height="100%" width="100%" dark tile>
-                        <v-card-title>The bottom pane</v-card-title>
                         <v-card-text>
-                            <!-- <create-character-dialog /> -->
+                            <action-buttons />
                         </v-card-text>
                     </v-card>
                 </pane>
@@ -58,6 +56,7 @@
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
 import AssetManager from "./AssetManager/AssetManager.vue";
+import ActionButtons from "./ActionButtons.vue";
 import CampaignCanvas from "./CampaignCanvas.vue";
 import Chat from "./Chat.vue";
 
@@ -72,10 +71,13 @@ enum TAB {
     CHAT = "Chat",
 }
 
+
+
 @Component({
     components: {
         "asset-manager": AssetManager,
         "campaign-canvas": CampaignCanvas,
+        ActionButtons,
         Splitpanes,
         Pane,
         Chat,
@@ -118,5 +120,9 @@ export default class CampaignEditor extends Vue {
     background: linear-gradient(0deg, #111, #FFF);
     margin: 0px;
     padding: 0px;
+}
+.gridContainer {
+    display: grid;
+
 }
 </style>

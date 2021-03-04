@@ -64,14 +64,17 @@ export default DynamicElement.extend({
         },
     },
     mounted()  {
-        this.titles = selectData(this.value.title, this.global.so);
-        this.fields = selectData(this.value.field, this.global.so);
+        let titles = selectData(this.value.title, this.global.so);
+        let fields = selectData(this.value.field, this.global.so);
+
+        this.titles = titles;
+        this.fields = fields;
     }
 })
 </script>
 
 <style scoped>
-.title {
+/* .title {
     text-transform: capitalize;
-}
+} */
 </style>

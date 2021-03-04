@@ -1,3 +1,15 @@
+import { imageStore } from "@/Stores/ImageStore";
+
+export const createImageURL = (imageID: string) => {
+    // construct map meshdata
+    const imageData = imageStore.get(imageID);
+    let url = null;
+    if (imageData) {
+        const blob = new Blob([imageData.fileBuffer]);
+        url = URL.createObjectURL(blob);
+        return url;
+    }
+}
 const MAX_BYTES_LENGTH = Math.pow(2, 16);
 
 export function arrayBufferToString(buffer: ArrayBuffer){

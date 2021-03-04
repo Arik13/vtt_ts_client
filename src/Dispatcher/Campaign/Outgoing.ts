@@ -9,7 +9,7 @@ import {locationStore} from "@/Stores/LocationStore";
 import {tokenStore} from "@/Stores/TokenStore";
 import {directoryStore} from "@/Stores/DirectoryStore";
 import { campaignStore } from '@/Stores/CampaignStore';
-import {arrayBufferToString} from "@/Util/arrayBufferToString";
+import {arrayBufferToString} from "@/Util/functions";
 import { Directory } from '@shared/Directories/Directory';
 import * as Flatted from 'flatted';
 import { scriptStore } from '@/Stores/ScriptStore';

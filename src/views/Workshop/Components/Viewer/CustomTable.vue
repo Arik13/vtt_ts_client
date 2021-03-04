@@ -1,5 +1,11 @@
 <template>
-    <div>
+    <div :style="getBlockStyle()">
+        <div v-if="this.value.header">
+            <h3>
+                {{ this.value.header }}
+            </h3>
+            <v-divider style="padding: 0 0 10px 0" />
+        </div>
         <div :style="getGridStyle()">
             <div v-for="(i) in fieldCount" :key="i" :style="getItemStyle(i)">
                 <div v-if="getItemType(i - 1) == 'label'" class="labelField">
@@ -15,6 +21,12 @@
                     <div v-else>
                         X
                     </div>
+                </div>
+                <div v-if="getItemType(i - 1) == 'counter'" class="counterField">
+                    <!-- <div v-for="">
+
+                    </div> -->
+                    {{ getItem(i - 1) }}
                 </div>
             </div>
         </div>
@@ -77,13 +89,17 @@ export default DynamicElement.extend({
                 gap: (this.value.horizontal)? `${this.value.vGap}px ${this.value.hGap}px` : `${this.value.hGap}px ${this.value.vGap}px`,
                 "grid-auto-columns": columnStyle, //`minmax(0, auto)`,
                 "grid-auto-rows": `minmax(0, auto)`,
-                "background-color": "gray",
-                "border-radius": "10px",
-                padding: "10px",
                 // "grid-auto-columns": `auto`,
                 // "grid-auto-rows": `auto`
             } as any;
             return styleObj;
+        },
+        getBlockStyle() {
+            return {
+                "background-color": "gray",
+                "border-radius": "10px",
+                padding: "10px",
+            }
         },
         getItemStyle(index: number) {
             let tableIndex = this.getIndex(index - 1);

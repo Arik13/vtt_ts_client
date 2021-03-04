@@ -35,7 +35,7 @@ export class DynamicComponentStore extends AssetStore<Asset.DynamicComponent.Dat
     constructor() {
         super("Script Store");
     }
-    getAssembledDC(id: string) {
+    getAssembledDC(id: string): Asset.DynamicComponent.Data {
         let dc = JSON.parse(JSON.stringify(this.get(id)));
         assembleCD(dc);
         return dc;

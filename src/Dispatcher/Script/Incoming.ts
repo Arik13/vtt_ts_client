@@ -2,8 +2,6 @@ import {serverProxy} from "@/Stores/ServerProxy";
 import { directoryStore } from '@/Stores/DirectoryStore';
 import { scriptStore } from "@/Stores/ScriptStore";
 import {EVENT_NAME, EVENT_TYPE} from "@shared/Events/Events";
-import {arrayBufferToString} from "@/Util/arrayBufferToString";
-import {Asset} from "@shared/Assets/Asset";
 import {DB} from "@/DB/IndexedDB";
 
 const scriptDownloaded = async (event: EVENT_TYPE.SCRIPT_CREATED) => {

@@ -49,4 +49,7 @@ componentMap.set(COMPONENT_NAME.TITLE_FIELD_GROUP, TitleFieldGroup);
 import CustomTable from "./Components/Viewer/CustomTable.vue";
 componentMap.set(COMPONENT_NAME.CUSTOM_TABLE, CustomTable);
 
+import ExpansionGroup from "./Components/Viewer/ExpansionGroup.vue";
+componentMap.set(COMPONENT_NAME.EXPANSION_GROUP, ExpansionGroup);
+
 export default componentMap;
