@@ -13,7 +13,7 @@
         "@types/socket.io-client": "^1.4.33",
         "@types/vue-splitpane": "^1.0.0",
         "@vue-stripe/vue-stripe": "^4.1.5",
-        "axios": "^0.19.2",
+        "axios": "^0.21.1",
         "babylonjs": "^4.2.0",
         "babylonjs-gui": "^4.2.0",
         "babylonjs-loaders": "^4.2.0",
