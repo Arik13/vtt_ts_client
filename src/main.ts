@@ -1,12 +1,12 @@
 import Vue from 'vue';
 import App from './App.vue';
-import router from './router';
+import router from './router/router';
 // import store from '@/Stores/vuex/vuex';
 import vuetify from './plugins/vuetify';
 
 Vue.config.productionTip = false
 Vue.config.errorHandler = (err: any, vm: any, info: any) => {
-    console.log(err, vm, info);
+    console.error(err, vm, info);
 }
 
 /*

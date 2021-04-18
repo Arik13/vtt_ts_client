@@ -7,14 +7,12 @@ import { stateObjectStore } from '@/Stores/StateObjectStore';
 const stateObjectCreated = async (event: EVENT_TYPE.STATE_OBJECT_CREATED) => {
     await DB.addStateObject(event.keyValue);
     stateObjectStore.add(event.keyValue.value);
-    directoryStore.attachChild(event.directory, event.parentID);
+    directoryStore.attachChild(event.directory);
 }
 
 const stateObjectUpdated = async (event: EVENT_TYPE.STATE_OBJECT_UPDATED) => {
-    const dir = directoryStore.getDirectory(event.directoryID);
-    let so = stateObjectStore.get(event.stateObject.id);
-    so = event.stateObject
-    dir.name = event.stateObject.id;
+    directoryStore.updateName(event.directoryID, event.stateObject.id);
+    stateObjectStore.update(event.stateObject);
 }
 
 const stateObjectDeleted = async (event: EVENT_TYPE.STATE_OBJECT_DELETED) => {

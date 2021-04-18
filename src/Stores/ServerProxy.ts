@@ -31,7 +31,7 @@ export class ServerProxy {
     // Handlers for events coming from server
     // TODO: refactor into a server proxy object
     async emit(eventName: EventName, event: EVENT_TYPE.EVENT_TYPE, callback?: EventHandler) {
-        console.log(`Emitting ${eventName} event: `, event);
+        console.info(`Emitting ${eventName} event: `, event);
         return new Promise<void>(resolve => {
             this.socket.emit(eventName, event, (payload: any) => {
                 if (callback) {
@@ -64,7 +64,7 @@ export class ServerProxy {
 
         // Copy user headers into payload
         Object.assign(finalPayload.headers, payload.headers);
-        console.log(`Sending ${finalPayload.method} request to ${finalPayload.url}: `, finalPayload);
+        console.info(`Sending ${finalPayload.method} request to ${finalPayload.url}: `, finalPayload);
 
         // Send http request then call callback
         const res = await this.axios(finalPayload);
@@ -81,9 +81,7 @@ export class ServerProxy {
             url: payload.route,
             data: payload.data,
         }
-        // console.log("_____________________________________________________");
-        console.log(`Sending ${finalPayload.method} request to ${finalPayload.url}: `, finalPayload);
-        // console.log("_____________________________________________________");
+        console.info(`Sending ${finalPayload.method} request to ${finalPayload.url}: `, finalPayload);
         const res = await this.axios(finalPayload)
         if (callback) {
             callback(res);
@@ -92,9 +90,7 @@ export class ServerProxy {
     addHandler(eventName: EventName, handle: EventHandler) {
         this.handlerMap.set(eventName, handle);
         this.socket.on(eventName, (payload: any) => {
-            // console.log("_____________________________________________________");
-            console.log(`Received ${eventName} event`, payload);
-            // console.log("_____________________________________________________");
+            console.info(`Received ${eventName} event`, payload);
             handle(payload)
         });
     }

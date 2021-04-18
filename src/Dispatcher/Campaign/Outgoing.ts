@@ -16,7 +16,7 @@ import { scriptStore } from '@/Stores/ScriptStore';
 import { userStore } from '@/Stores/UserStore';
 import { dcStore } from '@/Stores/DynamicComponentStore';
 import { stateObjectStore } from '@/Stores/StateObjectStore';
-import {clientConfigUpdated} from "./Incoming";
+import {campaignBindingsUpdated} from "./Incoming";
 import { rollStore } from '@/Stores/RollStore';
 
 export const join = async (campaignID: string, userID: string, callback?: () => void) => {
@@ -49,12 +49,17 @@ export const loadCampaign = async (campaignID: string, callback?: () => void) =>
                 imageMetaData.toAdd[i].fileBuffer = imageBuffers[i];
             }
             // Sync assets from server with front end db
-            console.log("Deserialized Sync Group: ", syncGroup);
+            console.info("Deserialized Sync Group: ", syncGroup);
+
+            const preAssets = await DB.getAssets();
+            console.log("Pre Assets: ", preAssets);
 
             await DB.syncAssets(syncGroup);
-            campaignStore.setCampaign(campaignID, syncGroup.campaignData.name, syncGroup.campaignData.activeLocationID, syncGroup.clientConfig);
+            campaignStore.setCampaign(campaignID, syncGroup.campaignData.name, syncGroup.campaignData.activeLocationID, syncGroup.campaignBindings);
 
             const assets = await DB.getAssets();
+            console.log("Assets: ", assets);
+
 
             // Add assets to asset stores for fast recall
             imageStore.setAll(assets.imageStore);
@@ -76,7 +81,7 @@ export const loadCampaign = async (campaignID: string, callback?: () => void) =>
             const rootDir = syncGroup.directory;
             setIsOpen(rootDir);
             directoryStore.setRoot(rootDir);
-            console.log(`${syncGroup.campaignData.name} loaded`);
+            console.info(`${syncGroup.campaignData.name} loaded`);
 
             if (callback) {
                 callback();
@@ -92,7 +97,7 @@ export const setActiveLocation = (locationID: string) => {
     }
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     serverProxy.emit(EVENT_NAME.UPDATE_ACTIVE_LOCATION, event, (reply: any) => {
-        console.log("Updating Active Location: ", reply);
+        console.info("Updating Active Location: ", reply);
     });
     campaignStore.setActiveLocation(locationID);
 }
@@ -113,18 +118,21 @@ export const deleteCampaign = (campaignID: string, callback: () => void) => {
     if (campaignStore.campaignID == campaignID) {
         campaignStore.reset();
     }
+    else {
+        DB.deleteDB(campaignID);
+    }
 }
-export const updateClientConfig = async (clientConfig: Asset.ClientConfig.Data, callback?: () => void) => {
-    const event: EVENT_TYPE.UPDATE_CLIENT_CONFIG = {clientConfig};
-    return new Promise<Asset.ClientConfig.Data>((resolve, reject) => {
+export const updateCampaignBindings = async (campaignBindings: Asset.CampaignBindings.Data, callback?: () => void) => {
+    const event: EVENT_TYPE.UPDATE_CAMPAIGN_BINDINGS = {campaignBindings};
+    return new Promise<Asset.CampaignBindings.Data>((resolve, reject) => {
         // serverProxy.emit(EVENT_NAME.UPDATE_CLIENT_CONFIG, event, callback)
-        serverProxy.emit(EVENT_NAME.UPDATE_CLIENT_CONFIG, event, async (payload: any) => {
+        serverProxy.emit(EVENT_NAME.UPDATE_CAMPAIGN_BINDINGS, event, async (payload: any) => {
             if (callback) {
                 callback();
                 resolve(null);
             }
             else {
-                payload.success? resolve(clientConfigUpdated(payload.event)) : reject();
+                payload.success? resolve(campaignBindingsUpdated(payload.event)) : reject();
             }
         });
     })

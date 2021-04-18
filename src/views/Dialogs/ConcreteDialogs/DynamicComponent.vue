@@ -30,9 +30,9 @@ import { Splitpanes, Pane } from "splitpanes";
 import 'splitpanes/dist/splitpanes.css';
 import Vue, {PropType} from 'vue';
 
-import "@/views/Workshop/ComponentMap";
-import DynamicList from "@/views/Workshop/Components/DynamicList.vue";
-import {ChoiceData} from "@/views/Workshop/ComponentTypes";
+import "@/views/DC_Module/ComponentMap";
+import DynamicList from "@/views/DC_Module/DynamicList.vue";
+import {ChoiceData} from "@/views/DC_Module/ComponentTypes";
 import AssetView from "@/views/components/AssetView.vue";
 import {MENU_ITEMS, MENU_ITEM_NAME} from "@/views/Menus/MenuItems";
 import { DialogObject } from '@/views/Dialogs/DialogObject';
@@ -74,7 +74,7 @@ export default Vue.extend({
                 isValidSubmission = isValidSubmission && node.validate();
             });
             if (!isValidSubmission) {
-                console.log("Form is incomplete!");
+                console.error("Form is incomplete!");
                 return;
             }
             form.traverseActiveChoices((node: any) => {
@@ -84,7 +84,7 @@ export default Vue.extend({
                 }
                 else choices.push(choice);
             });
-            console.log("Choices: ", choices);
+            console.info("Choices: ", choices);
 
             const action = {} as any;
             choices.forEach((choice: ChoiceData) => {
@@ -94,7 +94,6 @@ export default Vue.extend({
             this.d.hide(true);
         },
         handleDismiss() {
-            console.log("DISMISS");
             this.d.dismiss();
         }
     },

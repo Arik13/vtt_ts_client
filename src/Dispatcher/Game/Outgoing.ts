@@ -9,9 +9,9 @@ export const sendGameEvent = async (eventPayload: GAME_EVENT_TYPE.GAME_EVENT_TYP
         event: eventPayload,
     }
     /* eslint-disable  @typescript-eslint/no-explicit-any */
-    serverProxy.emit(EVENT_NAME.SEND_GAME_EVENT, event, (result: any) => {});
+    serverProxy.emit(EVENT_NAME.SEND_GAME_EVENT, event);
 }
-export const doAction = (actionName: string, actionArgs: any[], callback?: (event: GAME_EVENT_TYPE.ACTION_DONE) => void) => {
+export const doAction = (actionName: string, actionArgs: any, callback?: (event: GAME_EVENT_TYPE.ACTION_DONE) => void) => {
     const event: GAME_EVENT_TYPE.DO_ACTION = {
         name: actionName,
         args: actionArgs,

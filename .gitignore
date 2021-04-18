@@ -23,3 +23,6 @@ pnpm-debug.log*
 
 #Other
 .VSCodeCounter
+
+# Graphics Assets
+textures

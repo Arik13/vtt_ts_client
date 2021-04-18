@@ -1,7 +1,8 @@
 import * as Asset from "@shared/Assets/Asset";
 import {AssetStore} from "./AssetStore";
+import { CLIENT_EVENT } from "./EventBus";
 
-const assembleCD = (cd: any) => {
+export const assembleCD = (cd: any) => {
     for (let key in cd) {
         if (
             cd[key] &&
@@ -32,13 +33,35 @@ const assembleCD = (cd: any) => {
 }
 
 export class DynamicComponentStore extends AssetStore<Asset.DynamicComponent.Data> {
+    nameMap: Map<string, Asset.DynamicComponent.Data> = new Map();
     constructor() {
-        super("Script Store");
+        super(
+            "Dynamic Component Store",
+            CLIENT_EVENT.DC_ADDED,
+            CLIENT_EVENT.DC_UPDATED,
+            CLIENT_EVENT.DC_DELETED,
+        );
+    }
+    get(id: string) {
+        let dc = super.get(id);
+        return (dc)? dc : this.nameMap.get(id);
     }
     getAssembledDC(id: string): Asset.DynamicComponent.Data {
         let dc = JSON.parse(JSON.stringify(this.get(id)));
         assembleCD(dc);
         return dc;
+    }
+    setAll(dcs: Asset.DynamicComponent.Data[]) {
+        super.setAll(dcs);
+        this.forEach(dc => {
+            this.nameMap.set(dc.name, dc);
+        });
+    }
+    update(dc: Asset.DynamicComponent.Data) {
+        console.log(dc);
+
+        this.nameMap.set(dc.name, dc);
+        super.update(dc);
     }
 }
 const dcStore = new DynamicComponentStore();

@@ -4,20 +4,16 @@ import * as Dir from "@shared/Directories/Directory";
 import { directoryStore} from '@/Stores/DirectoryStore';
 
 export const directoryCreated = (event: DIRECTORY_EVENT_TYPE.DIRECTORY_CREATED) => {
-    return directoryStore.attachChild(event.directory, event.targetDirectoryID);
+    return directoryStore.attachChild(event.directory);
 }
 export const directoryUpdated = (event: DIRECTORY_EVENT_TYPE.DIRECTORY_UPDATED) => {
-    const dir = directoryStore.getDirectory(event.directoryID);
-    dir.name = event.name;
+    directoryStore.getDirectory(event.directoryID).name = event.name;
 }
 export const directoryDeleted = (event: DIRECTORY_EVENT_TYPE.DIRECTORY_DELETED) => {
-    const dir = directoryStore.getDirectory(event.directoryID);
-    Dir.deleteDirectory(dir);
+    directoryStore.delete(event.directoryID);
 }
 export const directoryMoved = (event: DIRECTORY_EVENT_TYPE.DIRECTORY_MOVED) => {
-    const moveDir = directoryStore.getDirectory(event.moveDirectoryID);
-    const targetDir = directoryStore.getDirectory(event.targetDirectoryID);
-    Dir.moveDirectory(moveDir, targetDir);
+    directoryStore.move(event.moveDirectoryID, event.targetDirectoryID);
 }
 
 serverProxy.addHandler(DIRECTORY_EVENT_NAME.DIRECTORY_CREATED, directoryCreated);

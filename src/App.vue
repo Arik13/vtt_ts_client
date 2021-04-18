@@ -1,5 +1,12 @@
 <template>
     <v-app dark>
+        <!-- <head>
+        <title>Checkout</title>
+        <script src="https://js.stripe.com/v3/"></script>
+        </head>
+        <body>
+        <button id="checkout">Subscribe</button>
+        </body> -->
         <!-- Navigation drawer on the left -->
         <v-navigation-drawer app dark v-model="drawer">
 
@@ -48,11 +55,12 @@
     as well as the main router view which will render the content of the app, depending on the current URL.
 */
 
+import {StripeCheckout} from "@vue-stripe/vue-stripe";
+import "@/Stores/MouseController";
 import Vue from 'vue';
-import {campaignStore} from "@/Stores/CampaignStore";
-import {userStore, UserStore} from "@/Stores/UserStore";
-import {ROUTE} from "./router/index";
+import {ROUTE} from "./router/router";
 import DialogManager from "@/views/Dialogs/DialogManager.vue";
+import { CLIENT_EVENT, eventBus } from "./Stores/EventBus";
 
 interface NavItem {
     title: string;
@@ -71,20 +79,17 @@ export default Vue.extend({
         isCampaignInitialized: false,
     }),
     components: {
-        "dialog-manager": DialogManager
+        "dialog-manager": DialogManager,
+        StripeCheckout,
     },
     computed: {
-        // isLoggedIn(): boolean {
-        //     return this.$store.state.isLoggedIn;
-        //     // return (this.$store.state.authToken);
-        // },
         navItems(): NavItem[] {
             return [
                 { title: "Log In", icon: "how_to_reg", route: ROUTE.LOGIN, show: !this.isLoggedIn},
                 { title: "Signup", icon: "how_to_reg", route: ROUTE.SIGNUP, show: !this.isLoggedIn},
                 { title: "Log Out", icon: "exit_to_app", route: ROUTE.LOGOUT, show: this.isLoggedIn},
-                { title: "Creator", icon: "exit_to_app", route: ROUTE.CAMPAIGN_CREATOR, show: this.isLoggedIn},
-                { title: "Selector", icon: "exit_to_app", route: ROUTE.CAMPAIGN_SELECTOR, show: (this.isLoggedIn)},
+                { title: "Selector", icon: "exit_to_app", route: ROUTE.CAMPAIGN_SELECTOR, show: this.isLoggedIn},
+                // { title: "Selector", icon: "exit_to_app", route: ROUTE.CAMPAIGN_SELECTOR, show: (this.isLoggedIn)},
                 { title: "Campaign", icon: "exit_to_app", route: ROUTE.CAMPAIGN_EDITOR, show: (this.isLoggedIn && this.isCampaignInitialized)},
                 { title: "Forms", icon: "exit_to_app", route: ROUTE.FORM_CREATOR, show: (this.isLoggedIn && this.isCampaignInitialized)},
                 { title: "Scripts", icon: "exit_to_app", route: ROUTE.SCRIPT_EDITOR, show: (this.isLoggedIn && this.isCampaignInitialized)},
@@ -97,42 +102,17 @@ export default Vue.extend({
     },
     // Retrieves user token and id for auto login
     mounted() {
-        campaignStore.subscribe({
-            added: () => {},
-            deleted: () => {},
-            updated: () => {},
-            notify: (eventName: string) => {
-                switch(eventName) {
-                    case (campaignStore.INITIALIZED): {
-                        this.isCampaignInitialized = true;
-                        break;
-                    }
-                    case (campaignStore.REMOVED): {
-                        this.isCampaignInitialized = false;
-                        break;
-                    }
+        eventBus.registerHandler(CLIENT_EVENT.INIT_NEW_CAMPAIGN, () => this.isCampaignInitialized = true);
+        eventBus.registerHandler(CLIENT_EVENT.CAMPAIGN_DELETED, () => this.isCampaignInitialized = false);
+        eventBus.registerHandler(CLIENT_EVENT.LOGGED_IN, () => this.isLoggedIn = true);
+        eventBus.registerHandler(CLIENT_EVENT.LOGGED_OUT, () => this.isLoggedIn = false);
+        // setTimeout(() => {
+        //     mouseEventProxy.enableLeftClick();
+        // }, 1000);
 
-                }
-            }
-        });
-        userStore.subscribe({
-            added: () => {},
-            deleted: () => {},
-            updated: () => {},
-            notify: (eventName: string) => {
-                switch(eventName) {
-                    case (userStore.LOGGED_IN): {
-                        this.isLoggedIn = true;
-                        break;
-                    }
-                    case (userStore.LOGGED_OUT): {
-                        this.isLoggedIn = false;
-                        break;
-                    }
-
-                }
-            }
-        });
+        // window.addEventListener('click',(event) => {
+        //     console.log('clicked', event);
+        // });
     },
 });
 </script>

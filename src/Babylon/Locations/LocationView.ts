@@ -2,6 +2,7 @@ import {MeshData} from "@/Babylon/Engine/MeshData"
 import lightScene from "@/Babylon/Engine/Lights"
 import {cameraFactory, PlanarCamera} from "@/Babylon/Engine/Camera"
 import {createPickPlane, createMesh, buildGridLines, buildScene, buildPipeline} from "./SceneAlgorithms";
+import { campaignStore } from "@/Stores/CampaignStore";
 
 export interface LocationViewListener {
     tokenSelected(tokenID: string): void;
@@ -97,9 +98,8 @@ export class LocationView {
         this.scene.render();
     }
     trySelect() {
-        const pick = this.scene.pick(this.scene.pointerX, this.scene.pointerY, (mesh) => {
-            return mesh !== this.pickPlane && mesh.isPickable;
-        });
+        const pick = this.scene.pick(this.scene.pointerX, this.scene.pointerY, mesh => mesh !== this.pickPlane && mesh.isPickable);
+
         // Deselect picked mesh if empty area clicked
         if (!pick.hit) {
             if (this.pickedMesh) {
@@ -116,6 +116,7 @@ export class LocationView {
                 this.pickedMesh = pick.pickedMesh;
                 this.pickedMesh.showBoundingBox = true;
                 this.pickStartingPosition = this.getGroundPosition();
+                campaignStore.setSelectedToken(pick.pickedMesh.id);
             }
         }
     }

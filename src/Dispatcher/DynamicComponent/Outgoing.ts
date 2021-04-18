@@ -19,9 +19,6 @@ export const createDynamicComponent = async (dynamicComponent: Asset.DynamicComp
 }
 
 export const updateDynamicComponent = async (dynamicComponent: Asset.DynamicComponent.Data, directoryID: string) => {
-    console.log("DC: ", dynamicComponent);
-    console.log("Dir: ", directoryStore.getDirectory(directoryID));
-
     const event: EVENT_TYPE.UPDATE_DYNAMIC_COMPONENT = {
         dynamicComponent,
         directoryID,

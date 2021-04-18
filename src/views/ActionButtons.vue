@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div :style="'overflow-y: auto; overflow-x: hidden; height: ' + height">
         <v-row>
             <v-col v-for="(actionGroup, i) in actionGroups" :key="i">
                 <h3>
@@ -7,45 +7,26 @@
                 </h3>
                 <div :style="getActionGridStyle()">
                     <div v-for="(action, j) in actionGroup.actions" :key="j" :style="getItemStyle(j)">
-                        <!-- {{ action }} -->
-                        <div style="background-color: white" @click="handleClick(action)">
-                            <v-img
-                                max-height="50"
-                                max-width="50"
-                                :src="getImageURL(action)"
-                                style="cursor: pointer; "
-                            />
-                        </div>
-                        <div style="">
-                            {{ action.label }}
-                        </div>
+                        <img
+                            :src="getImageURL(action)"
+                            @click="handleClick(action)"
+                            :title="action.label"
+                            :style="
+                                'margin: 0px;' +
+                                'padding: 0px;' +
+                                'min-width: 50px;' +
+                                'min-height: 50px;' +
+                                'max-height: 50px;' +
+                                'max-width: 50px;' +
+                                'cursor: pointer;' +
+                                `border: 2px solid ${getBorderColor(action)};` +
+                                `box-shadow: ${getBorderGlow(action)};`
+                            "
+                        >
                     </div>
                 </div>
-                <!-- {{ actionGroup }} -->
             </v-col>
         </v-row>
-        <!-- <div v-for="(actionGroup, i) in actionGroups" :key="i" :style="getGridStyle()">
-            <div :style="getItemStyle(i)">
-                <h3>
-                    {{ actionGroup.header }}
-                </h3>
-                <div :style="getActionGridStyle()">
-                    <div v-for="(action, j) in actionGroup.actions" :key="j" :style="getItemStyle(j)">
-                        <div style="text-align: center">
-                            {{ action.label }}
-                        </div>
-                        <div style="background-color: white" @click="handleClick(action)">
-                            <v-img
-                                max-height="50"
-                                max-width="50"
-                                :src="getImageURL(action)"
-                                style="cursor: pointer;"
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> -->
     </div>
 </template>
 
@@ -56,14 +37,41 @@ import Dispatcher from "@/Dispatcher/Dispatcher";
 import { campaignStore } from '@/Stores/CampaignStore';
 import { dcStore } from '@/Stores/DynamicComponentStore';
 import { stateObjectStore } from '@/Stores/StateObjectStore';
+import { tokenStore } from '@/Stores/TokenStore';
+import { eventBus, CLIENT_EVENT } from "@/Stores/EventBus";
+import { mouseController, MOUSE_EVENT } from "@/Stores/MouseController";
+import { globalMouseContext, MOUSE_CONTEXT } from '@/Stores/MouseContext';
 
-type ActionButtonData = {iconID: string, label: string, action: string};
+type ActionButtonData = {
+    iconID: string;
+    iconURL: string;
+    label: string;
+    toggle?: {
+        on: {
+            action: string;
+            params: any;
+        },
+        off: {
+            action: string;
+            params: any;
+        },
+        path: string[];
+    }
+    action: string;
+    target: {
+        mode: "point" | "circle" | "square" | "cone" | "chain";
+        amount: number | {
+            paths: string[][]
+        };
+        cursor: string;
+    }
+};
 type ActionGroupData = {
     header: string;
     path: string[];
     actions: {
         [key: string]: ActionButtonData
-    }
+    };
 }
 type ActionGroup = {
     header: string;
@@ -72,19 +80,33 @@ type ActionGroup = {
 
 export default Vue.extend({
     data: () => ({
-        actions: null as ActionButtonData[],
+        // actions: null as ActionButtonData[],
         actionGroups: [] as ActionGroup[],
         cols: 1,
+        // buttonCursor: "cursor: url(https://image.shutterstock.com/image-vector/line-cursor-icon-trendy-flat-260nw-761958064.jpg)",
+        buttonCursor: "cursor: pointer",
+        height: "0px",
     }),
+    props: {
+        bus: {
+            default: null,
+            type: Vue,
+        },
+    },
     methods: {
         getImageURL(actionData: ActionButtonData) {
-            return createImageURL(actionData.iconID);
+            return (actionData.iconURL)? (actionData.iconURL) : createImageURL(actionData.iconID);
+        },
+        updateHeight() {
+            let elDistanceToTop = window.pageYOffset + this.$el.getBoundingClientRect().top;
+            let height = window.innerHeight - elDistanceToTop - 40;
+            this.height = height + "px";
         },
         getActionGridStyle() {
             return {
                 display: "grid",
                 // gap: "10px",
-                "grid-auto-columns": `70px`,
+                "grid-auto-columns": `52px`,
                 "grid-auto-rows": `minmax(0, auto)`,
             }
         },
@@ -105,51 +127,139 @@ export default Vue.extend({
                 // "grid-column": this.cols++,
                 "grid-row": "1",
             }
-            console.log(itemStyle);
 
             return itemStyle;
         },
-        handleClick(action: ActionButtonData) {
-            console.log(action);
-            // Dispatcher.doAction(action.action, );
+        getBorderColor(actionData: ActionButtonData) {
+            if (actionData.toggle) {
+                let resolved = this.resolvePath(actionData.toggle.path);
+                return (resolved)? "red" : "gray";
+            }
+            return "gray";
+        },
+        getBorderGlow(actionData: ActionButtonData) {
+            if (actionData.toggle) {
+                return (this.resolvePath(actionData.toggle.path))? "0 0 15px red;'" : "";
+            }
+            return "";
+        },
+        resolvePath(path: string[]) {
+            let so = this.getSO();
+            let soAttr = so;
+            for (let i = 0; i < path.length && (soAttr !== null || soAttr !== undefined); i++) {
+                let pathEl = path[i];
+                soAttr = soAttr[pathEl];
+            }
+            return soAttr;
+        },
+        getSO() {
+            let soID = tokenStore.get(campaignStore.selectedTokenID).soID;
+            return stateObjectStore.get(soID);
+        },
+        handleClick(actionData: ActionButtonData) {
+            console.log(`${actionData.label} button clicked: ${actionData.action} action fired`);
+            console.log(actionData);
+            if (actionData.toggle && this.resolvePath(actionData.toggle.path)) {
+                let soID = tokenStore.get(campaignStore.selectedTokenID).soID;
+                Dispatcher.doAction(actionData.toggle.off.action, {
+                    ...actionData.toggle.off.params,
+                    initiatorID: soID,
+                });
+                return;
+            }
+            globalMouseContext.setContext(MOUSE_CONTEXT.TARGETING, actionData.target.cursor);
 
+            mouseController.handleOnce(MOUSE_EVENT.RIGHT_CLICK, e => {
+                globalMouseContext.setContext(MOUSE_CONTEXT.DEFAULT);
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+            });
+            eventBus.registerDisposableHandler(CLIENT_EVENT.POINT_TARGETED, (point) => {
+                let action = "";
+                let params = {};
+                if (actionData.toggle) {
+                    action = actionData.toggle.on.action;
+                    params = actionData.toggle.on.params;
+                }
+                else {
+                    action = actionData.action
+                }
+                // let action = (actionData.toggle)? actionData.toggle.on.action
+                // let params
+                let soID = tokenStore.get(campaignStore.selectedTokenID).soID;
+                Dispatcher.doAction(action, {
+                    initiatorID: soID,
+                    point,
+                    ...params
+                });
+            });
+        },
+        initButtons() {
+            // Get the campaign button config
+            let btnsID = campaignStore.campaignBindings.actionButtonGroup.dcID;
+            if (!btnsID) return;
+
+            let actionGroupData = dcStore.get(btnsID).cd as ActionGroupData[];
+            if (!actionGroupData) return;
+
+            // Create action button groups
+            let actionGroups: ActionGroup[] = [];
+            actionGroupData.forEach((actionGroupDatum) => {
+                // Get character actions
+                let soActions = this.resolvePath(actionGroupDatum.path);
+                if (!soActions || !Object.keys(soActions).length) return;
+
+                // Create an action button for each character action
+                let actions: ActionButtonData[] = [];
+                for (let key in soActions) {
+                    if (soActions[key]) {
+                        let actionButtonData = actionGroupDatum.actions[key];
+                        actions.push(actionButtonData);
+                    }
+                }
+                // Add action button group
+                let actionGroup: ActionGroup = {
+                    header: actionGroupDatum.header,
+                    actions,
+                }
+                actionGroups.push(actionGroup);
+            })
+            this.actionGroups = actionGroups;
+            console.log(this.actionGroups);
+
+        },
+        selectedTokenHandler(tokenID: string) {
+            if (!tokenID) {
+                return this.actionGroups = [];
+            }
+            let token = tokenStore.get(tokenID);
+            if (!token.soID) return;
+            let so = stateObjectStore.get(token.soID);
+            if (!so) return;
+            this.initButtons();
         }
     },
     mounted() {
-        let btnsID = campaignStore.clientConfig.actionButtonGroup.dcID;
-        if (!btnsID) return;
-        let actionGroupDatas = dcStore.get(btnsID).cd as ActionGroupData[];
-        if (!actionGroupDatas) return;
-
-        // TODO: replace with character selection mechanism
-        let soObj: any;
-        stateObjectStore.forEach(so => {
-            soObj = so;
+        eventBus.registerHandler(CLIENT_EVENT.SELECTED_TOKEN_UPDATED, this.selectedTokenHandler);
+        eventBus.registerHandler(CLIENT_EVENT.MOUSE_CONTEXT_CHANGED, (context: MOUSE_CONTEXT) => {
+            switch(context) {
+                case MOUSE_CONTEXT.TARGETING:
+                    this.buttonCursor = "";
+                    break;
+                case MOUSE_CONTEXT.DEFAULT:
+                    this.buttonCursor = "cursor: pointer";
+                    break;
+            }
         });
-
-        let actionGroups: ActionGroup[] = [];
-        // Init action groups
-        actionGroupDatas.forEach((actionGroupData) => {
-            // Get character actions
-            let soActions = soObj;
-            for (let i = 0; i < actionGroupData.path.length; i++) {
-                soActions = soActions[actionGroupData.path[i]];
+        eventBus.registerHandler(CLIENT_EVENT.STATE_OBJECT_UPDATED, (soID: string) => {
+            if (soID == this.getSO().id) {
+                this.selectedTokenHandler(campaignStore.selectedTokenID);
             }
-
-            let actions: ActionButtonData[] = [];
-            for (let key in soActions) {
-                actions.push(actionGroupData.actions[key]);
-            }
-            let actionGroup: ActionGroup = {
-                header: actionGroupData.header,
-                actions,
-            }
-            actionGroups.push(actionGroup)
-
-            // this.actions = displayedActions;
-        })
-        console.log(actionGroups);
-        this.actionGroups = actionGroups;
+        });
+        this.bus.$on('resized', () => {
+            this.updateHeight();
+        });
     }
 })
 </script>

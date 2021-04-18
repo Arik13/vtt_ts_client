@@ -15,7 +15,6 @@ export default Vue.extend({
         d: Object as PropType<DialogObject<any>>
     },
     mounted() {
-        console.log(this.d);
 
     }
 })

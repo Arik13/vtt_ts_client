@@ -17,7 +17,7 @@ export const imageCreated = async (payload: ArrayBuffer[]) => {
         fileBuffer: payload[0],
     }
     await DB.addImage(imageData);
-    directoryStore.attachChild(event.directory, event.parentID);
+    directoryStore.attachChild(event.directory);
     return imageStore.add(imageData);
 }
 export const imageDeleted = async (payload: EVENT_TYPE.IMAGE_DELETED) => {

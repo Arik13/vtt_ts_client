@@ -58,6 +58,7 @@ export const createMesh = (
         BABYLON.Texture.NEAREST_SAMPLINGMODE
     );
     mesh.material = meshMaterial;
+    meshMaterial.maxSimultaneousLights = 16;
     // mesh.
     return mesh;
 }

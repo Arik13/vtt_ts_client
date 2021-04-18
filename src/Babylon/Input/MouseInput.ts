@@ -80,6 +80,9 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
                 type: INPUT_EVENT.LEFT_DOWN
             });
         }
+        // if (this.buttonsPressed.includes(MOUSE_BUTTON.RIGHT)) {
+        //     console.log("HEREREO");
+        // }
         this.previousPosition = {
             x: evt.clientX,
             y: evt.clientY
@@ -115,26 +118,25 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
         eventState;
         if (this.buttonsPressed.includes(MOUSE_BUTTON.LEFT)) {
             MOUSE_STATE.MOVING = true;
-            inputBus.sendEvent({
-                type: INPUT_EVENT.LEFT_DOWN_MOVE
-            });
+            inputBus.sendEvent({type: INPUT_EVENT.LEFT_DOWN_MOVE});
             return;
         }
+        // else if (this)
         const evt = pointerInfo.event as PointerEvent;
 
         if (!this.previousPosition || this.camera.getEngine().isPointerLock) {
+            inputBus.sendEvent({type: INPUT_EVENT.ALL_UP_MOVE});
             return;
-        }
+        };
+
         const deltaX = evt.clientX - this.previousPosition.x;
         const deltaY = evt.clientY - this.previousPosition.y;
         const yRotation = deltaX / this.angularSensibility;
         const xRotation = deltaY / this.angularSensibility;
         this.camera.cameraRotation.y += (this.camera.getScene().useRightHandedSystem)? -1 * yRotation : yRotation;
         this.camera.cameraRotation.x += xRotation;
-        this.previousPosition = {
-            x: evt.clientX,
-            y: evt.clientY
-        };
+        this.previousPosition = {x: evt.clientX, y: evt.clientY};
+
         if (!this.noPreventDefault) {
             evt.preventDefault();
         }

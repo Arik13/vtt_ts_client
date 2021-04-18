@@ -7,6 +7,13 @@
                 Create Token
             </v-card-title>
             <v-card-text>
+                <v-select
+                    :items="d.state.soItems"
+                    item-text="name"
+                    item-value="id"
+                    v-model="d.state.soID"
+                    label="Character"
+                />
                 <v-text-field label="Label" v-model="d.state.label" />
                 <v-text-field label="Rank" v-model="d.state.x" />
                 <v-text-field label="File" v-model="d.state.z" />
@@ -21,10 +28,11 @@
 <script lang="ts">
 import Vue, {PropType} from 'vue'
 import {DialogObject} from "../DialogObject";
+import {CreateTokenState} from "../Dialog";
 
 export default Vue.extend({
     props: {
-        d: Object as PropType<DialogObject<any>>
+        d: Object as PropType<DialogObject<CreateTokenState>>
     },
 })
 </script>

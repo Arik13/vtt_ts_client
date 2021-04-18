@@ -7,22 +7,16 @@ import {DB} from "@/DB/IndexedDB";
 const scriptDownloaded = async (event: EVENT_TYPE.SCRIPT_CREATED) => {
     await DB.addScript(event.keyValue);
     scriptStore.add(event.keyValue.value);
-    directoryStore.attachChild(event.directory, event.parentID);
+    directoryStore.attachChild(event.directory);
 }
 const scriptUpdated = async (event: EVENT_TYPE.SCRIPT_UPDATED) => {
-    const dir = directoryStore.getDirectory(event.directoryID);
-    const script = scriptStore.get(event.script.id);
-
-    script.name = event.script.name;
-    script.script = event.script.script;
-    script.type = event.script.type;
-    script.isActive = event.script.isActive;
-    dir.name = event.script.name;
+    directoryStore.updateName(event.directoryID, event.script.name);
+    scriptStore.update(event.script);
 }
 const scriptDeleted = async (event: EVENT_TYPE.SCRIPT_DELETED) => {
-    scriptStore.deleted(event.scriptID);
     await DB.deleteScript(event.scriptID);
     directoryStore.delete(event.directoryID);
+    scriptStore.deleted(event.scriptID);
 }
 
 serverProxy.addHandler(EVENT_NAME.SCRIPT_CREATED, scriptDownloaded);

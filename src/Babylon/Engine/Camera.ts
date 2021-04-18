@@ -46,7 +46,7 @@ export class PlanarCamera extends BABYLON.UniversalCamera {
 export const cameraFactory = (scene: BABYLON.Scene) => {
     const camera = new PlanarCamera(
         "MyCamera",                         // Name
-        new BABYLON.Vector3(0, 120, 0),     // Position
+        new BABYLON.Vector3(0, 250, 0),     // Position
         new BABYLON.Vector3(0, 0, 0),       // Target
         scene,                              // Scene
         0.06,                               // Angular speed

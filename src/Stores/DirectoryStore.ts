@@ -3,21 +3,10 @@
     It also provides a way to interface with the campaign serverside
 */
 
-import { serverProxy, ServerProxy } from './ServerProxy';
 import {Directory} from "@shared/Directories/Directory";
 import * as Dir from "@shared/Directories/Directory";
-import {Subscriber} from "./Subscriber";
-
-export enum CAMPAIGN_EVENT {
-    ACTIVE_LOCATION_UPDATED = "ActiveLocationUpdated",
-}
-export interface CampaignSubscriber extends Subscriber {
-    updated?(id: string, eventName: CAMPAIGN_EVENT): void;
-}
 
 class DirectoryStore {
-    subscribers: Subscriber[] = [];
-    serverProxy: ServerProxy = serverProxy;
     root: Directory = null;
     directoryMap: Map<string, Directory> = new Map();
     getRoot(): Directory {
@@ -26,14 +15,14 @@ class DirectoryStore {
     getDirectory(dirID: string) {
         return this.directoryMap.get(dirID);
     }
-    attachChild(dirSchema: Dir.DirectorySchema, parentID: string) {
+    attachChild(dirSchema: Dir.DirectorySchema) {
         if (this.directoryMap.get(dirSchema.id)) return;
-        const parent = this.directoryMap.get(parentID);
+        const parent = this.directoryMap.get(dirSchema.parent);
         const children: Directory[] = [];
         if (dirSchema.children) {
             dirSchema.children.forEach((childID: string) => {
                 children.push(this.directoryMap.get(childID));
-            })
+            });
         }
         const dir: Directory = {
             id: dirSchema.id,
@@ -65,8 +54,13 @@ class DirectoryStore {
             this.directoryMap.set(dir.id, dir);
         }));
     }
-    addSubscriber(subscriber: Subscriber) {
-        this.subscribers.push(subscriber);
+    move(moveDirID: string, targetDirID: string) {
+        const moveDir = directoryStore.getDirectory(moveDirID);
+        const targetDir = directoryStore.getDirectory(targetDirID);
+        Dir.moveDirectory(moveDir, targetDir);
+    }
+    updateName(dirID: string, name: string) {
+        this.directoryMap.get(dirID).name = name;
     }
 }
 

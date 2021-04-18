@@ -5,7 +5,7 @@ import {
     setActiveLocation,
     getCampaigns,
     deleteCampaign,
-    updateClientConfig,
+    updateCampaignBindings,
 } from "./Campaign/Outgoing";
 
 import {
@@ -64,6 +64,13 @@ import {
     deleteRoll,
 } from "./Roll/Outgoing";
 
+import {
+    createTurnSequence,
+    endTurn,
+    moveTurn,
+    endTurnSequence,
+} from "./TurnSequence/Outgoing";
+
 
 ////////////////////////////////
 
@@ -74,7 +81,7 @@ export default {
     setActiveLocation,
     getCampaigns,
     deleteCampaign,
-    updateClientConfig,
+    updateCampaignBindings,
 
     // IMAGES
     createImage,
@@ -121,6 +128,12 @@ export default {
     createRoll,
     updateRoll,
     deleteRoll,
+
+    // TURN SEQUENCE
+    createTurnSequence,
+    goNextTurn: endTurn,
+    moveTurn,
+    endTurnSequence,
 }
 
 // INCOMING ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,3 +146,4 @@ import "./DynamicComponent/Incoming";
 import "./StateObject/Incoming";
 import "./Game/Incoming";
 import "./Roll/Incoming";
+import "./TurnSequence/Incoming";

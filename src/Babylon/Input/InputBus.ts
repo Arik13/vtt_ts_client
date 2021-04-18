@@ -14,13 +14,15 @@ export interface PickEvent extends InputEvent {
 }
 
 export enum INPUT_EVENT {
-    LEFT_DOWN = 1,
-    LEFT_UP = 2,
-    LEFT_DOWN_MOVE = 3,
-    LEFT_UP_MOVE = 4,
-    WHEEL_FORWARDS = 5,
-    WHEEL_BACKWARDS = 6,
-    DELETE = 7,
+    FALSEY,
+    LEFT_DOWN,
+    LEFT_UP,
+    LEFT_DOWN_MOVE,
+    LEFT_UP_MOVE,
+    ALL_UP_MOVE,
+    WHEEL_FORWARDS,
+    WHEEL_BACKWARDS,
+    DELETE,
 }
 
 export class InputBus {

@@ -14,12 +14,14 @@ import {Location} from "@/Babylon/Locations/Location";
 import * as Asset from "@shared/Assets/Asset"
 import "babylonjs";
 
-import {locationStore, LOCATION_EVENT_NAME, LOCATION_EVENT} from "@/Stores/LocationStore";
-import {campaignStore, CampaignSubscriber, CAMPAIGN_EVENT} from "@/Stores/CampaignStore";
+import {locationStore} from "@/Stores/LocationStore";
+import {campaignStore} from "@/Stores/CampaignStore";
 import {imageStore} from "@/Stores/ImageStore";
 import { tokenStore } from '@/Stores/TokenStore';
 import {createImageURL} from "@/Util/functions"
 import dispatcher from '@/Dispatcher/Dispatcher';
+import { eventBus, CLIENT_EVENT } from "@/Stores/EventBus";
+import { globalMouseContext, MOUSE_CONTEXT } from "@/Stores/MouseContext";
 class BabylonController implements InputReceiver {
     engine: BABYLON.Engine;
     canvas: HTMLCanvasElement;
@@ -32,70 +34,47 @@ class BabylonController implements InputReceiver {
         canvas.addEventListener('contextmenu', event => event.preventDefault());
 
         // Watch for browser/canvas resize events
-        window.addEventListener("resize", () => {
-            this.engine.resize();
-        });
+        window.addEventListener("resize", e => this.engine.resize());
 
         // Register a render loop to repeatedly render the scene
         this.engine.runRenderLoop(() => {
             if (this.activeLocation) this.activeLocation.render();
         });
-        locationStore.subscribe({
-            added: () => {console.log();},
-            deleted: (id) => {id; },
-            notify: () => {},
-            updated: (id: string, event: LOCATION_EVENT.LocationEvent) => {
-                if (id != this.activeLocationID) return;
-                switch(event.eventName) {
-                    case (LOCATION_EVENT_NAME.TOKEN_ADDED): {
-                        const tokenEvent = event as LOCATION_EVENT.TokenAddedEvent;
-                        const tokenData = tokenEvent.tokenData;
-                        const tokenMeshData: MeshData = {
-                            texturePath: createImageURL(tokenData.imageID),
-                            meshName: tokenData.id,
-                            materialName: tokenData.imageID
-                        }
-                        this.getActiveLocation().addToken(
-                            tokenData.tokenModel.position.x,
-                            tokenData.tokenModel.position.z,
-                            tokenMeshData,
-                        );
-                        break;
-                    }
-                    case (LOCATION_EVENT_NAME.TOKEN_UPDATED): {
-                        const tokenEvent = event as LOCATION_EVENT.TokenUpdatedEvent;
-                        const tokenData = tokenEvent.tokenData;
-                        this.activeLocation.updateToken(tokenData.id, tokenData);
-                        break;
-                    }
-                    case (LOCATION_EVENT_NAME.TOKEN_DELETED): {
-                        const tokenEvent = event as LOCATION_EVENT.TokenDeleteEvent;
-                        this.activeLocation.deleteToken(tokenEvent.tokenID);
-                        break;
-                    }
-                }
+        eventBus.registerHandler(CLIENT_EVENT.TOKEN_ADDED, (tokenID) => {
+            let token = tokenStore.get(tokenID);
+            const tokenMeshData: MeshData = {
+                texturePath: createImageURL(token.imageID),
+                meshName: token.id,
+                materialName: token.imageID
             }
+            this.getActiveLocation().addToken(
+                token.tokenModel.position.x,
+                token.tokenModel.position.z,
+                tokenMeshData,
+            );
         });
-        campaignStore.subscribe({
-            added: () => {
-                console.log();
-            },
-            deleted: () => {
-                console.log();
-            },
-            updated: (id: string, event: CAMPAIGN_EVENT) => {
-                switch(event) {
-                    case (CAMPAIGN_EVENT.ACTIVE_LOCATION_UPDATED):
-                        this.setActiveLocation(id);
-                        break;
-                }
-            }
-        })
+        eventBus.registerHandler(CLIENT_EVENT.TOKEN_UPDATED, (tokenID) => {
+            this.activeLocation.updateToken(tokenID, tokenStore.get(tokenID));
+        });
+        eventBus.registerHandler(CLIENT_EVENT.TOKEN_DELETED, (tokenID) => {
+            this.activeLocation.deleteToken(tokenID);
+        });
+        eventBus.registerHandler(CLIENT_EVENT.ACTIVE_LOCATION_UPDATED, id => this.setActiveLocation(id));
         if (campaignStore.activeLocationID) {
             this.setActiveLocation(campaignStore.activeLocationID);
         }
+        eventBus.registerHandler(CLIENT_EVENT.CREATE_LIGHT, point => this.activeLocation.createLight(point))
     }
     receiveEvent(evt: InputEvent) {
+        if (globalMouseContext.context == MOUSE_CONTEXT.TARGETING) {
+            if (evt.type == INPUT_EVENT.ALL_UP_MOVE) {
+                return;
+            }
+            let locPoint = this.activeLocation.tryTarget();
+            globalMouseContext.setContext(MOUSE_CONTEXT.DEFAULT);
+            eventBus.dispatch(CLIENT_EVENT.POINT_TARGETED, locPoint);
+            return;
+        }
         switch(evt.type) {
             case INPUT_EVENT.LEFT_DOWN: {
                 return this.activeLocation.trySelect();
@@ -131,11 +110,9 @@ class BabylonController implements InputReceiver {
                 if (this.activeLocation.hasSelection()) {
                     const location = this.activeLocation;
                     let startPos = this.activeLocation.pickStartingPosition;
-                    console.log("BEfore: ", startPos);
                     if (this.activeLocation.snapToGridEnabled) {
                         startPos = this.activeLocation.findClosestTileCenter(startPos);
                     }
-                    console.log("After snap: ", startPos);
                     let endPos = location.getGroundPosition();
                     location.pickStartingPosition = endPos;
                     // endPos = this.activeLocation.findClosestTileCenter(endPos);
@@ -164,12 +141,8 @@ class BabylonController implements InputReceiver {
             case INPUT_EVENT.DELETE: {
                 if (this.activeLocation.hasSelection()) {
                     let tokenID = this.activeLocation.pickedMesh.id;
-                    console.log("TokenID: ", tokenID);
-
                     dispatcher.deleteToken(tokenID, this.activeLocationID);
                 }
-                // this.getActiveView().zoomOut();
-                console.log("Delete");
                 break;
             }
         }
@@ -199,14 +172,13 @@ class BabylonController implements InputReceiver {
         canvas: HTMLCanvasElement,
         locationData: Asset.Location.Data,
     ) {
-        // const t0 = performance.now();
         const url = createImageURL(locationData.mapImageID);
         const locationMapName = locationData.name + " Map";
         const mapMeshData = new MeshData(url, locationMapName, locationMapName);
 
         // Create location
         const location = new Location(engine, canvas, locationData.locationModel, mapMeshData);
-        locationData.tokenIDs.forEach((tokenID: string) => {
+        locationData.tokenIDs.forEach(tokenID => {
             const tokenData = tokenStore.get(tokenID);
             const tokenMeshData: MeshData = {
                 texturePath: createImageURL(tokenData.imageID),
@@ -218,9 +190,7 @@ class BabylonController implements InputReceiver {
                 tokenData.tokenModel.position.z,
                 tokenMeshData,
             );
-        })
-        // const t1 = performance.now();
-        // console.log(`Created the location "${locationData.name}" in ${Math.round(t1 - t0)} milliseconds.`);
+        });
         return location;
     }
 }

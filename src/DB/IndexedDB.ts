@@ -51,7 +51,7 @@ class CampaignDBService {
     db: IDBPDatabase<ClientDB>;
     campaignID: string;
     constructor(campaignID: string) {
-        console.log("Constructing DB Service for campaign: ", campaignID);
+        console.info("Constructing DB Service for campaign: ", campaignID);
         this.campaignID = campaignID;
     }
     async open() {
@@ -63,7 +63,7 @@ class CampaignDBService {
             {
                 upgrade(db, oldVersion, newVersion, transaction) {
                     transaction;
-                    console.log(`Upgrading DB from version ${oldVersion} to version ${newVersion}`);
+                    console.info(`Upgrading DB from version ${oldVersion} to version ${newVersion}`);
 
                     // Asset Stores
                     db.createObjectStore(STORE.IMAGE_STORE);
@@ -134,7 +134,11 @@ class CampaignDBService {
         this.syncAsset(STORE.DYNAMIC_COMPONENT_STORE, STORE.DYNAMIC_COMPONENT_KEY_STORE, assets.dcData, queryList);
         this.syncAsset(STORE.STATE_OBJECT_STORE, STORE.STATE_OBJECT_KEY_STORE, assets.soData, queryList);
         this.syncAsset(STORE.ROLL_STORE, STORE.ROLL_KEY_STORE, assets.rollData, queryList);
+        let t1 = performance.now();
+
         await Promise.all(queryList);
+        let t2 = performance.now();
+        console.info(`DB Sync Time: ${((t2 - t1) / 1000).toFixed(2)} seconds`);
     }
 
     async getAssets() {
@@ -213,6 +217,9 @@ class CampaignDBService {
     async deleteRoll(id: string) {
         await this.db.delete(STORE.ROLL_KEY_STORE, id);
         await this.db.delete(STORE.ROLL_STORE, id);
+    }
+    async deleteDB(id: string) {
+        await deleteDB(this.campaignID);
     }
 }
 let DB: CampaignDBService = null;

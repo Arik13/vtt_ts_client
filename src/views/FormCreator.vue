@@ -58,10 +58,10 @@
 <script lang="ts">
 
 import Vue from 'vue';
-import "./Workshop/ComponentMap";
-import DynamicList from "./Workshop/Components/DynamicList.vue";
+import "./DC_Module/ComponentMap";
+import DynamicList from "./DC_Module/DynamicList.vue";
 
-import {ChoiceData} from "./Workshop/ComponentTypes";
+import {ChoiceData} from "./DC_Module/ComponentTypes";
 import dispatcher from "@/Dispatcher/Dispatcher";
 import {GAME_EVENT_NAME, GAME_EVENT_TYPE} from "@shared/Game/GameEvent";
 import AssetView from "./components/AssetView.vue";
@@ -80,45 +80,12 @@ import { DialogObject } from './Dialogs/DialogObject';
 import { scriptStore } from '@/Stores/ScriptStore';
 import * as Asset from "@shared/Assets/Asset";
 import { spawnCreateDirectoryDialog } from './Dialogs/DialogFactories';
-import { dcStore } from '@/Stores/DynamicComponentStore';
+import { dcStore, assembleCD } from '@/Stores/DynamicComponentStore';
 import { stateObjectStore } from '@/Stores/StateObjectStore';
-
-console.log("VJE: ", VueJsonEditor);
-
 
 
 const genBlankCD = () => {
     return {id: "", name: "", cd: ""};
-}
-
-const assembleCD = (cd: any) => {
-    for (let key in cd) {
-        if (
-            cd[key] &&
-            (typeof(cd[key]) == "object" ||
-            Array.isArray(cd[key]))
-        ) {
-            let cdID = null;
-            let cdKey = null;
-            if (cd[key].cds && typeof(cd[key].cds) == "string") {
-                cdID = cd[key].cds;
-                cdKey = "cds";
-            }
-            else if (cd[key].choices && typeof(cd[key].choices) == "string") {
-                cdID = cd[key].choices;
-                cdKey = "choices";
-            }
-            if (cdID) {
-                let storeCD = dcStore.get(cdID).cd;
-                let subCD = JSON.parse(JSON.stringify(storeCD));
-                assembleCD(subCD);
-                cd[key][cdKey] = subCD;
-            }
-            else {
-                assembleCD(cd[key]);
-            }
-        }
-    }
 }
 
 export default Vue.extend({
@@ -166,8 +133,6 @@ export default Vue.extend({
                     cds: cd,
                 };
                 let so = stateObjectStore.get(this.soID);
-                console.log("FM SO:", so);
-
                 dialog.global = {so};
 
                 dialog.show((state) => {
@@ -175,7 +140,7 @@ export default Vue.extend({
                 })
             }
             catch (error) {
-                console.log(error);
+                console.error(error);
             }
         },
         tabber(event: Event) {
@@ -225,7 +190,7 @@ export default Vue.extend({
                 dispatcher.updateDynamicComponent(this.activeCD, this.activeCDDirectory);
             }
             catch {
-                console.log("Invalid JSON");
+                console.error("Invalid JSON");
             }
         },
         onJsonChange(value: any) {

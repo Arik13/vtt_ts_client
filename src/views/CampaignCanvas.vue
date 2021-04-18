@@ -28,7 +28,7 @@ export default Vue.extend({
         this.bus.$on('resized', () => {
             this.engineController.resize();
         });
-        setTimeout(() => {this.engineController.resize();}, 400);
+        // setTimeout(() => {this.engineController.resize();}, 400);
     }
 });
 </script>

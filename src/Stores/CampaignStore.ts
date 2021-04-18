@@ -3,85 +3,55 @@
     It also provides a way to interface with the campaign serverside
 */
 
+import { DB } from "@/DB/IndexedDB";
 import * as Asset from "@shared/Assets/Asset";
-import { locationStore } from "./LocationStore";
-import {Subscriber} from "./Subscriber";
-
-export enum CAMPAIGN_EVENT {
-    ACTIVE_LOCATION_UPDATED = "ActiveLocationUpdated",
-}
-export interface CampaignSubscriber extends Subscriber {
-    updated?(id: string, eventName: CAMPAIGN_EVENT): void;
-}
+import { eventBus, CLIENT_EVENT } from "./EventBus";
 
 class CampaignStore {
     campaignID: string;
     name: string;
-    subscribers: Subscriber[] = [];
     activeLocationID: string;
-    INITIALIZED = "INITIALIZED";
-    REMOVED = "REMOVED";
-    clientConfig: Asset.ClientConfig.Data;
+    selectedTokenID: string;
+    campaignBindings: Asset.CampaignBindings.Data;
     constructor() {
         this.activeLocationID = null;
         this.campaignID = null;
         this.name = null;
-        this.clientConfig = null;
-    }
-    subscribe(subscriber: Subscriber) {
-        this.subscribers.push(subscriber);
+        this.campaignBindings = null;
     }
     setActiveLocation(locationID: string) {
         if (locationID == this.activeLocationID) return;
         this.activeLocationID = locationID;
-        this.subscribers.forEach((subscriber: Subscriber) => {
-            subscriber.updated(locationID, CAMPAIGN_EVENT.ACTIVE_LOCATION_UPDATED);
-        })
+        eventBus.dispatch(CLIENT_EVENT.ACTIVE_LOCATION_UPDATED, locationID);
     }
-    setCampaign(campaignID: string, name: string, activeLocationID: string, clientConfig: Asset.ClientConfig.Data) {
+    setCampaign(campaignID: string, name: string, activeLocationID: string, campaignBindings: Asset.CampaignBindings.Data) {
         this.setActiveLocation(activeLocationID);
-        console.log(locationStore);
-
-        // this.activeLocationID = activeLocationID;
         this.campaignID = campaignID;
         this.name = name;
-        this.clientConfig = clientConfig;
-
-        this.subscribers.forEach((subscriber: Subscriber) => {
-            subscriber.notify(this.INITIALIZED, null);
-        });
+        this.campaignBindings = campaignBindings;
+        eventBus.dispatch(CLIENT_EVENT.INIT_NEW_CAMPAIGN);
     }
-    reset() {
+    async reset() {
+        await DB.deleteDB(this.campaignID);
         this.campaignID = null;
         this.name = null;
         this.activeLocationID = null;
-        this.clientConfig = null;
-        this.subscribers.forEach((subscriber: Subscriber) => {
-            subscriber.notify(this.REMOVED, null);
-        });
+        this.campaignBindings = null;
+        eventBus.dispatch(CLIENT_EVENT.CAMPAIGN_DELETED);
     }
-    updateClientConfig(clientConfig: Asset.ClientConfig.Data) {
-        this.clientConfig = clientConfig;
-        return this.clientConfig;
+    updateCampaignBindings(campaignBindings: Asset.CampaignBindings.Data) {
+        this.campaignBindings = campaignBindings;
+        return this.campaignBindings;
+    }
+    setSelectedToken(tokenID: string) {
+        if (tokenID == this.selectedTokenID) return;
+        this.selectedTokenID = tokenID;
+        eventBus.dispatch(CLIENT_EVENT.SELECTED_TOKEN_UPDATED, tokenID);
     }
 }
 
 const campaignStore: CampaignStore = new CampaignStore();
 
-// const initCampaignStore = (
-//     campaignID: string,
-//     name: string,
-//     activeLocationID: string,
-// ) => {
-//     campaignStore = new CampaignStore(
-//         campaignID,
-//         name,
-//         activeLocationID,
-//     );
-//     return campaignStore;
-// }
-
 export {
     campaignStore,
-    // initCampaignStore,
 }

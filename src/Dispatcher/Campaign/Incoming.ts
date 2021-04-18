@@ -5,9 +5,9 @@ import { campaignStore } from '@/Stores/CampaignStore';
 export const activeLocationChanged = async (payload: EVENT_TYPE.ACTIVE_LOCATION_UPDATED) => {
     campaignStore.setActiveLocation(payload.locationID);
 }
-export const clientConfigUpdated = async (payload: EVENT_TYPE.CLIENT_CONFIG_UPDATED) => {
-    return campaignStore.updateClientConfig(payload.clientConfig);
+export const campaignBindingsUpdated = async (payload: EVENT_TYPE.CAMPAIGN_BINDINGS_UPDATED) => {
+    return campaignStore.updateCampaignBindings(payload.campaignBindings);
 }
 
 serverProxy.addHandler(EVENT_NAME.ACTIVE_LOCATION_UPDATED, activeLocationChanged);
-serverProxy.addHandler(EVENT_NAME.CLIENT_CONFIG_UPDATED, clientConfigUpdated);
+serverProxy.addHandler(EVENT_NAME.CAMPAIGN_BINDINGS_UPDATED, campaignBindingsUpdated);

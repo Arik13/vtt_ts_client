@@ -10,7 +10,7 @@ import DynamicComponent from "./ConcreteDialogs/DynamicComponent.vue";
 import {DialogObject} from "./DialogObject";
 import * as Asset from "@shared/Assets/Asset";
 
-
+type ItemPair = {name: string, id: string};
 export const dialogMap = new Map<string, DialogObject<any>>();
 
 export enum DIALOG_NAME {
@@ -44,7 +44,7 @@ export interface UpdateDirectoryState {
 }
 export interface CreateLocationState {
     location: Asset.Location.Data;
-    imageItems: {name: string; id: string}[];
+    imageItems: ItemPair[];
 }
 export interface CreateTokenState {
     x: number;
@@ -53,6 +53,8 @@ export interface CreateTokenState {
     length: number;
     label: string;
     imageID: string;
+    soID: string;
+    soItems: ItemPair[];
 }
 export interface CreateScriptState {
     name: string;
@@ -99,7 +101,7 @@ const createLocationBlankState = {
         mapImageID: "" as string,
         tokenIDs: [] as string[],
     } as Asset.Location.Data,
-    imageItems: [] as {name: string; id: string}[],
+    imageItems: [] as ItemPair[],
 }
 const createTokenBlankState = {
     x: 20,
@@ -107,7 +109,9 @@ const createTokenBlankState = {
     width: 5,
     length: 5,
     label: "test",
+    soID: null as string,
     imageID: null as string,
+    soItems: [] as ItemPair[],
 }
 const createScriptBlankState = {
     name: "",

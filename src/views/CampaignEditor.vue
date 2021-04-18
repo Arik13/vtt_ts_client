@@ -12,11 +12,22 @@
                     <campaign-canvas :bus="bus" />
                 </pane>
                 <pane :min-size="25" :size="25">
-                    <v-card height="100%" width="100%" dark tile>
-                        <v-card-text>
-                            <action-buttons />
-                        </v-card-text>
-                    </v-card>
+                    <splitpanes :push-other-panes="false">
+                        <pane>
+                            <v-card dark height="100%" tile>
+                                <v-card-text>
+                                    <action-buttons :bus="bus" />
+                                </v-card-text>
+                            </v-card>
+                        </pane>
+                        <pane>
+                            <v-card dark height="100%" tile>
+                                <v-card-text height="100px">
+                                    <action-log height="100%" :bus="bus" />
+                                </v-card-text>
+                            </v-card>
+                        </pane>
+                    </splitpanes>
                 </pane>
             </splitpanes>
         </pane>
@@ -43,6 +54,9 @@
                     <v-tab-item :value="TAB.CHAT">
                         <chat></chat>
                     </v-tab-item>
+                    <v-tab-item :value="TAB.CONTROLS">
+                        <controls />
+                    </v-tab-item>
 
                 </v-tabs-items>
             </v-tabs>
@@ -55,9 +69,11 @@
 <script lang="ts">
 import Vue from "vue";
 import { Component } from "vue-property-decorator";
-import AssetManager from "./AssetManager/AssetManager.vue";
+import AssetManager from "./AssetManager.vue";
 import ActionButtons from "./ActionButtons.vue";
+import ActionLog from "./ActionLog.vue";
 import CampaignCanvas from "./CampaignCanvas.vue";
+import Controls from "./Controls.vue";
 import Chat from "./Chat.vue";
 
 // @ts-ignore
@@ -69,6 +85,7 @@ import {campaignStore} from "@/Stores/CampaignStore";
 enum TAB {
     ASSET_MANAGER = "Assets",
     CHAT = "Chat",
+    CONTROLS = "Controls",
 }
 
 
@@ -81,6 +98,8 @@ enum TAB {
         Splitpanes,
         Pane,
         Chat,
+        Controls,
+        ActionLog,
     }
 })
 export default class CampaignEditor extends Vue {
@@ -90,6 +109,7 @@ export default class CampaignEditor extends Vue {
     tabs = [
         {name: TAB.ASSET_MANAGER},
         {name: TAB.CHAT},
+        {name: TAB.CONTROLS},
     ];
     model = 'tab-1';
     mounted() {
@@ -100,6 +120,7 @@ export default class CampaignEditor extends Vue {
         else if (!campaignID) {
             this.$router.push({path: "/campaignselector"})
         }
+        setTimeout(() => this.resize(), 250);
     }
     resize() {
         this.bus.$emit('resized');

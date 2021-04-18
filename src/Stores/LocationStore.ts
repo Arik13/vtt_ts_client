@@ -1,30 +1,21 @@
 import * as Asset from "@shared/Assets/Asset";
 import {AssetStore} from "./AssetStore";
+import { CLIENT_EVENT } from "./EventBus";
 
-export enum LOCATION_EVENT_NAME {
-    TOKEN_ADDED = "TokenAdded",
-    TOKEN_UPDATED = "TokenUpdated",
-    TOKEN_DELETED = "TokenDeleted",
-}
-
-export namespace LOCATION_EVENT {
-    export interface LocationEvent {
-        eventName: LOCATION_EVENT_NAME;
-    }
-    export interface TokenAddedEvent extends LocationEvent {
-        tokenData: Asset.Token.Data;
-    }
-    export interface TokenUpdatedEvent extends LocationEvent {
-        tokenData: Asset.Token.Data;
-    }
-    export interface TokenDeleteEvent extends LocationEvent {
-        tokenID: string;
-    }
-}
 
 class LocationStore extends AssetStore<Asset.Location.Data> {
     constructor() {
-        super("Location Store");
+        super(
+            "Location Store",
+            CLIENT_EVENT.LOCATION_ADDED,
+            CLIENT_EVENT.LOCATION_UPDATED,
+            CLIENT_EVENT.LOCATION_DELETED,
+        );
+    }
+    removeToken(locationID: string, tokenID: string) {
+        let location = this.assets.get(locationID);
+        let index = location.tokenIDs.findIndex(tID => tID == tokenID);
+        location.tokenIDs.splice(index, 1);
     }
 }
 
