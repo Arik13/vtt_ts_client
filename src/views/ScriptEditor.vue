@@ -56,12 +56,10 @@ import { Splitpanes, Pane } from "splitpanes";
 import 'splitpanes/dist/splitpanes.css';
 
 import dispatcher from "@/Dispatcher/Dispatcher";
-import { EVENT_NAME } from '@shared/Events/Names';
-import { dialogMap, DIALOG_NAME } from './Dialogs/Dialog';
-import { DialogObject } from './Dialogs/DialogObject';
+import { dialogs } from './Dialogs/Dialog';
 import { scriptStore } from '@/Stores/ScriptStore';
 import * as Asset from "@shared/Assets/Asset";
-import { spawnCreateDirectoryDialog } from './Dialogs/DialogFactories';
+import { spawnCreateDirectoryDialog } from './Dialogs/DialogSpawners';
 
 
 // import Prism Editor
@@ -74,10 +72,8 @@ import { highlight, languages } from 'prismjs/components/prism-core';
 import 'prismjs/components/prism-clike';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/themes/prism-tomorrow.css'; // import syntax highlighting styles
+import { DIR_INDEX } from '@shared/Directories/Directory';
 
-enum MENU_EVENT_NAME {
-    NEW_SCRIPT = "newScript",
-}
 
 const genBlankScript = () => {
     const script: Asset.Script.Data = {id: "", name: "", script: "", type: null, isActive: false};
@@ -113,8 +109,8 @@ export default Vue.extend({
         menuHandler(eventName: MENU_ITEM_NAME, dirID: string) {
             switch(eventName) {
                 case (MENU_ITEM_NAME.CREATE_SCRIPT): {
-                    const dialog = dialogMap.get(DIALOG_NAME.CREATE_SCRIPT) as DialogObject<any>;
-                    dialog.show((state) => {
+                    const dialog = dialogs.createScript;
+                    dialog.show(state => {
                         dispatcher.createScript({
                             name: state.name,
                             script: "",
@@ -125,13 +121,13 @@ export default Vue.extend({
                     break;
                 }
                 case (MENU_ITEM_NAME.DELETE_SCRIPT): {
-                    const scriptID = directoryStore.getDirectory(dirID).itemID;
+                    const scriptID = directoryStore.get(dirID).itemID;
                     if (scriptID == this.activeScript.id) this.activeScript = genBlankScript();
                     dispatcher.deleteScript(scriptID, dirID);
                     break;
                 }
                 case (MENU_ITEM_NAME.OPEN_SCRIPT): {
-                    const scriptID = directoryStore.getDirectory(dirID).itemID;
+                    const scriptID = directoryStore.get(dirID).itemID;
                     this.activeScriptDirectory = dirID;
                     this.activeScript = scriptStore.get(scriptID);
                     const editor = this.$refs.editor as Vue;
@@ -157,7 +153,7 @@ export default Vue.extend({
         }
     },
     mounted() {
-        this.scriptDirectory = directoryStore.getRoot().children[2];
+        this.scriptDirectory = directoryStore.root.children[DIR_INDEX.SCRIPTS];
         const outerEditor = this.$refs.outerEditor as Vue;
         const editor = this.$refs.editor as Vue;
         const scriptEditorEl = outerEditor.$el;
@@ -194,28 +190,25 @@ export default Vue.extend({
 .prism-editor__textarea:focus {
     outline: none;
 }
-
-.prism-editor__container {
-    /* background: #444; */
-    /* border-top: solid 5px #444; */
-    /* border-left: solid 10px #444; */
-}
 .prism-editor__line-numbers {
-    /* text-align: center; */
-    /* text-indent: 0px; */
-    /* margin-right: 9px; */
     padding-right: 9px;
+}
+
+/* .prism-editor__container {
+    background: #444;
+    border-top: solid 5px #444;
+    border-left: solid 10px #444;
 }
 .prism-editor-wrapper {
 
 }
 .prism-editor__line-number {
-    /* background-color: #444; */
+    background-color: #444;
 }
 .prism-editor__textarea {
 
 }
 .prism-editor__textarea--empty {
 
-}
+} */
 </style>

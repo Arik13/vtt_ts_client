@@ -29,3 +29,10 @@ export function arrayBufferToString(buffer: ArrayBuffer){
     // }
     return str;
 }
+// export const compose = (...fns: any[]) => {
+//     return (input: any) => {
+//         return fns.reduceRight((val, fn) => {
+//             return fn(val), input;
+//         });
+//     }
+// };

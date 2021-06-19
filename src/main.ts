@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import App from './App.vue';
 import router from './router/router';
+import store from '@/Stores';
 // import store from '@/Stores/vuex/vuex';
 import vuetify from './plugins/vuetify';
 
@@ -16,13 +17,13 @@ Vue.config.errorHandler = (err: any, vm: any, info: any) => {
 */
 new Vue({
     // The router handles changes to the URL usually by rendering new components
-    router: router,
+    router,
 
     // The store is a global object accessible to each Vue object, which has a shared state and methods
-    // store: store,
+    store,
 
     // Vuetify is a component library, which provides a lot of standard UI widgets, written using vuejs
-    vuetify: vuetify,
+    vuetify,
 
     // The render function renders the App Vue object, the top level component
     render: createElement => createElement(App)

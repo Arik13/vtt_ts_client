@@ -71,6 +71,11 @@ import {
     endTurnSequence,
 } from "./TurnSequence/Outgoing";
 
+import {
+    undo,
+    redo,
+} from "./Commands/Outgoing";
+
 
 ////////////////////////////////
 
@@ -134,10 +139,15 @@ export default {
     goNextTurn: endTurn,
     moveTurn,
     endTurnSequence,
+
+    // COMMANDS
+    undo,
+    redo,
 }
 
 // INCOMING ////////////////////////////////////////////////////////////////////////////////////////////////
 import "./Campaign/Incoming";
+import "./Commands/Incoming";
 import "./Image/Incoming";
 import "./Location/Incoming";
 import "./Directory/Incoming";

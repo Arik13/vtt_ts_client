@@ -7,7 +7,7 @@ import {DB} from "@/DB/IndexedDB";
 
 export const locationCreated = async (event: EVENT_TYPE.LOCATION_CREATED) => {
     await DB.addLocation(event.keyValue);
-    directoryStore.attachChild(event.directory);
+    directoryStore.add(event.directory);
     return locationStore.add(event.keyValue.value);
 }
 

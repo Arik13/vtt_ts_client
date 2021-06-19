@@ -1,5 +1,5 @@
 import { serverProxy } from '@/Stores/ServerProxy';
-import { createCampaignDBService } from '@/DB/IndexedDB';
+import { CampaignDBService, createCampaignDBService } from '@/DB/IndexedDB';
 import { EVENT_TYPE, EVENT_NAME } from '@shared/Events/Events';
 
 import {DB} from "@/DB/IndexedDB";
@@ -18,6 +18,7 @@ import { dcStore } from '@/Stores/DynamicComponentStore';
 import { stateObjectStore } from '@/Stores/StateObjectStore';
 import {campaignBindingsUpdated} from "./Incoming";
 import { rollStore } from '@/Stores/RollStore';
+import { store } from '@/Stores';
 
 export const join = async (campaignID: string, userID: string, callback?: () => void) => {
     const event: EVENT_TYPE.JOIN = {
@@ -46,7 +47,7 @@ export const loadCampaign = async (campaignID: string, callback?: () => void) =>
             // Image data and buffers were decoupled for transmission. Need to reattach them so they can be put in the db together.
             const imageMetaData = syncGroup.imageData;
             for (let i = 0; i < imageMetaData.toAdd.length; i++) {
-                imageMetaData.toAdd[i].fileBuffer = imageBuffers[i];
+                imageMetaData.toAdd[i].value.fileBuffer = imageBuffers[i];
             }
             // Sync assets from server with front end db
             console.info("Deserialized Sync Group: ", syncGroup);
@@ -61,7 +62,7 @@ export const loadCampaign = async (campaignID: string, callback?: () => void) =>
             console.log("Assets: ", assets);
 
 
-            // Add assets to asset stores for fast recall
+            // Hydrate asset stores
             imageStore.setAll(assets.imageStore);
             locationStore.setAll(assets.locationStore);
             tokenStore.setAll(assets.tokenStore);
@@ -71,7 +72,7 @@ export const loadCampaign = async (campaignID: string, callback?: () => void) =>
             rollStore.setAll(assets.rollStore);
             const setIsOpen = (directory: Directory) => {
                 if (directory.itemID) return;
-                directory.isOpen = false;
+                directory.isOpen = true;
                 if (directory.children) {
                     directory.children.forEach(subDirectory => {
                         setIsOpen(subDirectory);
@@ -79,8 +80,11 @@ export const loadCampaign = async (campaignID: string, callback?: () => void) =>
                 }
             }
             const rootDir = syncGroup.directory;
+            console.log("Root: ", rootDir);
+
             setIsOpen(rootDir);
-            directoryStore.setRoot(rootDir);
+            directoryStore.init(rootDir);
+            store.state.turnState.set(syncGroup.turnData);
             console.info(`${syncGroup.campaignData.name} loaded`);
 
             if (callback) {
@@ -119,7 +123,7 @@ export const deleteCampaign = (campaignID: string, callback: () => void) => {
         campaignStore.reset();
     }
     else {
-        DB.deleteDB(campaignID);
+        CampaignDBService.deleteDB(campaignID);
     }
 }
 export const updateCampaignBindings = async (campaignBindings: Asset.CampaignBindings.Data, callback?: () => void) => {

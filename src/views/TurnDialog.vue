@@ -135,9 +135,9 @@ export default Vue.extend({
     color: #14131c
 }
 
-.dialog-1.dialog-drag .dialog-header .title {
-    /* display: none */
-}
+/* .dialog-1.dialog-drag .dialog-header .title {
+
+} */
 
 .dialog-drag.dialog-1.fixed {
     border: #1aad8d solid 2px

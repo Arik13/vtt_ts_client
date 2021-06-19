@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from "@/vue";
 import dispatcher from '@/Dispatcher/Dispatcher';
 
 // TODO: Create password and username validation

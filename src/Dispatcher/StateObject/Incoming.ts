@@ -7,11 +7,12 @@ import { stateObjectStore } from '@/Stores/StateObjectStore';
 const stateObjectCreated = async (event: EVENT_TYPE.STATE_OBJECT_CREATED) => {
     await DB.addStateObject(event.keyValue);
     stateObjectStore.add(event.keyValue.value);
-    directoryStore.attachChild(event.directory);
+    let dir = event.directory;
+    directoryStore.add(dir);
 }
 
 const stateObjectUpdated = async (event: EVENT_TYPE.STATE_OBJECT_UPDATED) => {
-    directoryStore.updateName(event.directoryID, event.stateObject.id);
+    directoryStore.rename(event.directoryID, event.stateObject.name);
     stateObjectStore.update(event.stateObject);
 }
 

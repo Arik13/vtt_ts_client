@@ -25,7 +25,7 @@ export const createStateObject = (stateObject: Asset.StateObject.Data, directory
 //     /* eslint-disable  @typescript-eslint/no-explicit-any */
 //     serverProxy.emit(EVENT_NAME.UPDATE_SCRIPT, event, (reply: any) => {});
 // }
-export const deleteStateObject = async (soID: string, directoryID: string, callback: (reply: any) => void) => {
+export const deleteStateObject = async (soID: string, directoryID: string, callback?: (reply: any) => void) => {
     stateObjectStore.deleted(soID);
     await DB.deleteStateObject(soID);
     const event: EVENT_TYPE.DELETE_STATE_OBJECT = {

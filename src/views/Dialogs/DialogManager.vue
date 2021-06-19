@@ -6,10 +6,10 @@
             :d="storeDialog(dialog.name, dialog.dialogObject)"
         /> -->
         <component
-            v-for="(dialog, i) in dialogs"
+            v-for="(dialog, i) in dialogArray"
             :key="i"
             :is="dialog.component"
-            :d="initDialog(dialog.name, dialog.prop)"
+            :d="dialog.prop"
             :ref="dialog.name"
         />
     </div>
@@ -17,16 +17,14 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import {dialogs, DIALOG_NAME, dialogMap} from "./Dialog";
-import { DialogObject } from './DialogObject';
+import {dialogs, dialogArray} from "./Dialog";
 export default Vue.extend({
     data: () => ({
         dialogs,
     }),
-    methods: {
-        initDialog(name: string, d: DialogObject<any>) {
-            dialogMap.set(name, d);
-            return d;
+    computed: {
+        dialogArray() {
+            return dialogArray;
         }
     },
 })

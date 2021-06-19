@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import Vue from 'vue';
 import { createImageURL } from "@/Util/functions";
 import Dispatcher from "@/Dispatcher/Dispatcher";
 import { campaignStore } from '@/Stores/CampaignStore';
@@ -153,7 +153,9 @@ export default Vue.extend({
             return soAttr;
         },
         getSO() {
-            let soID = tokenStore.get(campaignStore.selectedTokenID).soID;
+            let token = tokenStore.get(campaignStore.selectedTokenID);
+            if (!token) return {id: null};
+            let soID = token.soID;
             return stateObjectStore.get(soID);
         },
         handleClick(actionData: ActionButtonData) {
@@ -197,7 +199,7 @@ export default Vue.extend({
         },
         initButtons() {
             // Get the campaign button config
-            let btnsID = campaignStore.campaignBindings.actionButtonGroup.dcID;
+            let btnsID = campaignStore.bindings.actionButtonGroup.dcID;
             if (!btnsID) return;
 
             let actionGroupData = dcStore.get(btnsID).cd as ActionGroupData[];

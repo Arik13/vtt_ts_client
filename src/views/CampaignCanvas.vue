@@ -9,9 +9,10 @@
 
 */
 import Vue from "vue";
+import VueMod from "@/vue";
 import {initializeBabylon, BabylonController} from "@/Babylon/Engine/BabylonController";
 
-export default Vue.extend({
+export default VueMod.extend({
     data: () => ({
         engineController: null as BabylonController,
     }),

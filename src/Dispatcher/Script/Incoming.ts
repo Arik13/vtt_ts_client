@@ -7,10 +7,11 @@ import {DB} from "@/DB/IndexedDB";
 const scriptDownloaded = async (event: EVENT_TYPE.SCRIPT_CREATED) => {
     await DB.addScript(event.keyValue);
     scriptStore.add(event.keyValue.value);
-    directoryStore.attachChild(event.directory);
+    directoryStore.add(event.directory);
 }
 const scriptUpdated = async (event: EVENT_TYPE.SCRIPT_UPDATED) => {
-    directoryStore.updateName(event.directoryID, event.script.name);
+    let ext = (event.script.type == "ACTION")? ".act" : "mdf";
+    directoryStore.rename(event.directoryID, event.script.name + ext);
     scriptStore.update(event.script);
 }
 const scriptDeleted = async (event: EVENT_TYPE.SCRIPT_DELETED) => {

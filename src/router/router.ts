@@ -14,7 +14,7 @@ import Login from "@/views/Login.vue";
 import Logout from "@/views/Logout.vue";
 import Signup from "@/views/Signup.vue";
 import LoadingScreen from "@/views/LoadingScreen.vue";
-import FormCreator from "@/views/FormCreator.vue";
+import ComponentEditor from "@/views/ComponentEditor.vue";
 import ScriptEditor from "@/views/ScriptEditor.vue";
 import DynamicViewBinder from "@/views/Binder.vue";
 import { userStore, AuthData } from '@/Stores/UserStore';
@@ -31,7 +31,7 @@ export enum ROUTE {
     // CAMPAIGN_CREATOR = "/campaigncreator",
     CAMPAIGN_SELECTOR = "/campaignselector",
     LOADING_SCREEN = "/loading",
-    FORM_CREATOR = "/formcreator",
+    COMPONENT_EDITOR = "/componenteditor",
     SCRIPT_EDITOR = "/scripteditor",
     DYNAMIC_VIEW_BINDER = "/dynamicviewbinder",
 }
@@ -47,7 +47,7 @@ const routes: Array<RouteConfig> = [
     // {path: ROUTE.CAMPAIGN_CREATOR, components: {default: CampaignCreator}, meta: {title: "Campaign Creator"}},
     {path: ROUTE.CAMPAIGN_SELECTOR, components: {default: CampaignSelector}, meta: {title: "Campaign Selector"}},
     {path: `${ROUTE.LOADING_SCREEN}/:ID`, components: {default: LoadingScreen}, meta: {title: "Loading"}},
-    {path: ROUTE.FORM_CREATOR, components: {default: FormCreator}, meta: {title: "Form Creator"}},
+    {path: ROUTE.COMPONENT_EDITOR, components: {default: ComponentEditor}, meta: {title: "Component Editor"}},
     {path: ROUTE.SCRIPT_EDITOR, components: {default: ScriptEditor}, meta: {title: "Script Editor"}},
     {path: ROUTE.DYNAMIC_VIEW_BINDER, components: {default: DynamicViewBinder}, meta: {title: "Dynamic View Binder"}},
 ];

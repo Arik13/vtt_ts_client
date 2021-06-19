@@ -56,4 +56,12 @@ export abstract class AssetStore<T extends Asset.Asset> {
         eventBus.dispatch(this.deletedEventName, asset.id);
         this.assets.delete(id);
     }
+    arrayMap<U>(cb: (val: T, key: string) => U) {
+        let array: U[] = [];
+        this.assets.forEach((asset, key) => array.push(cb(asset, key)));
+        return array;
+    }
+    toArray() {
+        return this.arrayMap(x => x);
+    }
 }

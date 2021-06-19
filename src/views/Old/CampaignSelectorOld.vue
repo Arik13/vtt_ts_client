@@ -33,9 +33,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue"
-import {campaignStore} from "@/Stores/CampaignStore";
-import {userStore} from "@/Stores/UserStore";
+import Vue from "@/vue";
 import dispatcher from '@/Dispatcher/Dispatcher';
 import * as Asset from "@shared/Assets/Asset";
 

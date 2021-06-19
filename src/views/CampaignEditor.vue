@@ -67,7 +67,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from "@/vue";
 import { Component } from "vue-property-decorator";
 import AssetManager from "./AssetManager.vue";
 import ActionButtons from "./ActionButtons.vue";

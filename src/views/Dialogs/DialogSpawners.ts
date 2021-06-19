@@ -1,12 +1,11 @@
 import dispatcher from '@/Dispatcher/Dispatcher';
 import { directoryStore } from '@/Stores/DirectoryStore';
-import { dialogMap, DIALOG_NAME, UpdateDirectoryState } from './Dialog';
-import { DialogObject } from './DialogObject';
+import { dialogs, UpdateDirectoryState } from './Dialog';
 
 export const spawnCreateDirectoryDialog = (dirID: string) => {
-    const dialog = dialogMap.get(DIALOG_NAME.CREATE_DIRECTORY) as DialogObject<any>;
+    const dialog = dialogs.createDirectory;
     dialog.state.parentID = dirID;
-    dialog.show((state: any) => {
+    dialog.show(state => {
         dispatcher.createDirectory(
             state.name,
             state.parentID,
@@ -15,11 +14,11 @@ export const spawnCreateDirectoryDialog = (dirID: string) => {
     return;
 }
 export const spawnUpdateDirectoryDialog = (dirID: string) => {
-    let dir = directoryStore.getDirectory(dirID);
-    const dialog = dialogMap.get(DIALOG_NAME.UPDATE_DIRECTORY) as DialogObject<UpdateDirectoryState>;
+    let dir = directoryStore.get(dirID);
+    const dialog = dialogs.updateDirectory;
     dialog.state.directoryID = dirID;
     dialog.state.name = dir.name;
-    dialog.show((state: any) => {
+    dialog.show(state => {
         dispatcher.updateDirectory(
             state.directoryID,
             state.name,

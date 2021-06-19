@@ -74,7 +74,7 @@
                                 :folderMenuItems="locationFolderMenuItems"
                                 :menuItems="locationMenuItems"
                                 :menuBus="menuHandler"
-                                :assetClickEventName="MENU_ITEM_NAME.OPEN_LOCATION"
+                                :assetClickEventName="MENU_ITEM_NAME.VIEW_LOCATION"
                                 :directory="locationDirectory"
                             />
                         </v-tab-item>
@@ -97,18 +97,18 @@
     which can update the asset store relevant to the asset being created/updated/deleted.
 */
 
-import Vue from "vue";
+import Vue from "@/vue";
 import AssetView from "@/views/components/AssetView.vue";
 import * as Asset from "@shared/Assets/Asset";
+import {DIR_INDEX} from "@shared/Directories/Directory";
 import {imageStore} from '@/Stores/ImageStore';
 import {locationStore} from '@/Stores/LocationStore';
 import {directoryStore} from '@/Stores/DirectoryStore';
 import {babylonController} from "@/Babylon/Engine/BabylonController";
 import dispatcher from "@/Dispatcher/Dispatcher";
 import {MENU_ITEMS, MENU_ITEM_NAME} from "@/views/Menus/MenuItems";
-import {DIALOG_NAME, dialogMap, ImageViewerState, CreateLocationState, LocationViewerState, CreateTokenState} from "@/views/Dialogs/Dialog";
-import {DialogObject} from "@/views/Dialogs/DialogObject";
-import {spawnCreateDirectoryDialog, spawnUpdateDirectoryDialog} from "@/views/Dialogs/DialogFactories";
+import { dialogs } from "@/views/Dialogs/Dialog";
+import {spawnCreateDirectoryDialog, spawnUpdateDirectoryDialog} from "@/views/Dialogs/DialogSpawners";
 import { stateObjectStore } from '@/Stores/StateObjectStore';
 import { dcStore } from "@/Stores/DynamicComponentStore";
 import { campaignStore } from "@/Stores/CampaignStore";
@@ -200,7 +200,7 @@ export default Vue.extend({
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     components: {
-        "asset-view": AssetView,
+        AssetView,
     },
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -210,9 +210,9 @@ export default Vue.extend({
             switch(eventName) {
                 // IMAGES
                 case MENU_ITEM_NAME.OPEN_IMAGE: {
-                    const dir = directoryStore.getDirectory(itemID);
+                    const dir = directoryStore.get(itemID);
                     const url = this.createImageURL(dir.itemID);
-                    const dialog = dialogMap.get(DIALOG_NAME.IMAGE_VIEWER);
+                    const dialog = dialogs.imageViewer;
                     dialog.setState({imageSrc: url});
                     dialog.show();
                     return;
@@ -224,43 +224,38 @@ export default Vue.extend({
                     return;
                 }
                 case MENU_ITEM_NAME.DELETE_IMAGE: {
-                    const dir = directoryStore.getDirectory(itemID);
+                    const dir = directoryStore.get(itemID);
                     dispatcher.deleteImage(dir.itemID, dir.id);
                     return;
                 }
 
                 // LOCATIONS
                 case MENU_ITEM_NAME.OPEN_LOCATION: {
-                    const dir = directoryStore.getDirectory(itemID);
+                    const dir = directoryStore.get(itemID);
                     const location = locationStore.get(dir.itemID);
 
                     const url = this.createImageURL(location.mapImageID);
-                    const dialog = dialogMap.get(DIALOG_NAME.LOCATION_VIEWER) as DialogObject<LocationViewerState>;
-                    dialog.setState({
-                        mapImageSrc: url,
-                        location,
-                    });
+                    const dialog = dialogs.locationViewer;
+                    dialog.setState({mapImageSrc: url, location});
                     dialog.state; // TODO: Edit state
                     dialog.show(null);
                     return;
                 }
                 case MENU_ITEM_NAME.CREATE_LOCATION: {
-                    const dialog = dialogMap.get(DIALOG_NAME.CREATE_LOCATION) as DialogObject<CreateLocationState>;
+                    const dialog = dialogs.createLocation;
                     dialog.state.imageItems = this.imageItems;
-                    dialog.show((state: CreateLocationState) => {
-                        dispatcher.createLocation(state.location, itemID);
-                    });
+                    dialog.show(state => dispatcher.createLocation(state.location, itemID));
 
                     return;
                 }
                 case MENU_ITEM_NAME.DELETE_LOCATION: {
-                    const dir = directoryStore.getDirectory(itemID);
+                    const dir = directoryStore.get(itemID);
                     const location = locationStore.get(dir.itemID);
                     dispatcher.deleteLocation(location.id, itemID);
                     return;
                 }
                 case MENU_ITEM_NAME.VIEW_LOCATION: {
-                    const dir = directoryStore.getDirectory(itemID);
+                    const dir = directoryStore.get(itemID);
                     const location = locationStore.get(dir.itemID);
                     dispatcher.setActiveLocation(location.id);
                     return;
@@ -268,28 +263,14 @@ export default Vue.extend({
 
                 // TOKENS
                 case MENU_ITEM_NAME.CREATE_TOKEN: {
-                    const dialog = dialogMap.get(DIALOG_NAME.CREATE_TOKEN) as DialogObject<CreateTokenState>;
-                    const imgID = directoryStore.getDirectory(itemID).itemID;
-                    dialog.state.imageID = imgID;
+                    const dialog = dialogs.createToken;
+                    const imgID = directoryStore.get(itemID).itemID;
+                    dialog.state.token.imageID = imgID;
                     dialog.state.soItems = this.soItems;
 
                     dialog.show((state) => {
                         const locationID = babylonController.getActiveLocationID();
-                        const token: Asset.Token.Data = {
-                            name: state.label,
-                            imageID: state.imageID,
-                            soID: state.soID,
-                            tokenModel: {
-                                position: {
-                                    x: state.x,
-                                    z: state.z,
-                                },
-                                dimensions: {
-                                    width: state.width,
-                                    length: state.length,
-                                }
-                            },
-                        }
+                        const token = state.token;
                         dispatcher.createToken(locationID, token);
                     });
                     return;
@@ -309,51 +290,44 @@ export default Vue.extend({
                     return;
                 }
                 case MENU_ITEM_NAME.DELETE_CHARACTER: {
-                    const dir = directoryStore.getDirectory(itemID);
+                    const dir = directoryStore.get(itemID);
                     // let so = stateObjectStore.get(dir.itemID)
                     dispatcher.deleteStateObject(dir.itemID, dir.id, (reply) => {});
                     return;
                 }
                 case MENU_ITEM_NAME.CREATE_CHARACTER: {
-                    const callback = (reply: any) => {
-                        const event = reply.returnPayload as EVENT_TYPE.STATE_OBJECT_CREATED;
+                    const callback = ({returnPayload}: {returnPayload: EVENT_TYPE.STATE_OBJECT_CREATED}) => {
+                        const event = returnPayload;
                         const so = event.keyValue.value;
-                        const dialog = dialogMap.get(DIALOG_NAME.DYNAMIC_COMPONENT);
-                        const dcID = campaignStore.campaignBindings.createCharacter.dcID;
-                        // const dc = dcStore.get(dcID);
+                        const dialog = dialogs.dynamicComponent;
+                        const dcID = campaignStore.bindings.createCharacter.dcID;
                         const dc = dcStore.getAssembledDC(dcID);
 
-                        dialog.state.cds = {
-                            header: "",
-                            cds: dc.cd,
-                        };
-                        dialog.show((output: any, eventName: string) => {
+                        dialog.state.cds = {header: "", cds: dc.cd};
+                        dialog.show((output, eventName: string) => {
                             if (eventName == "dismiss") {
-                                dispatcher.deleteStateObject(event.keyValue.value.id, event.directory.id, (reply) => {
-                                    console.info("State Object Dismissed");
-                                });
+                                return dispatcher.deleteStateObject(event.keyValue.value.id, event.directory.id);
                             }
-                            else {
-                                const actionTarget = campaignStore.campaignBindings.createCharacter.actionTarget;
-                                output.action.characterID = so.id
-                                dispatcher.doAction(actionTarget, output.action, (result: any) => {
-                                    let soFinal = result.result.sos[0] as any;
-                                    if (soFinal && soFinal.name) {
-                                        dispatcher.updateDirectory(event.directory.id, soFinal.name);
-                                    }
-                                });
-                            }
+                            const actionTarget = campaignStore.bindings.createCharacter.actionTarget;
+                            output.action.characterID = so.id
+                            dispatcher.doAction(actionTarget, output.action, (result) => {
+                                let soFinal = result.sos[0];
+                                console.log("Final SO: ", soFinal);
+                                if (soFinal && soFinal.name) {
+                                    dispatcher.updateDirectory(event.directory.id, soFinal.name);
+                                }
+                            });
                         });
                     }
-                    dispatcher.createStateObject({mods: []}, itemID, callback);
+                    dispatcher.createStateObject({mods: [], name: null}, itemID, callback);
                     return;
                 }
                 case MENU_ITEM_NAME.VIEW_CHARACTER: {
-                    const dir = directoryStore.getDirectory(itemID);
+                    const dir = directoryStore.get(itemID);
                     const so = stateObjectStore.get(dir.itemID);
                     console.info("SO: ", so);
-                    const dcID = campaignStore.campaignBindings.viewCharacter.dcID;
-                    const dialog = dialogMap.get(DIALOG_NAME.DYNAMIC_COMPONENT);
+                    const dcID = campaignStore.bindings.viewCharacter.dcID;
+                    const dialog = dialogs.dynamicComponent;
                     const dc = dcStore.getAssembledDC(dcID);
                     dialog.state.cds = {
                         header: "",
@@ -439,13 +413,15 @@ export default Vue.extend({
         eventBus.registerHandler(CLIENT_EVENT.STATE_OBJECT_DELETED, this.stateObjectDeleted);
 
         // Pull all assets from the stores and add them to the view
-        imageStore.forEach(image => this.imageItems.push({id: image.id, name: image.name}));
-        // locationStore.forEach(location => this.locationItems.push({id: location.id, name: location.name}));
-        stateObjectStore.forEach((so: any) => this.soItems.push({id: so.id, name: so.name}));
+        this.imageItems = imageStore.arrayMap(asset => ({id: asset.id, name: asset.name}));
+        this.soItems = stateObjectStore.arrayMap(asset => ({id: asset.id, name: asset.name}));
+        // this.locationItems = locationStore.arrayMap(asset => ({id: asset.id, name: asset.name}));
 
-        this.imageDirectory = directoryStore.getRoot().children[0];
-        this.locationDirectory = directoryStore.getRoot().children[1];
-        this.characterDirectory = directoryStore.getRoot().children[3];
+        console.log(directoryStore.root.children);
+
+        this.imageDirectory = directoryStore.root.children[DIR_INDEX.IMAGES];
+        this.locationDirectory = directoryStore.root.children[DIR_INDEX.LOCATIONS];
+        this.characterDirectory = directoryStore.root.children[DIR_INDEX.CHARACTERS];
     }
 });
 </script>

@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from "@/vue";
 import dispatcher from '@/Dispatcher/Dispatcher';
 
 export default Vue.extend({

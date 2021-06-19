@@ -6,12 +6,20 @@ import {DB} from "@/DB/IndexedDB";
 import * as Asset from "@shared/Assets/Asset";
 import {imageCreated} from "./Incoming";
 
-export const createImage = (name: string, image: ArrayBuffer, directoryID: string) => {
+export const createImage = (name: string, buffer: ArrayBuffer, directoryID: string) => {
+    let image: Asset.ImageInfo = {
+        name,
+        fileBuffer: buffer,
+        dirID: directoryID,
+        fileType: "",
+    }
     const event: EVENT_TYPE.CREATE_IMAGE = {
-        campaignID: campaignStore.campaignID,
-        name: name,
-        fileBuffer: image,
+        image,
         directoryID,
+        // campaignID: campaignStore.campaignID,
+        // name: name,
+        // fileBuffer: image,
+        // directoryID,
     }
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     return new Promise<Asset.ImageInfo>((resolve, reject) => {

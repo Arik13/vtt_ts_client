@@ -12,8 +12,8 @@ export class DialogObject<T> {
         this.state = this.createState();
         this.on = false;
     }
-    show(callback?: (state: T, closeType: "submit" | "dismiss") => void) {
-        this.callback = callback;
+    show(closeHandler?: (state: T, closeType: "submit" | "dismiss") => void) {
+        this.callback = closeHandler;
         this.on = true;
     }
     hide(doCallback: boolean) {

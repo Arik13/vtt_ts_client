@@ -75,13 +75,14 @@ import 'splitpanes/dist/splitpanes.css';
 import VueJsonEditor from 'vue-json-editor'
 
 import { EVENT_NAME } from '@shared/Events/Names';
-import {DIALOG_NAME, dialogMap, ImageViewerState, CreateLocationState, LocationViewerState} from "@/views/Dialogs/Dialog";
+import { dialogs, ImageViewerState, CreateLocationState, LocationViewerState} from "@/views/Dialogs/Dialog";
 import { DialogObject } from './Dialogs/DialogObject';
 import { scriptStore } from '@/Stores/ScriptStore';
 import * as Asset from "@shared/Assets/Asset";
-import { spawnCreateDirectoryDialog } from './Dialogs/DialogFactories';
+import { spawnCreateDirectoryDialog } from './Dialogs/DialogSpawners';
 import { dcStore, assembleCD } from '@/Stores/DynamicComponentStore';
 import { stateObjectStore } from '@/Stores/StateObjectStore';
+import { DIR_INDEX } from '@shared/Directories/Directory';
 
 
 const genBlankCD = () => {
@@ -124,7 +125,7 @@ export default Vue.extend({
         renderForm() {
             try {
                 this.nextKey++;
-                const dialog = dialogMap.get(DIALOG_NAME.DYNAMIC_COMPONENT);
+                const dialog = dialogs.dynamicComponent;
                 let cdOriginal = this.activeCD.cd;
                 let cd = JSON.parse(JSON.stringify(cdOriginal));
                 assembleCD(cd);
@@ -136,7 +137,7 @@ export default Vue.extend({
                 dialog.global = {so};
 
                 dialog.show((state) => {
-                    const action = state.action;
+                    // const action = state.action;
                 })
             }
             catch (error) {
@@ -150,7 +151,7 @@ export default Vue.extend({
         menuHandler(eventName: MENU_ITEM_NAME, dirID: string) {
             switch(eventName) {
                 case (MENU_ITEM_NAME.CREATE_COMPONENT): {
-                    const dialog = dialogMap.get(DIALOG_NAME.CREATE_COMPONENT) as DialogObject<any>;
+                    const dialog = dialogs.createComponent;
                     dialog.show((state) => {
                         dispatcher.createDynamicComponent({
                             name: state.name,
@@ -160,13 +161,13 @@ export default Vue.extend({
                     break;
                 }
                 case (MENU_ITEM_NAME.DELETE_COMPONENT): {
-                    const cdID = directoryStore.getDirectory(dirID).itemID;
+                    const cdID = directoryStore.get(dirID).itemID;
                     if (cdID == this.activeCD.id) this.activeCD = genBlankCD();
                     dispatcher.deleteDynamicComponent(cdID, dirID);
                     break;
                 }
                 case (MENU_ITEM_NAME.VIEW_COMPONENT): {
-                    const cdID = directoryStore.getDirectory(dirID).itemID;
+                    const cdID = directoryStore.get(dirID).itemID;
                     this.activeCDDirectory = dirID;
                     const dc = dcStore.get(cdID);
                     this.activeCD = dc;
@@ -197,16 +198,13 @@ export default Vue.extend({
 
         },
         initStateObjectData() {
-            this.stateObjects = [];
-            stateObjectStore.forEach((so: any) => {
-                this.stateObjects.push({id: so.id, name: so.name});
-            });
+            this.stateObjects = stateObjectStore.arrayMap(asset => ({id: asset.id, name: asset.name}));
             this.soID = this.stateObjects[0].id;
         }
     },
     mounted() {
         this.initStateObjectData();
-        this.directory = directoryStore.getRoot().children[4];
+        this.directory = directoryStore.root.children[DIR_INDEX.COMPONENTS];
     }
 })
 </script>

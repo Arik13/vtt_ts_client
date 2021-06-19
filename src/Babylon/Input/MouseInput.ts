@@ -80,9 +80,6 @@ export class MouseInput implements BABYLON.ICameraInput<PlanarCamera> {
                 type: INPUT_EVENT.LEFT_DOWN
             });
         }
-        // if (this.buttonsPressed.includes(MOUSE_BUTTON.RIGHT)) {
-        //     console.log("HEREREO");
-        // }
         this.previousPosition = {
             x: evt.clientX,
             y: evt.clientY

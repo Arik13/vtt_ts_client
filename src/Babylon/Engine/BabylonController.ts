@@ -40,23 +40,14 @@ class BabylonController implements InputReceiver {
         this.engine.runRenderLoop(() => {
             if (this.activeLocation) this.activeLocation.render();
         });
-        eventBus.registerHandler(CLIENT_EVENT.TOKEN_ADDED, (tokenID) => {
+        eventBus.registerHandler(CLIENT_EVENT.TOKEN_ADDED, tokenID => {
             let token = tokenStore.get(tokenID);
-            const tokenMeshData: MeshData = {
-                texturePath: createImageURL(token.imageID),
-                meshName: token.id,
-                materialName: token.imageID
-            }
-            this.getActiveLocation().addToken(
-                token.tokenModel.position.x,
-                token.tokenModel.position.z,
-                tokenMeshData,
-            );
+            this.getActiveLocation().addToken(token);
         });
-        eventBus.registerHandler(CLIENT_EVENT.TOKEN_UPDATED, (tokenID) => {
+        eventBus.registerHandler(CLIENT_EVENT.TOKEN_UPDATED, tokenID => {
             this.activeLocation.updateToken(tokenID, tokenStore.get(tokenID));
         });
-        eventBus.registerHandler(CLIENT_EVENT.TOKEN_DELETED, (tokenID) => {
+        eventBus.registerHandler(CLIENT_EVENT.TOKEN_DELETED, tokenID => {
             this.activeLocation.deleteToken(tokenID);
         });
         eventBus.registerHandler(CLIENT_EVENT.ACTIVE_LOCATION_UPDATED, id => this.setActiveLocation(id));
@@ -86,13 +77,9 @@ class BabylonController implements InputReceiver {
                     if (currentPosition) {
                         const pickedMesh = this.activeLocation.pickedMesh;
                         const currentTilePosition = pickedMesh.position;
-                        let newPosition = this.activeLocation.findClosestTileCenter(currentPosition);
-                        if (this.activeLocation.snapToGridEnabled) {
-                            newPosition = this.activeLocation.findClosestTileCenter(currentPosition);
-                        }
-                        else {
-                            newPosition = currentPosition;
-                        }
+                        let newPosition = this.activeLocation.snapToGridEnabled?
+                            this.activeLocation.findClosestTileCenter(currentPosition) :
+                            currentPosition;
                         if (
                             currentTilePosition.x != newPosition.x ||
                             currentTilePosition.z != newPosition.z
@@ -125,11 +112,10 @@ class BabylonController implements InputReceiver {
                     ) {
                         const mesh = this.activeLocation.pickedMesh;
                         const token = tokenStore.get(mesh.id);
-                        token.tokenModel.position = this.activeLocation.convertToRankFilePos(endPos);
+                        token.position = this.activeLocation.convertToRankFilePos(endPos);
                         dispatcher.updateToken(this.activeLocationID, token);
                     }
                 }
-
                 break;
             }
             // case INPUT_EVENT.WHEEL_FORWARDS:
@@ -160,9 +146,7 @@ class BabylonController implements InputReceiver {
         this.activeLocationID = id;
         const locationData = locationStore.get(id);
         if (locationData) {
-            if (this.activeLocation) {
-                this.activeLocation.detachControl();
-            }
+            if (this.activeLocation) this.activeLocation.detachControl();
             this.activeLocation = this.createLocation(this.engine, this.canvas, locationData);
             this.activeLocation.attachControl();
         }
@@ -173,30 +157,23 @@ class BabylonController implements InputReceiver {
         locationData: Asset.Location.Data,
     ) {
         const url = createImageURL(locationData.mapImageID);
-        const locationMapName = locationData.name + " Map";
+        const locationMapName = `${locationData.name} Map`;
         const mapMeshData = new MeshData(url, locationMapName, locationMapName);
 
         // Create location
-        const location = new Location(engine, canvas, locationData.locationModel, mapMeshData);
+        const location = new Location(engine, canvas, locationData);
         locationData.tokenIDs.forEach(tokenID => {
-            const tokenData = tokenStore.get(tokenID);
-            const tokenMeshData: MeshData = {
-                texturePath: createImageURL(tokenData.imageID),
-                meshName: tokenData.id,
-                materialName: tokenData.imageID
-            }
-            location.addToken(
-                tokenData.tokenModel.position.x,
-                tokenData.tokenModel.position.z,
-                tokenMeshData,
-            );
+            const token = tokenStore.get(tokenID);
+            console.log(token);
+
+            location.addToken(token);
         });
         return location;
     }
 }
 let babylonController = null as BabylonController;
 
-const initializeBabylon = function (canvas: HTMLCanvasElement): BabylonController {
+const initializeBabylon = function (canvas: HTMLCanvasElement) {
     babylonController = new BabylonController(canvas)
     return babylonController;
 }

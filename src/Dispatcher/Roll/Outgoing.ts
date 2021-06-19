@@ -6,14 +6,14 @@ import {DB} from "@/DB/IndexedDB";
 import {rollCreated} from "./Incoming"
 
 export const createRoll = async (roll: Asset.Roll.Data) => {
-    const event: EVENT_TYPE.CREATE_ROLL = {
-        roll: {}
-    }
-    return new Promise<Asset.Roll.Data>((resolve, reject) => {
-        serverProxy.emit(EVENT_NAME.CREATE_ROLL, event, async (payload: any) => {
-            payload.success? resolve(rollCreated(payload.event)) : reject();
-        });
-    })
+    // const event: EVENT_TYPE.CREATE_ROLL = {
+    //     roll: {}
+    // }
+    // return new Promise<Asset.Roll.Data>((resolve, reject) => {
+    //     serverProxy.emit(EVENT_NAME.CREATE_ROLL, event, async (payload: any) => {
+    //         payload.success? resolve(rollCreated(payload.event)) : reject();
+    //     });
+    // })
 }
 
 export const updateRoll = async (roll: Asset.Roll.Data) => {

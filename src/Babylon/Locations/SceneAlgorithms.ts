@@ -34,33 +34,29 @@ export const createMesh = (
 
     const mesh = BABYLON.MeshBuilder.CreatePlane(
         meshData.meshName,
-        {
-            width: width,
-            height: height,
-            sideOrientation: BABYLON.Mesh.DOUBLESIDE
-        },
+        {width, height, sideOrientation: BABYLON.Mesh.DOUBLESIDE},
         scene,
     );
     mesh.setPositionWithLocalVector(new BABYLON.Vector3(position.x, position.y, position.z));
     mesh.addRotation(Math.PI/2, 0, 0);
-    const meshMaterial = new BABYLON.StandardMaterial(meshData.materialName, scene);
     mesh.alphaIndex = alphaIndex;
-    meshMaterial.diffuseTexture = new BABYLON.Texture(
-        meshData.texturePath,
-        scene,
-    );
+    mesh.material = buildStandardMaterial(meshData.texturePath, meshData.materialName, scene);
+    return mesh;
+}
+
+export const buildStandardMaterial = (texturePath: string, name: string, scene: BABYLON.Scene) => {
+    const meshMaterial = new BABYLON.StandardMaterial(name, scene);
+    meshMaterial.maxSimultaneousLights = 16;
+    meshMaterial.diffuseTexture = new BABYLON.Texture(texturePath, scene);
     meshMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
     meshMaterial.opacityTexture = new BABYLON.Texture(
-        meshData.texturePath,
+        texturePath,
         scene,
         false,
         true,
         BABYLON.Texture.NEAREST_SAMPLINGMODE
     );
-    mesh.material = meshMaterial;
-    meshMaterial.maxSimultaneousLights = 16;
-    // mesh.
-    return mesh;
+    return meshMaterial;
 }
 
 export const buildGridLines = (
@@ -142,4 +138,25 @@ export const buildPipeline = (scene: BABYLON.Scene) => {
     pipeline.samples = 4;
     pipeline.fxaaEnabled = true;
     return pipeline;
+}
+
+var line2D = function(name: string, options: any, scene: BABYLON.Scene) {
+
+    let positions: any[] = [];
+    let indices: any[] = [];
+    let normals: any[] = [];
+    let uvs: any[] = [];
+
+    let customMesh = new BABYLON.Mesh(name, scene);
+    let vertexData = new BABYLON.VertexData();
+
+    //Assign positions and indices to vertexData
+    vertexData.positions = positions;
+    vertexData.indices = indices;
+    vertexData.normals = normals;
+    vertexData.uvs = uvs;
+
+    //Apply vertexData to custom mesh
+    vertexData.applyToMesh(customMesh);
+    return customMesh;
 }

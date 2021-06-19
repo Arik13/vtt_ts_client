@@ -3,7 +3,7 @@
     It also provides a way to interface with the campaign serverside
 */
 
-import { DB } from "@/DB/IndexedDB";
+import { CampaignDBService, DB } from "@/DB/IndexedDB";
 import * as Asset from "@shared/Assets/Asset";
 import { eventBus, CLIENT_EVENT } from "./EventBus";
 
@@ -12,12 +12,12 @@ class CampaignStore {
     name: string;
     activeLocationID: string;
     selectedTokenID: string;
-    campaignBindings: Asset.CampaignBindings.Data;
+    bindings: Asset.CampaignBindings.Data;
     constructor() {
         this.activeLocationID = null;
         this.campaignID = null;
         this.name = null;
-        this.campaignBindings = null;
+        this.bindings = null;
     }
     setActiveLocation(locationID: string) {
         if (locationID == this.activeLocationID) return;
@@ -28,20 +28,20 @@ class CampaignStore {
         this.setActiveLocation(activeLocationID);
         this.campaignID = campaignID;
         this.name = name;
-        this.campaignBindings = campaignBindings;
+        this.bindings = campaignBindings;
         eventBus.dispatch(CLIENT_EVENT.INIT_NEW_CAMPAIGN);
     }
     async reset() {
-        await DB.deleteDB(this.campaignID);
+        await CampaignDBService.deleteDB(this.campaignID);
         this.campaignID = null;
         this.name = null;
         this.activeLocationID = null;
-        this.campaignBindings = null;
+        this.bindings = null;
         eventBus.dispatch(CLIENT_EVENT.CAMPAIGN_DELETED);
     }
     updateCampaignBindings(campaignBindings: Asset.CampaignBindings.Data) {
-        this.campaignBindings = campaignBindings;
-        return this.campaignBindings;
+        this.bindings = campaignBindings;
+        return this.bindings;
     }
     setSelectedToken(tokenID: string) {
         if (tokenID == this.selectedTokenID) return;

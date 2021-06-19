@@ -20,7 +20,7 @@
                             label="Dynamic View"
                             :items="items"
                             item-text="name"
-                            item-value="id"
+                            item-value="name"
                             v-model="binding.createCharacter.dcID"
                         />
                     </v-col>
@@ -39,7 +39,7 @@
                             label="Dynamic View"
                             :items="items"
                             item-text="name"
-                            item-value="id"
+                            item-value="name"
                             v-model="binding.viewCharacter.dcID"
                         />
                     </v-col>
@@ -51,7 +51,7 @@
                             label="Dynamic View"
                             :items="items"
                             item-text="name"
-                            item-value="id"
+                            item-value="name"
                             v-model="binding.actionButtonGroup.dcID"
                         />
                     </v-col>
@@ -94,7 +94,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from "@/vue";
 import {dcStore} from "@/Stores/DynamicComponentStore"
 import {campaignStore} from "@/Stores/CampaignStore"
 import * as Asset from "@shared/Assets/Asset";
@@ -103,7 +103,7 @@ import Dispatcher from "@/Dispatcher/Dispatcher";
 export default Vue.extend({
     data: () => ({
         items: [],
-        binding: null as Asset.CampaignBindings.Data,
+        binding: new Asset.CampaignBindings.Data(),
     }),
     methods: {
         save() {
@@ -111,10 +111,15 @@ export default Vue.extend({
         }
     },
     mounted() {
-        this.binding = JSON.parse(JSON.stringify(campaignStore.campaignBindings));
-        dcStore.forEach((dc: Asset.DynamicComponent.Data) => {
-            this.items.push(dc);
-        })
+        Object.assign(this.binding, campaignStore.bindings);
+        console.log(this.binding);
+
+
+        // this.binding = JSON.parse(JSON.stringify(campaignStore.campaignBindings));
+        this.items = dcStore.toArray();
+        this.$forceUpdate();
+        console.log("Binding: ", this.binding);
+
     }
 });
 </script>

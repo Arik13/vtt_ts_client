@@ -8,7 +8,7 @@ import { dcStore } from '@/Stores/DynamicComponentStore';
 
 export const dynamicComponentCreated = async (event: EVENT_TYPE.DYNAMIC_COMPONENT_CREATED) => {
     await DB.addDynamicComponent(event.keyValue);
-    directoryStore.attachChild(event.directory);
+    directoryStore.add(event.directory);
     return dcStore.add(event.keyValue.value);
 }
 
@@ -16,7 +16,7 @@ export const dynamicComponentUpdated = async (event: EVENT_TYPE.DYNAMIC_COMPONEN
     console.log(event);
 
     await DB.addDynamicComponent(event.keyValue);
-    const dir = directoryStore.getDirectory(event.directoryID);
+    const dir = directoryStore.get(event.directoryID);
     dir.name = event.keyValue.value.name;
     dcStore.update(event.keyValue.value);
 }

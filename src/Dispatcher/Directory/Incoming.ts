@@ -4,10 +4,10 @@ import * as Dir from "@shared/Directories/Directory";
 import { directoryStore} from '@/Stores/DirectoryStore';
 
 export const directoryCreated = (event: DIRECTORY_EVENT_TYPE.DIRECTORY_CREATED) => {
-    return directoryStore.attachChild(event.directory);
+    return directoryStore.add(event.directory);
 }
 export const directoryUpdated = (event: DIRECTORY_EVENT_TYPE.DIRECTORY_UPDATED) => {
-    directoryStore.getDirectory(event.directoryID).name = event.name;
+    directoryStore.rename(event.directoryID, event.name);
 }
 export const directoryDeleted = (event: DIRECTORY_EVENT_TYPE.DIRECTORY_DELETED) => {
     directoryStore.delete(event.directoryID);

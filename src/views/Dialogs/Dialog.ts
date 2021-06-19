@@ -11,151 +11,87 @@ import {DialogObject} from "./DialogObject";
 import * as Asset from "@shared/Assets/Asset";
 
 type ItemPair = {name: string, id: string};
-export const dialogMap = new Map<string, DialogObject<any>>();
 
-export enum DIALOG_NAME {
-    IMAGE_VIEWER = "imageViewer",
-    CREATE_TOKEN = "createToken",
-    CREATE_LOCATION = "createLocation",
-    LOCATION_VIEWER = "locationViewer",
-    CREATE_DIRECTORY = "createDirectory",
-    UPDATE_DIRECTORY = "updateDirectory",
-    DIALOG_OBJECT = "dialogObject",
-    CREATE_SCRIPT = "createScript",
-    CREATE_COMPONENT = "createComponent",
-    DYNAMIC_COMPONENT = "dynamicComponent",
-}
-
-export interface LocationViewerState {
-    mapImageSrc: string;
+export class LocationViewerState {
+    mapImageSrc: string = "";
     location: Asset.Location.Data;
 }
-
-export interface ImageViewerState {
-    imageSrc: string;
+export class ImageViewerState {
+    imageSrc: string = "";
 }
-export interface CreateDirectoryState {
-    parentID: string;
-    name: string;
+export class CreateDirectoryState {
+    parentID: string = "";
+    name: string = "Directory";
 }
-export interface UpdateDirectoryState {
-    directoryID: string;
-    name: string;
+export class UpdateDirectoryState {
+    directoryID: string = "";
+    name: string = "";
 }
-export interface CreateLocationState {
+export class CreateLocationState {
     location: Asset.Location.Data;
-    imageItems: ItemPair[];
-}
-export interface CreateTokenState {
-    x: number;
-    z: number;
-    width: number;
-    length: number;
-    label: string;
-    imageID: string;
-    soID: string;
-    soItems: ItemPair[];
-}
-export interface CreateScriptState {
-    name: string;
-    type: string;
-}
-export interface CreateComponentState {
-    name: string;
-}
-export interface DynamicComponentState {
-    cds: any;
-}
-
-const blankLocationViewerState = {
-    mapImageSrc: "",
-    location: {
-        name: "",
-        locationModel: {
-            ranks: 0,
-            files: 0,
-            tileWidth: 0,
-            tileLength: 0,
-        },
-        mapImageID: null as string,
-        tokenIDs: [] as string[],
-    } as Asset.Location.Data
-}
-const createDirectoryBlankState = {
-    parentID: "",
-    name: "New Directory",
-}
-const updateDirectoryBlankState = {
-    directoryID: "",
-    name: "",
-}
-const createLocationBlankState = {
-    location: {
-        name: "Location 1",
-        locationModel: {
+    imageItems: ItemPair[] = [];
+    constructor() {
+        this.location = new Asset.Location.Data();
+        this.location.locationModel = {
             files: 40,
             ranks: 40,
             tileLength: 5,
             tileWidth: 5,
-        },
-        mapImageID: "" as string,
-        tokenIDs: [] as string[],
-    } as Asset.Location.Data,
-    imageItems: [] as ItemPair[],
+        }
+        this.location.name = "Location"
+    }
 }
-const createTokenBlankState = {
-    x: 20,
-    z: 20,
-    width: 5,
-    length: 5,
-    label: "test",
-    soID: null as string,
-    imageID: null as string,
-    soItems: [] as ItemPair[],
+export class CreateTokenState {
+    token: Asset.Token.Data;
+    soItems: ItemPair[] = [];
+    constructor() {
+        this.token = {
+            name: "",
+            imageID: "",
+            soID: "",
+            position: {
+                x: 20,
+                y: 20,
+            },
+            dimensions: {
+                width: 5,
+                height: 5,
+            }
+        }
+    }
 }
-const createScriptBlankState = {
-    name: "",
-    type: "Modification",
+export class CreateScriptState {
+    name: string = "";
+    type: "MODIFICATION" | "ACTION" = "MODIFICATION";
 }
-const createComponentBlankState = {
-    name: "",
+export class CreateComponentState {
+    name: string = "";
 }
-const dynamicComponentBlankState = {
-    cds: {},
+export class DynamicComponentState {
+    cds: any = {};
+    action: any = {};
 }
 
-export const dialogs = [
-    {name: DIALOG_NAME.LOCATION_VIEWER, component: LocationViewer, prop: new DialogObject<LocationViewerState>(blankLocationViewerState)},
-    {name: DIALOG_NAME.IMAGE_VIEWER, component: ImageViewer, prop: new DialogObject<ImageViewerState>({imageSrc: ""})},
-    {name: DIALOG_NAME.CREATE_DIRECTORY, component: CreateDirectory, prop: new DialogObject<CreateDirectoryState>(createDirectoryBlankState)},
-    {name: DIALOG_NAME.UPDATE_DIRECTORY, component: UpdateDirectory, prop: new DialogObject<UpdateDirectoryState>(updateDirectoryBlankState)},
-    {name: DIALOG_NAME.CREATE_LOCATION, component: CreateLocation, prop: new DialogObject<CreateLocationState>(createLocationBlankState)},
-    {name: DIALOG_NAME.CREATE_TOKEN, component: CreateToken, prop: new DialogObject<CreateTokenState>(createTokenBlankState)},
-    {name: DIALOG_NAME.CREATE_SCRIPT, component: CreateScript, prop: new DialogObject<CreateScriptState>(createScriptBlankState)},
-    {name: DIALOG_NAME.CREATE_COMPONENT, component: CreateComponent, prop: new DialogObject<CreateComponentState>(createComponentBlankState)},
-    {name: DIALOG_NAME.DYNAMIC_COMPONENT, component: DynamicComponent, prop: new DialogObject<DynamicComponentState>(dynamicComponentBlankState)},
+export const dialogs = {
+    imageViewer:        new DialogObject(new ImageViewerState()),
+    createToken:        new DialogObject(new CreateTokenState()),
+    createLocation:     new DialogObject(new CreateLocationState()),
+    locationViewer:     new DialogObject(new LocationViewerState()),
+    createDirectory:    new DialogObject(new CreateDirectoryState()),
+    updateDirectory:    new DialogObject(new UpdateDirectoryState()),
+    createScript:       new DialogObject(new CreateScriptState()),
+    createComponent:    new DialogObject(new CreateComponentState()),
+    dynamicComponent:   new DialogObject(new DynamicComponentState()),
+}
+
+export const dialogArray = [
+    {component: LocationViewer,      prop: dialogs.locationViewer},
+    {component: ImageViewer,         prop: dialogs.imageViewer},
+    {component: CreateDirectory,     prop: dialogs.createDirectory},
+    {component: UpdateDirectory,     prop: dialogs.updateDirectory},
+    {component: CreateLocation,      prop: dialogs.createLocation},
+    {component: CreateToken,         prop: dialogs.createToken},
+    {component: CreateScript,        prop: dialogs.createScript},
+    {component: CreateComponent,     prop: dialogs.createComponent},
+    {component: DynamicComponent,    prop: dialogs.dynamicComponent},
 ];
-
-
-// createToken: {
-//     on: false,
-//     state: {
-//         x: 20,
-//         z: 20,
-//         width: 5,
-//         length: 5,
-//         label: "test",
-//         imageID: null,
-//     }
-// },
-// createLocation: {
-//     on: false,
-//     state: {
-//         mapImageID: "",
-//         name: "Location 1",
-//         files: 40,
-//         ranks: 40,
-//         tileLength: 5,
-//         tileWidth: 5,
-//     }
-// },

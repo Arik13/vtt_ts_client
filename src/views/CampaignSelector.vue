@@ -66,7 +66,7 @@ import * as Asset from "@shared/Assets/Asset"
 import { directoryStore } from '@/Stores/DirectoryStore';
 import { serverProxy } from '@/Stores/ServerProxy';
 import { userStore } from '@/Stores/UserStore';
-import Vue from "vue"
+import Vue from "@/vue"
 import { campaignStore } from '@/Stores/CampaignStore';
 import { dcStore } from '@/Stores/DynamicComponentStore';
 

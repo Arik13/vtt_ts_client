@@ -57,10 +57,13 @@
 
 import {StripeCheckout} from "@vue-stripe/vue-stripe";
 import "@/Stores/MouseController";
-import Vue from 'vue';
+import Vue from "@/vue";
 import {ROUTE} from "./router/router";
 import DialogManager from "@/views/Dialogs/DialogManager.vue";
 import { CLIENT_EVENT, eventBus } from "./Stores/EventBus";
+
+import * as Mousetrap from "mousetrap";
+import Dispatcher from "@/Dispatcher/Dispatcher";
 
 interface NavItem {
     title: string;
@@ -91,7 +94,7 @@ export default Vue.extend({
                 { title: "Selector", icon: "exit_to_app", route: ROUTE.CAMPAIGN_SELECTOR, show: this.isLoggedIn},
                 // { title: "Selector", icon: "exit_to_app", route: ROUTE.CAMPAIGN_SELECTOR, show: (this.isLoggedIn)},
                 { title: "Campaign", icon: "exit_to_app", route: ROUTE.CAMPAIGN_EDITOR, show: (this.isLoggedIn && this.isCampaignInitialized)},
-                { title: "Forms", icon: "exit_to_app", route: ROUTE.FORM_CREATOR, show: (this.isLoggedIn && this.isCampaignInitialized)},
+                { title: "Components", icon: "exit_to_app", route: ROUTE.COMPONENT_EDITOR, show: (this.isLoggedIn && this.isCampaignInitialized)},
                 { title: "Scripts", icon: "exit_to_app", route: ROUTE.SCRIPT_EDITOR, show: (this.isLoggedIn && this.isCampaignInitialized)},
                 { title: "Binder", icon: "exit_to_app", route: ROUTE.DYNAMIC_VIEW_BINDER, show: (this.isLoggedIn && this.isCampaignInitialized)},
             ];
@@ -106,13 +109,15 @@ export default Vue.extend({
         eventBus.registerHandler(CLIENT_EVENT.CAMPAIGN_DELETED, () => this.isCampaignInitialized = false);
         eventBus.registerHandler(CLIENT_EVENT.LOGGED_IN, () => this.isLoggedIn = true);
         eventBus.registerHandler(CLIENT_EVENT.LOGGED_OUT, () => this.isLoggedIn = false);
-        // setTimeout(() => {
-        //     mouseEventProxy.enableLeftClick();
-        // }, 1000);
 
-        // window.addEventListener('click',(event) => {
-        //     console.log('clicked', event);
-        // });
+        Mousetrap.bind("ctrl+z", () => {
+            console.log("undo");
+            Dispatcher.undo();
+        });
+        Mousetrap.bind("ctrl+shift+z", () => {
+            console.log("redo");
+            Dispatcher.redo();
+        });
     },
 });
 </script>

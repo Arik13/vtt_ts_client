@@ -15,11 +15,11 @@ import { MouseInput } from "@/Babylon/Input/MouseInput";
 import "babylonjs"
 
 export class PlanarCamera extends BABYLON.UniversalCamera {
+    // cameraRotation: BABYLON.Vector2;
+    // minZ: number;
+    // speed: number;
     direction: BABYLON.Vector3;
-    cameraRotation: BABYLON.Vector2;
     angularSpeed: number;
-    minZ: number;
-    speed: number;
     angle: number;
     constructor(
         name: string,
